@@ -10,7 +10,7 @@ import logging
 import os
 import sys
 from modules.fishnet.fishnet import stockfish_command
-from modules.puzzle.puzzle import puzzle
+from modules.puzzle.puzzle import Puzzle
 from modules.bcolors.bcolors import bcolors
 from modules.investigate.investigate import investigate
 
@@ -84,7 +84,7 @@ while True:
         if investigate(prev_score, cur_score, node.board()):
             # Found a possible puzzle
             logging.debug(bcolors.WARNING + "   Investigate!" + bcolors.ENDC)
-            puzzles.append(puzzle(node.board(), next_node.move, str(game_id), engine, info_handler, game, settings.strict))
+            puzzles.append(Puzzle(node.board(), next_node.move, str(game_id), engine, info_handler, game, settings.strict))
     
         prev_score = cur_score
         node = next_node

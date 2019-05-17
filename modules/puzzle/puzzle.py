@@ -1,12 +1,15 @@
-from modules.puzzle.position_list import PositionList
-from modules.bcolors.bcolors import bcolors
+import os
 import json
 import logging
-import os
+
 import chess
 import chess.pgn
 
-class puzzle:
+from modules.puzzle.position_list import PositionList
+from modules.bcolors.bcolors import bcolors
+
+
+class Puzzle(object):
     def __init__(self, last_pos, last_move, game_id, engine, info_handler, game, strict):
         self.last_pos = last_pos.copy()
         self.last_move = last_move
