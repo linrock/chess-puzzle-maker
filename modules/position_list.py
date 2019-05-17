@@ -144,21 +144,23 @@ class PositionList(object):
 
     # Return True if it's unclear whether there's a single best player move
     def ambiguous(self):
-        # If strict == False then it will generate more tactics but  more ambiguous
-        move_number = 1 if self.strict == True else 2
+        # If strict == False then it will generate more tactics but more ambiguous
+        # move_number = 1 if self.strict == True else 2
         if len(self.candidate_moves) > 1:
             best_move_score = self.candidate_moves[0].evaluation.cp
             second_best_move_score = self.candidate_moves[1].evaluation.cp
             if (best_move_score is not None and second_best_move_score is not None):
-                # Unclear if the best move leads to a decisive advantage
                 if best_move_score < 210:
+                    # Unclear if the best move leads to a decisive advantage
                     return True
-                if second_best_move_score > 90:
+                if best_move_score < 1000:
                     # If the best move is decisively better than the 2nd best move
-                    if best_move_score - second_best_move_score > 500:
+                    if best_move_score > 500 and second_best_move_score < 140:
                         return False
-                    else:
-                        return True
+                    elif best_move_score - second_best_move_score > 500:
+                        return False
+                if second_best_move_score > 90:
+                    return True
             if self.candidate_moves[0].evaluation.mate:
                 if self.candidate_moves[1].evaluation.mate:
                     if (self.candidate_moves[0].evaluation.mate > -1 and self.candidate_moves[1].evaluation.mate > -1):
