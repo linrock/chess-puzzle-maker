@@ -17,12 +17,12 @@ from modules.investigate import should_investigate
 
 parser = argparse.ArgumentParser(description=__doc__)
 
-parser.add_argument("threads", metavar="THREADS", nargs="?", type=int, default=4,
+parser.add_argument("threads", metavar="THREADS", nargs="?", type=int, default=2,
                     help="number of engine threads")
 parser.add_argument("memory", metavar="MEMORY", nargs="?", type=int, default=2048,
                     help="memory in MB to use for engine hashtables")
-parser.add_argument("--depth", metavar="DEPTH", nargs="?", type=int, default=15,
-                    help="depth for stockfish analysis")
+parser.add_argument("--depth", metavar="DEPTH", nargs="?", type=int, default=14,
+                    help="stockfish depth for scanning for candidate puzzles")
 parser.add_argument("--quiet", dest="loglevel",
                     default=logging.DEBUG, action="store_const", const=logging.INFO,
                     help="substantially reduce the number of logged messages")
@@ -52,7 +52,6 @@ info_handler = chess.uci.InfoHandler()
 engine.info_handlers.append(info_handler)
 
 all_games = open(settings.games, "r")
-tactics_file = open("tactics.pgn", "w")
 game_id = 0
 
 while True:
@@ -95,13 +94,14 @@ while True:
     for i, puzzle in enumerate(puzzles):
         logging.debug("")
         logging.debug(bcolors.HEADER + ("Considering position %d of %d..." % (i+1, len(puzzles))) + bcolors.ENDC)
-        # use depth 24 to explore puzzle positions
-        puzzle.generate(24)
+        # use depth 22 to explore puzzle positions
+        puzzle.generate(22)
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.to_pgn())
-            logging.debug(bcolors.WARNING + "NEW PUZZLE GENERATED" + bcolors.ENDC)
+            logging.debug(bcolors.HEADER + "NEW PUZZLE GENERATED" + bcolors.ENDC)
             logging.info(bcolors.OKBLUE + puzzle_pgn + bcolors.ENDC)
+            tactics_file = open("tactics.pgn", "a")
             tactics_file.write(puzzle_pgn)
             tactics_file.write("\n\n")
+            tactics_file.close()
 
-tactics_file.close()
