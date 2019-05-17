@@ -42,12 +42,13 @@ class PositionList(object):
         logging.debug(bcolors.OKBLUE + ('Material difference:  %d' % self.material_difference()))
         logging.debug(bcolors.OKBLUE + ("# legal moves:        %d" % len(self.position.legal_moves)) + bcolors.ENDC)
         has_best = self.evaluate_best(depth)
-        if self.player_turn:
-            self.evaluate_legals(depth)
+        if not self.player_turn:
+            self.next_position.generate(depth)
+            return
+        self.evaluate_legals(depth)
         if has_best and not self.ambiguous() and not self.game_over():
             logging.debug(bcolors.OKGREEN + "Going deeper:")
             logging.debug("   Ambiguous: " + str(self.ambiguous()))
-            logging.debug("   Game over: " + str(self.game_over()))
             logging.debug("   Has best move: " + str(has_best) + bcolors.ENDC)
             self.next_position.generate(depth)
         else:
@@ -87,14 +88,15 @@ class PositionList(object):
         self.engine.go(depth=depth)
 
         for i in range(multipv):
-            move = self.engine.info_handlers[0].info["pv"].get(i + 1)[0]
-            score = self.engine.info_handlers[0].info["score"].get(i + 1)
+            info = self.engine.info_handlers[0].info
+            move = info["pv"].get(i + 1)[0]
+            score = info["score"].get(i + 1)
             self.analysed_legals.append(Analysis(move, score))
 
-        for analysis in self.analysed_legals[:3]:
+        for analysis in self.analysed_legals:
             logging.debug(bcolors.OKGREEN + "Move: " + str(analysis.move.uci()) + bcolors.ENDC)
             if analysis.evaluation.mate:
-                logging.debug("   Mate: " + str(analysis.evaluation.mate))
+                logging.debug(bcolors.OKBLUE + "   Mate: " + str(analysis.evaluation.mate))
             else:
                 logging.debug(bcolors.OKBLUE + "   CP: " + str(analysis.evaluation.cp))
         self.engine.setoption({ "MultiPV": 1 })
