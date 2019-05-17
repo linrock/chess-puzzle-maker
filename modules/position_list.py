@@ -18,7 +18,7 @@ class PositionList(object):
         self.best_move = best_move
         self.evaluation = evaluation
         self.next_position = None
-        self.analysed_legals = []
+        self.candidate_moves = []
         self.strict = strict
 
     def move_list(self):
@@ -48,7 +48,7 @@ class PositionList(object):
         if not self.player_turn:
             self.next_position.generate(depth)
             return
-        self.evaluate_legals(depth)
+        self.evaluate_candidate_moves(depth)
         if has_best and not self.ambiguous() and not self.game_over():
             logging.debug(bcolors.OKGREEN + "Going deeper:")
             logging.debug("   Ambiguous: " + str(self.ambiguous()))
@@ -83,7 +83,8 @@ class PositionList(object):
             logging.debug(bcolors.FAIL + "No best move!" + bcolors.ENDC)
             return False
 
-    def evaluate_legals(self, depth):
+    # Analyze the best possible moves from the current position
+    def evaluate_candidate_moves(self, depth):
         multipv = min(3, len(self.position.legal_moves))
         logging.debug(bcolors.OKGREEN + ("Evaluating best %d moves..." % multipv) + bcolors.ENDC)
         self.engine.setoption({ "MultiPV": multipv })
@@ -94,9 +95,9 @@ class PositionList(object):
         for i in range(multipv):
             move = info["pv"].get(i + 1)[0]
             evaluation = info["score"].get(i + 1)
-            self.analysed_legals.append(Analysis(move, evaluation))
+            self.candidate_moves.append(Analysis(move, evaluation))
 
-        for analysis in self.analysed_legals:
+        for analysis in self.candidate_moves:
             logging.debug(bcolors.OKGREEN + "Move: " + str(analysis.move.uci()) + bcolors.ENDC)
             if analysis.evaluation.mate:
                 logging.debug(bcolors.OKBLUE + "   Mate: " + str(analysis.evaluation.mate))
@@ -141,22 +142,30 @@ class PositionList(object):
             else:
                 return False
 
+    # Return True if it's unclear whether there's a single best player move
     def ambiguous(self):
         # If strict == False then it will generate more tactics but  more ambiguous
         move_number = 1 if self.strict == True else 2
-        if len(self.analysed_legals) > 1:
-            if (self.analysed_legals[0].evaluation.cp is not None
-                and self.analysed_legals[1].evaluation.cp is not None):
-                if (self.analysed_legals[0].evaluation.cp < 210
-                    or self.analysed_legals[move_number].evaluation.cp > 90):
+        if len(self.candidate_moves) > 1:
+            best_move_score = self.candidate_moves[0].evaluation.cp
+            second_best_move_score = self.candidate_moves[1].evaluation.cp
+            if (best_move_score is not None and second_best_move_score is not None):
+                # Unclear if the best move leads to a decisive advantage
+                if best_move_score < 210:
                     return True
-            if self.analysed_legals[0].evaluation.mate:
-                if self.analysed_legals[1].evaluation.mate:
-                    if (self.analysed_legals[0].evaluation.mate > -1 and self.analysed_legals[1].evaluation.mate > -1):
+                if second_best_move_score > 90:
+                    # If the best move is decisively better than the 2nd best move
+                    if best_move_score - second_best_move_score > 500:
+                        return False
+                    else:
+                        return True
+            if self.candidate_moves[0].evaluation.mate:
+                if self.candidate_moves[1].evaluation.mate:
+                    if (self.candidate_moves[0].evaluation.mate > -1 and self.candidate_moves[1].evaluation.mate > -1):
                         # More than one possible mate-in-1
                         return True
-                elif self.analysed_legals[1].evaluation.cp is not None:
-                    if self.analysed_legals[1].evaluation.cp > 200:
+                elif self.candidate_moves[1].evaluation.cp is not None:
+                    if self.candidate_moves[1].evaluation.cp > 200:
                         return True
         return False
 
