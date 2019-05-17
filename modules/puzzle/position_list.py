@@ -1,10 +1,12 @@
 import logging
 import os
+from collections import namedtuple
 
 import chess
 
 from modules.bcolors import bcolors
-from modules.puzzle.analysed import Analysis
+
+Analysis = namedtuple("Analysis", ["move", "evaluation"])
 
 class PositionList(object):
     def __init__(self, position, engine, info_handler, player_turn=True, best_move=None, evaluation=None, strict = True):
@@ -90,8 +92,8 @@ class PositionList(object):
         info = self.engine.info_handlers[0].info
         for i in range(multipv):
             move = info["pv"].get(i + 1)[0]
-            score = info["score"].get(i + 1)
-            self.analysed_legals.append(Analysis(move, score))
+            evaluation = info["score"].get(i + 1)
+            self.analysed_legals.append(Analysis(move, evaluation))
 
         for analysis in self.analysed_legals:
             logging.debug(bcolors.OKGREEN + "Move: " + str(analysis.move.uci()) + bcolors.ENDC)
