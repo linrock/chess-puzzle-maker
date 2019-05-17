@@ -46,8 +46,7 @@ except ImportError:
 
 logging.basicConfig(format="%(message)s", level=settings.loglevel, stream=sys.stdout)
 logging.getLogger("requests.packages.urllib3").setLevel(logging.WARNING)
-logging.getLogger("chess.engine").setLevel(logging.WARNING)
-logging.getLogger("chess.uci").setLevel(logging.WARNING)
+logging.getLogger("chess").setLevel(logging.WARNING)
 
 engine = chess.uci.popen_engine(stockfish_command())
 engine.setoption({'Threads': settings.threads, 'Hash': settings.memory})
