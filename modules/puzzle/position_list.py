@@ -38,6 +38,7 @@ class position_list:
 
     def generate(self, depth):
         logging.debug(bcolors.WARNING + str(self.position) + bcolors.ENDC)
+        logging.debug(bcolors.WARNING + self.position.fen() + bcolors.ENDC)
         logging.debug(bcolors.OKBLUE + 'Material Value: ' + str(self.material_difference()) + bcolors.ENDC)
         has_best = self.evaluate_best(depth)
         if self.player_turn:
