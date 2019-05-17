@@ -5,6 +5,7 @@ from collections import namedtuple
 import chess
 
 from modules.bcolors import bcolors
+from modules.utils import material_difference
 
 Analysis = namedtuple("Analysis", ["move", "evaluation"])
 
@@ -104,7 +105,7 @@ class PositionList(object):
         self.engine.setoption({ "MultiPV": 1 })
 
     def material_difference(self):
-        return sum(v * (len(self.position.pieces(pt, True)) - len(self.position.pieces(pt, False))) for v, pt in zip([0,3,3,5.5,9], chess.PIECE_TYPES))
+        return material_difference(self.position)
 
     def material_count(self):
         return chess.pop_count(self.position.occupied)

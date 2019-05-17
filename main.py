@@ -13,7 +13,7 @@ import sys
 from modules.bcolors import bcolors
 from modules.fishnet import stockfish_command
 from modules.puzzle import Puzzle
-from modules.investigate import should_investigate
+from modules.utils import should_investigate
 
 parser = argparse.ArgumentParser(description=__doc__)
 
