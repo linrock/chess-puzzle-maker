@@ -13,7 +13,6 @@ from modules.fishnet.fishnet import stockfish_command
 from modules.puzzle.puzzle import puzzle
 from modules.bcolors.bcolors import bcolors
 from modules.investigate.investigate import investigate
-from modules.api.api import post_puzzle
 
 parser = argparse.ArgumentParser(description=__doc__)
 
@@ -94,7 +93,9 @@ while True:
         logging.debug(bcolors.WARNING + "Generating new puzzle..." + bcolors.ENDC)
         puzzle.generate(settings.depth)
         if puzzle.is_complete():
-            puzzle_pgn = post_puzzle(puzzle)
+            puzzle_pgn = str(puzzle.to_pgn())
+            logging.debug(bcolors.WARNING + "NEW PUZZLE GENERATED" + bcolors.ENDC)
+            logging.info(bcolors.OKBLUE + puzzle_pgn + bcolors.ENDC)
             tactics_file.write(puzzle_pgn)
             tactics_file.write("\n\n")
 
