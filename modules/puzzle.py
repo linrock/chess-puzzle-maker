@@ -5,7 +5,7 @@ import logging
 import chess
 import chess.pgn
 
-from modules.puzzle.position_list import PositionList
+from modules.position_list import PositionList
 from modules.bcolors import bcolors
 
 
