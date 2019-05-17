@@ -29,6 +29,8 @@ parser.add_argument("--quiet", dest="loglevel",
                     help="substantially reduce the number of logged messages")
 parser.add_argument("--games", metavar="GAMES", default="games.pgn",
                     help="A specific pgn with games")
+parser.add_argument("--output", metavar="OUTPUT_PGN", default="tactics.out.pgn",
+                    help="An output pgn file")
 parser.add_argument("--strict", metavar="STRICT", default=True,
                     help="If False then it will be generate more tactics but maybe a little ambiguous")
 settings = parser.parse_args()
@@ -101,7 +103,7 @@ while True:
             puzzle_pgn = str(puzzle.to_pgn())
             logging.debug(bcolors.HEADER + "NEW PUZZLE GENERATED" + bcolors.ENDC)
             logging.info(bcolors.OKBLUE + puzzle_pgn + bcolors.ENDC)
-            tactics_file = open("tactics.pgn", "a")
+            tactics_file = open(settings.output, "a")
             tactics_file.write(puzzle_pgn)
             tactics_file.write("\n\n")
             tactics_file.close()

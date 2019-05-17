@@ -43,7 +43,7 @@ class PositionList(object):
         logging.debug(bcolors.WARNING + str(self.position) + bcolors.ENDC)
         logging.debug(bcolors.WARNING + self.position.fen() + bcolors.ENDC)
         logging.debug(bcolors.OKBLUE + ('Material difference:  %d' % self.material_difference()))
-        logging.debug(bcolors.OKBLUE + ("# legal moves:        %d" % len(self.position.legal_moves)) + bcolors.ENDC)
+        logging.debug(bcolors.OKBLUE + ("# legal moves:        %d" % self.position.legal_moves.count()) + bcolors.ENDC)
         has_best = self.evaluate_best(depth)
         if not self.player_turn:
             self.next_position.generate(depth)
@@ -85,7 +85,7 @@ class PositionList(object):
 
     # Analyze the best possible moves from the current position
     def evaluate_candidate_moves(self, depth):
-        multipv = min(3, len(self.position.legal_moves))
+        multipv = min(3, self.position.legal_moves.count())
         logging.debug(bcolors.OKGREEN + ("Evaluating best %d moves..." % multipv) + bcolors.ENDC)
         self.engine.setoption({ "MultiPV": multipv })
         self.engine.position(self.position)
@@ -109,7 +109,7 @@ class PositionList(object):
         return material_difference(self.position)
 
     def material_count(self):
-        return chess.pop_count(self.position.occupied)
+        return chess.popcount(self.position.occupied)
 
     def is_complete(self, category, color, first_node, first_val):
         if self.next_position is not None:
