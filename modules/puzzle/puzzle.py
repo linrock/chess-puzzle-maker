@@ -22,7 +22,7 @@ class puzzle:
             'last_pos': self.last_pos.fen(),
             'last_move': self.last_move.uci(),
             'move_list': self.position_list.move_list()
-            }
+        }
 
     def to_pgn(self):
         fen = self.last_pos.fen()

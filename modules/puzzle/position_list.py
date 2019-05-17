@@ -39,7 +39,8 @@ class PositionList(object):
     def generate(self, depth):
         logging.debug(bcolors.WARNING + str(self.position) + bcolors.ENDC)
         logging.debug(bcolors.WARNING + self.position.fen() + bcolors.ENDC)
-        logging.debug(bcolors.OKBLUE + 'Material difference: ' + str(self.material_difference()) + bcolors.ENDC)
+        logging.debug(bcolors.OKBLUE + ('Material difference:  %d' % self.material_difference()))
+        logging.debug(bcolors.OKBLUE + ("# legal moves:        %d" % len(self.position.legal_moves)) + bcolors.ENDC)
         has_best = self.evaluate_best(depth)
         if self.player_turn:
             self.evaluate_legals(depth)
@@ -56,7 +57,7 @@ class PositionList(object):
             logging.debug("   Has best move: " + str(has_best) + bcolors.ENDC)
 
     def evaluate_best(self, depth):
-        logging.debug(bcolors.OKGREEN + "Evaluating Best Move...")
+        logging.debug(bcolors.OKGREEN + "Evaluating best move...")
         self.engine.position(self.position)
         self.best_move = self.engine.go(depth=depth)
         if self.best_move.bestmove is not None:
@@ -68,9 +69,11 @@ class PositionList(object):
                 strict = self.strict
             )
             self.next_position.position.push(self.best_move.bestmove)
-            logging.debug("Best Move: " + self.best_move.bestmove.uci() + bcolors.ENDC)
-            logging.debug(bcolors.OKBLUE + "   CP: " + str(self.evaluation.cp))
-            logging.debug("   Mate: " + str(self.evaluation.mate) + bcolors.ENDC)
+            logging.debug(bcolors.OKGREEN + "Best move: " + self.best_move.bestmove.uci() + bcolors.ENDC)
+            if self.evaluation.mate:
+                logging.debug(bcolors.OKBLUE + "   Mate: " + str(self.evaluation.mate) + bcolors.ENDC)
+            else:
+                logging.debug(bcolors.OKBLUE + "   CP: " + str(self.evaluation.cp))
             return True
         else:
             logging.debug(bcolors.FAIL + "No best move!" + bcolors.ENDC)
@@ -78,7 +81,7 @@ class PositionList(object):
 
     def evaluate_legals(self, depth):
         multipv = 3
-        logging.debug(bcolors.OKGREEN + "Evaluating best 3 moves..." + bcolors.ENDC)
+        logging.debug(bcolors.OKGREEN + ("Evaluating best %d moves..." % multipv) + bcolors.ENDC)
         self.engine.setoption({ "MultiPV": multipv })
         self.engine.position(self.position)
         self.engine.go(depth=depth)
@@ -94,7 +97,7 @@ class PositionList(object):
                 logging.debug("   Mate: " + str(analysis.evaluation.mate))
             else:
                 logging.debug(bcolors.OKBLUE + "   CP: " + str(analysis.evaluation.cp))
-        logging.debug("... and " + str(max(0, len(self.analysed_legals) - 3)) + " more moves" + bcolors.ENDC)
+        self.engine.setoption({ "MultiPV": 1 })
 
     def material_difference(self):
         return sum(v * (len(self.position.pieces(pt, True)) - len(self.position.pieces(pt, False))) for v, pt in zip([0,3,3,5.5,9], chess.PIECE_TYPES))
