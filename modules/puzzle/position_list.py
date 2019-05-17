@@ -6,7 +6,7 @@ from modules.bcolors.bcolors import bcolors
 from modules.puzzle.analysed import analysed
 from operator import methodcaller
 
-class position_list:
+class PositionList(object):
     def __init__(self, position, engine, info_handler, player_turn=True, best_move=None, evaluation=None, strict = True):
         self.position = position.copy()
         self.engine = engine
@@ -61,7 +61,7 @@ class position_list:
         self.best_move = self.engine.go(depth=depth)
         if self.best_move.bestmove is not None:
             self.evaluation = self.info_handler.info["score"][1]
-            self.next_position = position_list(self.position.copy(),
+            self.next_position = PositionList(self.position.copy(),
                 self.engine,
                 self.info_handler,
                 not self.player_turn,
