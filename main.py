@@ -20,7 +20,7 @@ parser.add_argument("threads", metavar="THREADS", nargs="?", type=int, default=4
                     help="number of engine threads")
 parser.add_argument("memory", metavar="MEMORY", nargs="?", type=int, default=2048,
                     help="memory in MB to use for engine hashtables")
-parser.add_argument("--depth", metavar="DEPTH", nargs="?", type=int, default=14,
+parser.add_argument("--depth", metavar="DEPTH", nargs="?", type=int, default=15,
                     help="depth for stockfish analysis")
 parser.add_argument("--quiet", dest="loglevel",
                     default=logging.DEBUG, action="store_const", const=logging.INFO,
@@ -82,15 +82,17 @@ while True:
         else:
             logging.debug(bcolors.OKBLUE + "   CP: " + str(cur_score.cp) + bcolors.ENDC)
         if investigate(prev_score, cur_score, node.board()):
+            # Found a possible puzzle
             logging.debug(bcolors.WARNING + "   Investigate!" + bcolors.ENDC)
             puzzles.append(puzzle(node.board(), next_node.move, str(game_id), engine, info_handler, game, settings.strict))
     
         prev_score = cur_score
         node = next_node
 
-    logging.debug(bcolors.WARNING + "# puzzles to consider = " + str(len(puzzles)))
-    for puzzle in puzzles:
-        logging.debug(bcolors.WARNING + "Generating new puzzle..." + bcolors.ENDC)
+    logging.debug(bcolors.WARNING + "# positions to consider as puzzles = " + str(len(puzzles)))
+    for i, puzzle in enumerate(puzzles):
+        logging.debug("")
+        logging.debug(bcolors.OKGREEN + ("Considering position %d of %d..." % (i+1, len(puzzles))) + bcolors.ENDC)
         puzzle.generate(settings.depth)
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.to_pgn())

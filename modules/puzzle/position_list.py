@@ -39,21 +39,21 @@ class position_list:
     def generate(self, depth):
         logging.debug(bcolors.WARNING + str(self.position) + bcolors.ENDC)
         logging.debug(bcolors.WARNING + self.position.fen() + bcolors.ENDC)
-        logging.debug(bcolors.OKBLUE + 'Material Value: ' + str(self.material_difference()) + bcolors.ENDC)
+        logging.debug(bcolors.OKBLUE + 'Material difference: ' + str(self.material_difference()) + bcolors.ENDC)
         has_best = self.evaluate_best(depth)
         if self.player_turn:
             self.evaluate_legals(depth)
         if has_best and not self.ambiguous() and not self.game_over():
-            logging.debug(bcolors.OKGREEN + "Going Deeper:")
+            logging.debug(bcolors.OKGREEN + "Going deeper:")
             logging.debug("   Ambiguous: " + str(self.ambiguous()))
-            logging.debug("   Game Over: " + str(self.game_over()))
-            logging.debug("   Has Best Move: " + str(has_best) + bcolors.ENDC)
+            logging.debug("   Game over: " + str(self.game_over()))
+            logging.debug("   Has best move: " + str(has_best) + bcolors.ENDC)
             self.next_position.generate(depth)
         else:
-            logging.debug(bcolors.WARNING + "Not Going Deeper:")
+            logging.debug(bcolors.WARNING + "Not going deeper:")
             logging.debug("   Ambiguous: " + str(self.ambiguous()))
-            logging.debug("   Game Over: " + str(self.game_over()))
-            logging.debug("   Has Best Move: " + str(has_best) + bcolors.ENDC)
+            logging.debug("   Game over: " + str(self.game_over()))
+            logging.debug("   Has best move: " + str(has_best) + bcolors.ENDC)
 
     def evaluate_best(self, depth):
         logging.debug(bcolors.OKGREEN + "Evaluating Best Move...")
@@ -65,7 +65,8 @@ class position_list:
                 self.engine,
                 self.info_handler,
                 not self.player_turn,
-                strict = self.strict)
+                strict = self.strict
+            )
             self.next_position.position.push(self.best_move.bestmove)
             logging.debug("Best Move: " + self.best_move.bestmove.uci() + bcolors.ENDC)
             logging.debug(bcolors.OKBLUE + "   CP: " + str(self.evaluation.cp))
@@ -86,8 +87,10 @@ class position_list:
         self.analysed_legals = sorted(self.analysed_legals, key=methodcaller('sort_val'))
         for i in self.analysed_legals[:3]:
             logging.debug(bcolors.OKGREEN + "Move: " + str(i.move.uci()) + bcolors.ENDC)
-            logging.debug(bcolors.OKBLUE + "   CP: " + str(i.evaluation.cp))
-            logging.debug("   Mate: " + str(i.evaluation.mate))
+            if i.evaluation.mate:
+                logging.debug("   Mate: " + str(i.evaluation.mate))
+            else:
+                logging.debug(bcolors.OKBLUE + "   CP: " + str(i.evaluation.cp))
         logging.debug("... and " + str(max(0, len(self.analysed_legals) - 3)) + " more moves" + bcolors.ENDC)
 
     def material_difference(self):
@@ -136,15 +139,14 @@ class position_list:
                 if (self.analysed_legals[0].evaluation.cp > -210
                     or self.analysed_legals[move_number].evaluation.cp < -90):
                     return True
-            if (self.analysed_legals[0].evaluation.mate is not None
-                and self.analysed_legals[1].evaluation.mate is not None):
-                if (self.analysed_legals[0].evaluation.mate < 1
-                    and self.analysed_legals[1].evaluation.mate < 1):
-                    return True
-            if (self.analysed_legals[0].evaluation.mate is not None
-                and self.analysed_legals[1].evaluation.cp is not None):
-                if (self.analysed_legals[1].evaluation.cp < -200):
-                    return True
+            if self.analysed_legals[0].evaluation.mate:
+                if self.analysed_legals[1].evaluation.mate:
+                    if (self.analysed_legals[0].evaluation.mate < 1 and self.analysed_legals[1].evaluation.mate < 1):
+                        # More than one possible mate-in-1
+                        return True
+                elif self.analysed_legals[1].evaluation.cp is not None:
+                    if self.analysed_legals[1].evaluation.cp < -200:
+                        return True
         return False
 
     def game_over(self):
