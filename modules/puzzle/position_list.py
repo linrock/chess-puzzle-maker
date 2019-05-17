@@ -81,14 +81,14 @@ class PositionList(object):
             return False
 
     def evaluate_legals(self, depth):
-        multipv = 3
+        multipv = min(3, len(self.position.legal_moves))
         logging.debug(bcolors.OKGREEN + ("Evaluating best %d moves..." % multipv) + bcolors.ENDC)
         self.engine.setoption({ "MultiPV": multipv })
         self.engine.position(self.position)
         self.engine.go(depth=depth)
 
+        info = self.engine.info_handlers[0].info
         for i in range(multipv):
-            info = self.engine.info_handlers[0].info
             move = info["pv"].get(i + 1)[0]
             score = info["score"].get(i + 1)
             self.analysed_legals.append(Analysis(move, score))
