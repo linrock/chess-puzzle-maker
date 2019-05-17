@@ -77,21 +77,23 @@ class PositionList(object):
             return False
 
     def evaluate_legals(self, depth):
-        logging.debug(bcolors.OKGREEN + "Evaluating Legal Moves..." + bcolors.ENDC)
-        for move in self.position.legal_moves:
-            position_copy = self.position.copy()
-            position_copy.push(move)
-            self.engine.position(position_copy)
-            self.engine.go(depth=depth)
-            analysis = Analysis(move, self.info_handler.info["score"][1])
-            self.analysed_legals.append(analysis)
-        self.analysed_legals = sorted(self.analysed_legals, key=methodcaller('sort_val'))
-        for i in self.analysed_legals[:3]:
-            logging.debug(bcolors.OKGREEN + "Move: " + str(i.move.uci()) + bcolors.ENDC)
-            if i.evaluation.mate:
-                logging.debug("   Mate: " + str(i.evaluation.mate))
+        multipv = 3
+        logging.debug(bcolors.OKGREEN + "Evaluating best 3 moves..." + bcolors.ENDC)
+        self.engine.setoption({ "MultiPV": multipv })
+        self.engine.position(self.position)
+        self.engine.go(depth=depth)
+
+        for i in range(multipv):
+            move = self.engine.info_handlers[0].info["pv"].get(i + 1)[0]
+            score = self.engine.info_handlers[0].info["score"].get(i + 1)
+            self.analysed_legals.append(Analysis(move, score))
+
+        for analysis in self.analysed_legals[:3]:
+            logging.debug(bcolors.OKGREEN + "Move: " + str(analysis.move.uci()) + bcolors.ENDC)
+            if analysis.evaluation.mate:
+                logging.debug("   Mate: " + str(analysis.evaluation.mate))
             else:
-                logging.debug(bcolors.OKBLUE + "   CP: " + str(i.evaluation.cp))
+                logging.debug(bcolors.OKBLUE + "   CP: " + str(analysis.evaluation.cp))
         logging.debug("... and " + str(max(0, len(self.analysed_legals) - 3)) + " more moves" + bcolors.ENDC)
 
     def material_difference(self):
@@ -137,16 +139,16 @@ class PositionList(object):
         if len(self.analysed_legals) > 1:
             if (self.analysed_legals[0].evaluation.cp is not None
                 and self.analysed_legals[1].evaluation.cp is not None):
-                if (self.analysed_legals[0].evaluation.cp > -210
-                    or self.analysed_legals[move_number].evaluation.cp < -90):
+                if (self.analysed_legals[0].evaluation.cp < 210
+                    or self.analysed_legals[move_number].evaluation.cp > 90):
                     return True
             if self.analysed_legals[0].evaluation.mate:
                 if self.analysed_legals[1].evaluation.mate:
-                    if (self.analysed_legals[0].evaluation.mate < 1 and self.analysed_legals[1].evaluation.mate < 1):
+                    if (self.analysed_legals[0].evaluation.mate > -1 and self.analysed_legals[1].evaluation.mate > -1):
                         # More than one possible mate-in-1
                         return True
                 elif self.analysed_legals[1].evaluation.cp is not None:
-                    if self.analysed_legals[1].evaluation.cp < -200:
+                    if self.analysed_legals[1].evaluation.cp > 200:
                         return True
         return False
 
