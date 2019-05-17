@@ -2,16 +2,16 @@
 
 """Downloading chess puzzles for lichess.org"""
 
-import argparse
-import chess
-import chess.pgn
-import logging
 import os
 import sys
-import requests
-import chess
 import re
 import time
+import argparse
+import logging
+
+import chess
+import chess.pgn
+import requests
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--token", metavar="TOKEN",default="",

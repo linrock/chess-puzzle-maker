@@ -3,12 +3,13 @@
 """Creating chess puzzles for lichess.org"""
 
 import argparse
-import chess
-import chess.uci
-import chess.pgn
 import logging
 import os
 import sys
+
+import chess
+import chess.uci
+import chess.pgn
 
 from modules.bcolors import bcolors
 from modules.fishnet import stockfish_command
