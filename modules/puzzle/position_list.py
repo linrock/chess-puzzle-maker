@@ -1,10 +1,10 @@
-import chess
-import chess.uci
 import logging
 import os
-from modules.bcolors.bcolors import bcolors
+
+import chess
+
+from modules.bcolors import bcolors
 from modules.puzzle.analysed import Analysis
-from operator import methodcaller
 
 class PositionList(object):
     def __init__(self, position, engine, info_handler, player_turn=True, best_move=None, evaluation=None, strict = True):

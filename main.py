@@ -9,10 +9,11 @@ import chess.pgn
 import logging
 import os
 import sys
-from modules.fishnet.fishnet import stockfish_command
+
+from modules.bcolors import bcolors
+from modules.fishnet import stockfish_command
 from modules.puzzle.puzzle import Puzzle
-from modules.bcolors.bcolors import bcolors
-from modules.investigate.investigate import should_investigate
+from modules.investigate import should_investigate
 
 parser = argparse.ArgumentParser(description=__doc__)
 
