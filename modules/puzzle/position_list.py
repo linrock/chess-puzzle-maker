@@ -3,7 +3,7 @@ import chess.uci
 import logging
 import os
 from modules.bcolors.bcolors import bcolors
-from modules.puzzle.analysed import analysed
+from modules.puzzle.analysed import Analysis
 from operator import methodcaller
 
 class PositionList(object):
@@ -78,12 +78,13 @@ class PositionList(object):
 
     def evaluate_legals(self, depth):
         logging.debug(bcolors.OKGREEN + "Evaluating Legal Moves..." + bcolors.ENDC)
-        for i in self.position.legal_moves:
+        for move in self.position.legal_moves:
             position_copy = self.position.copy()
-            position_copy.push(i)
+            position_copy.push(move)
             self.engine.position(position_copy)
             self.engine.go(depth=depth)
-            self.analysed_legals.append(analysed(i, self.info_handler.info["score"][1]))
+            analysis = Analysis(move, self.info_handler.info["score"][1])
+            self.analysed_legals.append(analysis)
         self.analysed_legals = sorted(self.analysed_legals, key=methodcaller('sort_val'))
         for i in self.analysed_legals[:3]:
             logging.debug(bcolors.OKGREEN + "Move: " + str(i.move.uci()) + bcolors.ENDC)

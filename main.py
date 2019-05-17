@@ -93,7 +93,7 @@ while True:
     for i, puzzle in enumerate(puzzles):
         logging.debug("")
         logging.debug(bcolors.OKGREEN + ("Considering position %d of %d..." % (i+1, len(puzzles))) + bcolors.ENDC)
-        puzzle.generate(settings.depth)
+        puzzle.generate(20)
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.to_pgn())
             logging.debug(bcolors.WARNING + "NEW PUZZLE GENERATED" + bcolors.ENDC)
