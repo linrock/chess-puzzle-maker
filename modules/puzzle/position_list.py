@@ -93,7 +93,7 @@ class position_list:
         return sum(v * (len(self.position.pieces(pt, True)) - len(self.position.pieces(pt, False))) for v, pt in zip([0,3,3,5.5,9], chess.PIECE_TYPES))
 
     def material_count(self):
-        return chess.popcount(self.position.occupied)
+        return chess.pop_count(self.position.occupied)
 
     def is_complete(self, category, color, first_node, first_val):
         if self.next_position is not None:
