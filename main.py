@@ -12,7 +12,7 @@ import sys
 from modules.fishnet.fishnet import stockfish_command
 from modules.puzzle.puzzle import Puzzle
 from modules.bcolors.bcolors import bcolors
-from modules.investigate.investigate import investigate
+from modules.investigate.investigate import should_investigate
 
 parser = argparse.ArgumentParser(description=__doc__)
 
@@ -53,6 +53,7 @@ engine.info_handlers.append(info_handler)
 all_games = open(settings.games, "r")
 tactics_file = open("tactics.pgn", "w")
 game_id = 0
+
 while True:
     game = chess.pgn.read_game(all_games)
     if game == None:
@@ -81,7 +82,7 @@ while True:
             logging.debug(bcolors.OKBLUE + "   Mate: " + str(cur_score.mate) + bcolors.ENDC)
         else:
             logging.debug(bcolors.OKBLUE + "   CP: " + str(cur_score.cp) + bcolors.ENDC)
-        if investigate(prev_score, cur_score, node.board()):
+        if should_investigate(prev_score, cur_score, node.board()):
             # Found a possible puzzle
             logging.debug(bcolors.WARNING + "   Investigate!" + bcolors.ENDC)
             puzzles.append(Puzzle(node.board(), next_node.move, str(game_id), engine, info_handler, game, settings.strict))

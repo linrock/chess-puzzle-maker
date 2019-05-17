@@ -14,7 +14,7 @@ def material_value(board):
 def material_count(board):
     return chess.pop_count(board.occupied)
 
-def investigate(a, b, board):
+def should_investigate(a, b, board):
     # determine if the difference between position A and B 
     # is worth investigating for a puzzle.
     if a.cp is not None and b.cp is not None:
