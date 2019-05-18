@@ -62,12 +62,15 @@ class PositionListNode(object):
             logging.debug(bcolors.GREEN + "Going deeper...")
             self.next_position.generate(depth)
         else:
-            logging.debug(bcolors.WARNING + "Not going deeper:")
-            logging.debug("   Ambiguous: " + str(self.ambiguous()))
-            logging.debug("   Game over: " + str(self.game_over()))
+            log_str = "Not going deeper: "
+            if self.ambiguous():
+                log_str += "ambiguous"
+            elif self.game_over():
+                log_str += "game over"
+            logging.debug(bcolors.WARNING + log_str + bcolors.ENDC)
 
     def evaluate_best(self, depth):
-        logging.debug(bcolors.GREEN + "Evaluating best move...")
+        logging.debug(bcolors.DIM + "Evaluating best move..." + bcolors.ENDC)
         engine.position(self.position)
         self.best_move = engine.go(depth=depth)
         if self.best_move.bestmove is not None:
@@ -81,12 +84,13 @@ class PositionListNode(object):
             self.next_position.position.push(self.best_move.bestmove)
             move = self.best_move.bestmove
             move_san = self.position.san(move)
-            log_str = "%s%s (%s)" % (fullmove_string(self.position), move_san, move.uci())
-            logging.debug(bcolors.GREEN + log_str)
+            log_str = bcolors.GREEN
+            log_str += ("%s%s (%s)" % (fullmove_string(self.position), move_san, move.uci())).ljust(22)
             if self.evaluation.mate:
-                logging.debug(bcolors.BLUE + "   Mate: " + str(self.evaluation.mate) + bcolors.ENDC)
+                log_str += bcolors.BLUE + "   Mate: " + str(self.evaluation.mate)
             else:
-                logging.debug(bcolors.BLUE + "   CP: " + str(self.evaluation.cp))
+                log_str += bcolors.BLUE + "   CP: " + str(self.evaluation.cp)
+            logging.debug(log_str + bcolors.ENDC)
             return True
         else:
             logging.debug(bcolors.FAIL + "No best move!" + bcolors.ENDC)
@@ -97,7 +101,7 @@ class PositionListNode(object):
         multipv = min(3, self.position.legal_moves.count())
         if multipv == 0:
             return
-        logging.debug(bcolors.GREEN + ("Evaluating best %d moves..." % multipv) + bcolors.ENDC)
+        logging.debug(bcolors.DIM + ("Evaluating best %d moves..." % multipv) + bcolors.ENDC)
         engine.setoption({ "MultiPV": multipv })
         engine.position(self.position)
         engine.go(depth=depth)
@@ -108,12 +112,13 @@ class PositionListNode(object):
             move_san = self.position.san(move)
             evaluation = info["score"].get(i + 1)
             analysis = Analysis(move_uci, move_san, evaluation)
-            log_str = "%s%s (%s)" % (fullmove_string(self.position), move_san, move_uci)
-            logging.debug(bcolors.GREEN + log_str)
+            log_str = bcolors.GREEN
+            log_str += ("%s%s (%s)" % (fullmove_string(self.position), move_san, move_uci)).ljust(22)
             if evaluation.mate:
-                logging.debug(bcolors.BLUE + "   Mate: " + str(evaluation.mate))
+                log_str += bcolors.BLUE + "   Mate: " + str(evaluation.mate)
             else:
-                logging.debug(bcolors.BLUE + "   CP: " + str(evaluation.cp))
+                log_str += bcolors.BLUE + "   CP: " + str(evaluation.cp)
+            logging.debug(log_str + bcolors.ENDC)
             self.candidate_moves.append(analysis)
         engine.setoption({ "MultiPV": 1 })
 

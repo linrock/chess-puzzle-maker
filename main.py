@@ -71,15 +71,15 @@ while True:
     node = game
 
     game_id = game_id + 1 
-    logging.debug(bcolors.HEADER + "Game ID: " + str(game_id) + bcolors.ENDC)
+    logging.debug(bcolors.HEADER + "\nGame ID: " + str(game_id) + bcolors.ENDC)
     logging.debug(bcolors.WARNING + str(game)  + bcolors.ENDC)
     
     prev_score = chess.uci.Score(0, None)
     puzzles = []
     
-    logging.debug(bcolors.GREEN + "Game length: " + str(game.end().board().fullmove_number))
+    logging.debug(bcolors.BLUE + "Game length: " + str(game.end().board().fullmove_number) + bcolors.ENDC)
     logging.debug(
-        bcolors.BLUE +
+        bcolors.DIM +
         ("Scanning game for puzzles (depth: %d)..." % settings.depth) +
         bcolors.ENDC
     )
