@@ -14,7 +14,7 @@ import chess.pgn
 from modules.bcolors import bcolors
 from modules.fishnet import stockfish_command
 from modules.puzzle import Puzzle
-from modules.utils import fullmove_string, should_investigate
+from modules.utils import fullmove_string, normalize_score, should_investigate
 
 parser = argparse.ArgumentParser(description=__doc__)
 
@@ -33,6 +33,8 @@ parser.add_argument("--output", metavar="OUTPUT_PGN", default="tactics.out.pgn",
                     help="An output pgn file")
 parser.add_argument("--strict", metavar="STRICT", default=True,
                     help="If False then it will be generate more tactics but maybe a little ambiguous")
+parser.add_argument("--scan-only", default=False, action="store_true",
+                    help="Only scan for possible puzzles. Don't analyze positions")
 settings = parser.parse_args()
 try:
     # Optionally fix colors on Windows and in journals if the colorama module
@@ -82,9 +84,11 @@ while True:
     # Scan through the game, looking for possible puzzles
     while not node.is_end():
         next_node = node.variation(0)
-        engine.position(next_node.board())
+        next_board = next_node.board()
+        engine.position(next_board)
         engine.go(depth=settings.depth)
-        cur_score = info_handler.info["score"][1]
+        cur_score = normalize_score(next_board, info_handler.info["score"][1])
+        # import pdb; pdb.set_trace()
         board = node.board()
         log_str = bcolors.OKGREEN + ("%s %s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
         if cur_score.mate:
@@ -110,6 +114,8 @@ while True:
         node = next_node
 
     logging.debug(bcolors.WARNING + "# positions to consider as puzzles = " + str(len(puzzles)))
+    if settings.scan_only:
+        continue
     for i, puzzle in enumerate(puzzles):
         logging.debug("")
         logging.debug(bcolors.HEADER + ("Considering position %d of %d..." % (i+1, len(puzzles))) + bcolors.ENDC)
