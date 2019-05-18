@@ -155,7 +155,7 @@ class PositionListNode(object):
     def ambiguous(self):
         """ True if it's unclear whether there's a single best player move
         """
-        return ambiguous(self.candidate_moves)
+        return ambiguous([move.evaluation for move in self.candidate_moves])
 
     def game_over(self):
         return self.position.is_game_over() or self.next_position.position.is_game_over()

@@ -1,16 +1,16 @@
-def ambiguous(moves):
+def ambiguous(scores):
     """
-    Looks at a list of candidate moves (sorted by score) to determine
+    Looks at a list of candidate scores (best move first) to determine
     if there's a single best player move
 
-    Returns True if a clear best move can't be determined
+    Returns True if a clear best move can't be determined based on these scores
     """
-    if len(moves) <= 1:
+    if len(scores) <= 1:
         return False
     # If strict == False then it will generate more tactics but more ambiguous
     # move_number = 1 if self.strict == True else 2
-    best_move_score = moves[0].evaluation.cp
-    second_best_move_score = moves[1].evaluation.cp
+    best_move_score = scores[0].cp
+    second_best_move_score = scores[1].cp
     if (best_move_score is not None and second_best_move_score is not None):
         if best_move_score < 210:
             # Unclear if the best move leads to a decisive advantage
@@ -23,13 +23,13 @@ def ambiguous(moves):
                 return False
         if second_best_move_score > 90:
             return True
-    if moves[0].evaluation.mate:
-        if moves[1].evaluation.mate:
-            if (moves[0].evaluation.mate > -1 and moves[1].evaluation.mate > -1):
+    if scores[0].mate:
+        if scores[1].mate:
+            if (scores[0].mate > -1 and scores[1].mate > -1):
                 # More than one possible mate-in-1
                 return True
-        elif moves[1].evaluation.cp is not None:
-            if moves[1].evaluation.cp > 500:
+        elif scores[1].cp is not None:
+            if scores[1].cp > 500:
                 # 2nd best move is a decisive material advantage
                 return True
     return False
