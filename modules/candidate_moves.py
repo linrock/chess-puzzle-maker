@@ -1,7 +1,9 @@
 def ambiguous(moves):
     """
-    Looks at a list of candidate moves to determine if there's
-    a single best player move
+    Looks at a list of candidate moves (sorted by score) to determine
+    if there's a single best player move
+
+    Returns True if a clear best move can't be determined
     """
     if len(moves) <= 1:
         return False

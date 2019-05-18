@@ -1,6 +1,8 @@
 import chess
 import chess.pgn
 
+from modules.analysis import engine
+
 class PuzzlePgn(object):
     """ Exports a puzzle to a PGN file
     """
@@ -42,6 +44,6 @@ class PuzzlePgn(object):
             position_list_node = position_list_node.next_position
         for h in puzzle.game.headers:
             game.headers[h] = puzzle.game.headers[h]
-        game.headers['PuzzleEngine'] = puzzle.engine.name
+        game.headers['PuzzleEngine'] = engine.name
         game.headers['PuzzleResult'] = result
         return game

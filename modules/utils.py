@@ -41,7 +41,7 @@ def normalize_score(board, score):
     """ flip the signs of the score to be from white's perspective
     """
     polarity = 1 if board.turn else -1
-    if score.mate:
+    if score.mate is not None:
         return chess.uci.Score(None, score.mate * polarity)
     else:
         return chess.uci.Score(score.cp * polarity, None)
