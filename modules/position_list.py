@@ -1,10 +1,11 @@
-import logging
 import os
+import logging
 from collections import namedtuple
 
 import chess
 
 from modules.bcolors import bcolors
+from modules.candidate_moves import ambiguous
 from modules.utils import material_difference
 
 Analysis = namedtuple("Analysis", ["move", "evaluation"])
@@ -144,34 +145,11 @@ class PositionList(object):
             else:
                 return False
 
-    # Return True if it's unclear whether there's a single best player move
     def ambiguous(self):
-        # If strict == False then it will generate more tactics but more ambiguous
-        # move_number = 1 if self.strict == True else 2
-        if len(self.candidate_moves) > 1:
-            best_move_score = self.candidate_moves[0].evaluation.cp
-            second_best_move_score = self.candidate_moves[1].evaluation.cp
-            if (best_move_score is not None and second_best_move_score is not None):
-                if best_move_score < 210:
-                    # Unclear if the best move leads to a decisive advantage
-                    return True
-                if best_move_score < 1000:
-                    # If the best move is decisively better than the 2nd best move
-                    if best_move_score > 500 and second_best_move_score < 140:
-                        return False
-                    elif best_move_score - second_best_move_score > 500:
-                        return False
-                if second_best_move_score > 90:
-                    return True
-            if self.candidate_moves[0].evaluation.mate:
-                if self.candidate_moves[1].evaluation.mate:
-                    if (self.candidate_moves[0].evaluation.mate > -1 and self.candidate_moves[1].evaluation.mate > -1):
-                        # More than one possible mate-in-1
-                        return True
-                elif self.candidate_moves[1].evaluation.cp is not None:
-                    if self.candidate_moves[1].evaluation.cp > 200:
-                        return True
-        return False
+        """
+        Return True if it's unclear whether there's a single best player move
+        """
+        return ambiguous(self.candidate_moves)
 
     def game_over(self):
         return self.next_position.position.is_game_over()
