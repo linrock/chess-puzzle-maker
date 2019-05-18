@@ -12,12 +12,19 @@ def ambiguous(scores):
     best_move_score = scores[0].cp
     second_best_move_score = scores[1].cp
     if (best_move_score is not None and second_best_move_score is not None):
+        if abs(best_move_score) < 50:
+            # From equality, greater than 120 cp diff
+            if abs(second_best_move_score - best_move_score) > 120:
+                return False
         if best_move_score < 210:
+            # Significant difference between best move and 2nd best
+            if abs(second_best_move_score - best_move_score) > 250:
+                return False
             # Unclear if the best move leads to a decisive advantage
             return True
         if best_move_score < 1000:
             # If the best move is decisively better than the 2nd best move
-            if best_move_score > 500 and second_best_move_score < 140:
+            if best_move_score > 350 and second_best_move_score < 140:
                 return False
             elif best_move_score - second_best_move_score > 500:
                 return False
