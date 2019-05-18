@@ -6,6 +6,7 @@ import chess
 
 from modules.bcolors import bcolors
 from modules.candidate_moves import ambiguous
+from modules.analysis import engine
 from modules.utils import material_difference, fullmove_string
 
 Analysis = namedtuple("Analysis", ["move_uci", "move_san", "evaluation"])
@@ -13,9 +14,8 @@ Analysis = namedtuple("Analysis", ["move_uci", "move_san", "evaluation"])
 class PositionListNode(object):
     """ Linked list node of positions within a puzzle
     """
-    def __init__(self, position, engine, info_handler, player_turn=True, best_move=None, evaluation=None, strict=True):
+    def __init__(self, position, info_handler, player_turn=True, best_move=None, evaluation=None, strict=True):
         self.position = position.copy()
-        self.engine = engine
         self.info_handler = info_handler
         self.player_turn = player_turn
         self.best_move = best_move
@@ -67,13 +67,12 @@ class PositionListNode(object):
 
     def evaluate_best(self, depth):
         logging.debug(bcolors.OKGREEN + "Evaluating best move...")
-        self.engine.position(self.position)
-        self.best_move = self.engine.go(depth=depth)
+        engine.position(self.position)
+        self.best_move = engine.go(depth=depth)
         if self.best_move.bestmove is not None:
             self.evaluation = self.info_handler.info["score"][1]
             self.next_position = PositionListNode(
                 self.position.copy(),
-                self.engine,
                 self.info_handler,
                 not self.player_turn,
                 strict = self.strict
@@ -98,10 +97,10 @@ class PositionListNode(object):
         if multipv == 0:
             return
         logging.debug(bcolors.OKGREEN + ("Evaluating best %d moves..." % multipv) + bcolors.ENDC)
-        self.engine.setoption({ "MultiPV": multipv })
-        self.engine.position(self.position)
-        self.engine.go(depth=depth)
-        info = self.engine.info_handlers[0].info
+        engine.setoption({ "MultiPV": multipv })
+        engine.position(self.position)
+        engine.go(depth=depth)
+        info = engine.info_handlers[0].info
         for i in range(multipv):
             move = info["pv"].get(i + 1)[0]
             move_uci = move.uci()
@@ -115,7 +114,7 @@ class PositionListNode(object):
             else:
                 logging.debug(bcolors.OKBLUE + "   CP: " + str(analysis.evaluation.cp))
             self.candidate_moves.append(analysis)
-        self.engine.setoption({ "MultiPV": 1 })
+        engine.setoption({ "MultiPV": 1 })
 
     def material_difference(self):
         return material_difference(self.position)

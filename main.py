@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-"""Creating chess puzzles for lichess.org"""
+""" Creates chess puzzles in PGN format from PGN files
+"""
 
 import argparse
 import logging
@@ -12,9 +13,10 @@ import chess.uci
 import chess.pgn
 
 from modules.bcolors import bcolors
-from modules.fishnet import stockfish_command
 from modules.puzzle import Puzzle
 from modules.utils import fullmove_string, normalize_score, should_investigate
+from modules.analysis import engine
+
 
 parser = argparse.ArgumentParser(description=__doc__)
 
@@ -50,7 +52,6 @@ logging.basicConfig(format="%(message)s", level=settings.loglevel, stream=sys.st
 logging.getLogger("requests.packages.urllib3").setLevel(logging.WARNING)
 logging.getLogger("chess").setLevel(logging.WARNING)
 
-engine = chess.uci.popen_engine(stockfish_command())
 engine.setoption({
   'Threads': settings.threads,
   'Hash': settings.memory,
@@ -106,7 +107,6 @@ while True:
                 board,
                 next_node.move,
                 str(game_id),
-                engine,
                 info_handler,
                 game,
                 settings.strict
