@@ -77,9 +77,9 @@ while True:
     prev_score = chess.uci.Score(0, None)
     puzzles = []
     
-    logging.debug(bcolors.OKGREEN + "Game length: " + str(game.end().board().fullmove_number))
+    logging.debug(bcolors.GREEN + "Game length: " + str(game.end().board().fullmove_number))
     logging.debug(
-        bcolors.OKBLUE +
+        bcolors.BLUE +
         ("Scanning game for puzzles (depth: %d)..." % settings.depth) +
         bcolors.ENDC
     )
@@ -94,12 +94,12 @@ while True:
         cur_score = normalize_score(next_board, info_handler.info["score"][1])
         # import pdb; pdb.set_trace()
         board = node.board()
-        log_str = bcolors.OKGREEN
+        log_str = bcolors.GREEN
         log_str += ("%s%s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
         if cur_score.mate:
-            log_str += bcolors.OKBLUE + ("   Mate: " + str(cur_score.mate)).ljust(12)
+            log_str += bcolors.BLUE + ("   Mate: " + str(cur_score.mate)).ljust(12)
         else:
-            log_str += bcolors.OKBLUE + ("   CP: " + str(cur_score.cp)).ljust(12)
+            log_str += bcolors.BLUE + ("   CP: " + str(cur_score.cp)).ljust(12)
         if should_investigate(prev_score, cur_score, board):
             # Found a possible puzzle
             log_str += bcolors.WARNING + "   Investigate!" + bcolors.ENDC
@@ -127,7 +127,7 @@ while True:
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.to_pgn())
             logging.debug(bcolors.HEADER + "NEW PUZZLE GENERATED" + bcolors.ENDC)
-            logging.info(bcolors.OKBLUE + puzzle_pgn + bcolors.ENDC)
+            logging.info(bcolors.BLUE + puzzle_pgn + bcolors.ENDC)
             tactics_file = open(settings.output, "a")
             tactics_file.write(puzzle_pgn)
             tactics_file.write("\n\n")

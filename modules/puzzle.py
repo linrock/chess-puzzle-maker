@@ -38,7 +38,7 @@ class Puzzle(object):
     def generate(self, depth=22):
         self.position_list_node.generate(depth)
         if self.is_complete():
-            logging.debug(bcolors.OKGREEN + "Puzzle is complete" + bcolors.ENDC)
+            logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
         else:
             logging.debug(bcolors.FAIL + "Puzzle incomplete" + bcolors.ENDC)
 
