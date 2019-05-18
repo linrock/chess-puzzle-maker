@@ -14,13 +14,13 @@ import chess.pgn
 from modules.bcolors import bcolors
 from modules.fishnet import stockfish_command
 from modules.puzzle import Puzzle
-from modules.utils import should_investigate
+from modules.utils import fullmove_string, should_investigate
 
 parser = argparse.ArgumentParser(description=__doc__)
 
 parser.add_argument("threads", metavar="THREADS", nargs="?", type=int, default=2,
                     help="number of engine threads")
-parser.add_argument("memory", metavar="MEMORY", nargs="?", type=int, default=2048,
+parser.add_argument("memory", metavar="MEMORY", nargs="?", type=int, default=4096,
                     help="memory in MB to use for engine hashtables")
 parser.add_argument("--depth", metavar="DEPTH", nargs="?", type=int, default=15,
                     help="stockfish depth for scanning for candidate puzzles")
@@ -74,21 +74,33 @@ while True:
     logging.debug("Analysing Game..." + bcolors.ENDC)
     
     engine.ucinewgame()
-    
+
+    # Scan through the game, looking for possible puzzles
     while not node.is_end():
         next_node = node.variation(0)
         engine.position(next_node.board())
         engine.go(depth=settings.depth)
         cur_score = info_handler.info["score"][1]
-        logging.debug(bcolors.OKGREEN + node.board().san(next_node.move) + bcolors.ENDC)
+        board = node.board()
+        log_str = bcolors.OKGREEN + ("%s %s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
         if cur_score.mate:
-            logging.debug(bcolors.OKBLUE + "   Mate: " + str(cur_score.mate) + bcolors.ENDC)
+            log_str += bcolors.OKBLUE + "   Mate: " + str(cur_score.mate)
         else:
-            logging.debug(bcolors.OKBLUE + "   CP: " + str(cur_score.cp) + bcolors.ENDC)
-        if should_investigate(prev_score, cur_score, node.board()):
+            log_str += bcolors.OKBLUE + "   CP: " + str(cur_score.cp)
+        logging.debug(log_str + bcolors.ENDC)
+        if should_investigate(prev_score, cur_score, board):
             # Found a possible puzzle
             logging.debug(bcolors.WARNING + "   Investigate!" + bcolors.ENDC)
-            puzzles.append(Puzzle(node.board(), next_node.move, str(game_id), engine, info_handler, game, settings.strict))
+            puzzle = Puzzle(
+                board,
+                next_node.move,
+                str(game_id),
+                engine,
+                info_handler,
+                game,
+                settings.strict
+            )
+            puzzles.append(puzzle)
     
         prev_score = cur_score
         node = next_node

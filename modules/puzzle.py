@@ -8,6 +8,8 @@ import chess.pgn
 from modules.position_list import PositionList
 from modules.bcolors import bcolors
 
+# minimum number of movies required for a puzzle to be considered complete
+MIN_MOVES = 2
 
 class Puzzle(object):
     def __init__(self, last_pos, last_move, game_id, engine, info_handler, game, strict):
@@ -57,7 +59,7 @@ class Puzzle(object):
                 self.position_list.material_difference()
             )
             and not self.position_list.ambiguous()
-            and len(self.position_list.move_list()) > 2)
+            and len(self.position_list.move_list()) > MIN_MOVES)
 
     def generate(self, depth):
         self.position_list.generate(depth)

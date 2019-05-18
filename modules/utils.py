@@ -17,6 +17,14 @@ def material_difference(board):
 def material_count(board):
     return chess.popcount(board.occupied)
 
+def fullmove_string(board):
+    move_str = str(board.fullmove_number)
+    if board.turn:
+        move_str = "%s.   " % move_str
+    else:
+        move_str = "%s... " % move_str
+    return move_str
+
 # determine if the difference between position A and B
 # is worth investigating for a puzzle.
 def should_investigate(a, b, board):
