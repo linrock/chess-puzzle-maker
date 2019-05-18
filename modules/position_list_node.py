@@ -6,11 +6,13 @@ import chess
 
 from modules.bcolors import bcolors
 from modules.candidate_moves import ambiguous
-from modules.utils import material_difference
+from modules.utils import material_difference, fullmove_string
 
 Analysis = namedtuple("Analysis", ["move_uci", "move_san", "evaluation"])
 
 class PositionListNode(object):
+    """ Linked list node of positions within a puzzle
+    """
     def __init__(self, position, engine, info_handler, player_turn=True, best_move=None, evaluation=None, strict=True):
         self.position = position.copy()
         self.engine = engine
@@ -56,15 +58,12 @@ class PositionListNode(object):
             return
         self.evaluate_candidate_moves(depth)
         if has_best and not self.ambiguous() and not self.game_over():
-            logging.debug(bcolors.OKGREEN + "Going deeper:")
-            logging.debug("   Ambiguous: " + str(self.ambiguous()))
-            logging.debug("   Has best move: " + str(has_best) + bcolors.ENDC)
+            logging.debug(bcolors.OKGREEN + "Going deeper...")
             self.next_position.generate(depth)
         else:
             logging.debug(bcolors.WARNING + "Not going deeper:")
             logging.debug("   Ambiguous: " + str(self.ambiguous()))
             logging.debug("   Game over: " + str(self.game_over()))
-            logging.debug("   Has best move: " + str(has_best) + bcolors.ENDC)
 
     def evaluate_best(self, depth):
         logging.debug(bcolors.OKGREEN + "Evaluating best move...")
@@ -81,8 +80,9 @@ class PositionListNode(object):
             )
             self.next_position.position.push(self.best_move.bestmove)
             move = self.best_move.bestmove
-            san = self.position.san(move)
-            logging.debug(bcolors.OKGREEN + "Best move: %s %s" % (move.uci(), san))
+            move_san = self.position.san(move)
+            log_str = "%s%s (%s)" % (fullmove_string(self.position), move_san, move.uci())
+            logging.debug(bcolors.OKGREEN + log_str)
             if self.evaluation.mate:
                 logging.debug(bcolors.OKBLUE + "   Mate: " + str(self.evaluation.mate) + bcolors.ENDC)
             else:
@@ -101,22 +101,20 @@ class PositionListNode(object):
         self.engine.setoption({ "MultiPV": multipv })
         self.engine.position(self.position)
         self.engine.go(depth=depth)
-
         info = self.engine.info_handlers[0].info
         for i in range(multipv):
             move = info["pv"].get(i + 1)[0]
+            move_uci = move.uci()
             move_san = self.position.san(move)
             evaluation = info["score"].get(i + 1)
-            self.candidate_moves.append(Analysis(move.uci(), move_san, evaluation))
-
-        for i, analysis in enumerate(self.candidate_moves):
-            move_uci = analysis.move_uci
-            move_san = analysis.move_san
-            logging.debug(bcolors.OKGREEN + "Move %d: %s %s" % (i, move_uci, move_san))
+            analysis = Analysis(move_uci, move_san, evaluation)
+            log_str = "%s%s (%s)" % (fullmove_string(self.position), move_san, move_uci)
+            logging.debug(bcolors.OKGREEN + log_str)
             if analysis.evaluation.mate:
                 logging.debug(bcolors.OKBLUE + "   Mate: " + str(analysis.evaluation.mate))
             else:
                 logging.debug(bcolors.OKBLUE + "   CP: " + str(analysis.evaluation.cp))
+            self.candidate_moves.append(analysis)
         self.engine.setoption({ "MultiPV": 1 })
 
     def material_difference(self):

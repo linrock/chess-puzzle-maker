@@ -2,7 +2,8 @@ import chess
 import chess.pgn
 
 class PuzzlePgn(object):
-
+    """ Exports a puzzle to a PGN file
+    """
     def __init__(self, puzzle):
         self.puzzle = puzzle
 
@@ -13,9 +14,9 @@ class PuzzlePgn(object):
         for analysis in candidate_moves:
             comment += analysis.move_san
             if analysis.evaluation.mate:
-                comment += " [mate in %d] " % analysis.evaluation.mate
+                comment += " (mate in %d) " % analysis.evaluation.mate
             else:
-                comment += " [%d] " % analysis.evaluation.cp
+                comment += " (%d) " % analysis.evaluation.cp
         return comment.strip()
 
     def export(self):

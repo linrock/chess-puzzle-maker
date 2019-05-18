@@ -8,6 +8,8 @@ from modules.bcolors import bcolors
 MIN_MOVES = 2
 
 class Puzzle(object):
+    """ last_pos = chess.Board instance
+    """
     def __init__(self, last_pos, last_move, game_id, engine, info_handler, game, strict):
         self.last_pos = last_pos.copy()
         self.last_move = last_move
