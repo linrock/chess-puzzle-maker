@@ -96,13 +96,12 @@ while True:
         log_str = bcolors.OKGREEN
         log_str += ("%s%s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
         if cur_score.mate:
-            log_str += bcolors.OKBLUE + "   Mate: " + str(cur_score.mate)
+            log_str += bcolors.OKBLUE + ("   Mate: " + str(cur_score.mate)).ljust(12)
         else:
-            log_str += bcolors.OKBLUE + "   CP: " + str(cur_score.cp)
-        logging.debug(log_str + bcolors.ENDC)
+            log_str += bcolors.OKBLUE + ("   CP: " + str(cur_score.cp)).ljust(12)
         if should_investigate(prev_score, cur_score, board):
             # Found a possible puzzle
-            logging.debug(bcolors.WARNING + "   Investigate!" + bcolors.ENDC)
+            log_str += bcolors.WARNING + "   Investigate!" + bcolors.ENDC
             puzzle = Puzzle(
                 board,
                 next_node.move,
@@ -113,6 +112,7 @@ while True:
                 settings.strict
             )
             puzzles.append(puzzle)
+        logging.debug(log_str + bcolors.ENDC)
     
         prev_score = cur_score
         node = next_node
