@@ -49,7 +49,11 @@ logging.getLogger("requests.packages.urllib3").setLevel(logging.WARNING)
 logging.getLogger("chess").setLevel(logging.WARNING)
 
 engine = chess.uci.popen_engine(stockfish_command())
-engine.setoption({'Threads': settings.threads, 'Hash': settings.memory})
+engine.setoption({
+  'Threads': settings.threads,
+  'Hash': settings.memory,
+  'Contempt': 0,
+})
 engine.uci()
 info_handler = chess.uci.InfoHandler()
 engine.info_handlers.append(info_handler)
