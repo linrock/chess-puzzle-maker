@@ -7,16 +7,17 @@ import chess
 from modules.bcolors import bcolors
 from modules.candidate_moves import ambiguous
 from modules.analysis import engine
-from modules.utils import material_difference, fullmove_string
+from modules.utils import material_difference, material_count, fullmove_string
+
 
 Analysis = namedtuple("Analysis", ["move_uci", "move_san", "evaluation"])
 
 class PositionListNode(object):
     """ Linked list node of positions within a puzzle
     """
-    def __init__(self, position, info_handler, player_turn=True, best_move=None, evaluation=None, strict=True):
+    def __init__(self, position, player_turn=True, best_move=None, evaluation=None, strict=True):
         self.position = position.copy()
-        self.info_handler = info_handler
+        self.info_handler = engine.info_handlers[0]
         self.player_turn = player_turn
         self.best_move = best_move
         self.evaluation = evaluation
@@ -100,7 +101,7 @@ class PositionListNode(object):
         engine.setoption({ "MultiPV": multipv })
         engine.position(self.position)
         engine.go(depth=depth)
-        info = engine.info_handlers[0].info
+        info = self.info_handler.info
         for i in range(multipv):
             move = info["pv"].get(i + 1)[0]
             move_uci = move.uci()
@@ -109,18 +110,15 @@ class PositionListNode(object):
             analysis = Analysis(move_uci, move_san, evaluation)
             log_str = "%s%s (%s)" % (fullmove_string(self.position), move_san, move_uci)
             logging.debug(bcolors.OKGREEN + log_str)
-            if analysis.evaluation.mate:
-                logging.debug(bcolors.OKBLUE + "   Mate: " + str(analysis.evaluation.mate))
+            if evaluation.mate:
+                logging.debug(bcolors.OKBLUE + "   Mate: " + str(evaluation.mate))
             else:
-                logging.debug(bcolors.OKBLUE + "   CP: " + str(analysis.evaluation.cp))
+                logging.debug(bcolors.OKBLUE + "   CP: " + str(evaluation.cp))
             self.candidate_moves.append(analysis)
         engine.setoption({ "MultiPV": 1 })
 
     def material_difference(self):
         return material_difference(self.position)
-
-    def material_count(self):
-        return chess.popcount(self.position.occupied)
 
     def is_complete(self, category, color, first_node, first_val):
         if self.next_position is not None:
@@ -129,13 +127,14 @@ class PositionListNode(object):
                 return self.next_position.is_complete(category, color, False, first_val)
 
         # if the position was converted into a material advantage
+        num_pieces = material_count(self.position)
         if category == 'Material':
             if color:
                 if (self.material_difference() > 0.2 
                     and abs(self.material_difference() - first_val) > 0.1 
                     and first_val < 2
                     and self.evaluation.mate is None
-                    and self.material_count() > 6):
+                    and num_pieces > 6):
                     return True
                 else:
                     return False
@@ -144,15 +143,14 @@ class PositionListNode(object):
                     and abs(self.material_difference() - first_val) > 0.1
                     and first_val > -2
                     and self.evaluation.mate is None
-                    and self.material_count() > 6):
+                    and num_pieces > 6):
                     return True
                 else:
                     return False
         else:
-            if self.position.is_game_over() and self.material_count() > 6:
-                return True
-            else:
-                return False
+            # mate puzzles are only complete at checkmate
+            # return self.position.is_game_over() and num_pieces > 6:
+            return self.position.is_game_over()
 
     def ambiguous(self):
         """ True if it's unclear whether there's a single best player move

@@ -10,13 +10,12 @@ MIN_MOVES = 3
 class Puzzle(object):
     """ last_pos = chess.Board instance
     """
-    def __init__(self, last_pos, last_move, game_id, info_handler, game, strict):
+    def __init__(self, last_pos, last_move, game, strict):
         self.last_pos = last_pos.copy()
         self.last_move = last_move
-        self.game_id = game_id
-        last_pos.push(last_move)
-        self.position_list_node = PositionListNode(last_pos, info_handler, strict)
         self.game = game
+        last_pos.push(last_move)
+        self.position_list_node = PositionListNode(last_pos, strict=strict)
 
     def to_pgn(self):
         return PuzzlePgn(self).export()
@@ -36,7 +35,7 @@ class Puzzle(object):
             self.position_list_node.material_difference()
         )
 
-    def generate(self, depth):
+    def generate(self, depth=22):
         self.position_list_node.generate(depth)
         if self.is_complete():
             logging.debug(bcolors.OKGREEN + "Puzzle is complete" + bcolors.ENDC)

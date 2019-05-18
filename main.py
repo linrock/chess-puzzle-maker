@@ -79,9 +79,9 @@ while True:
     
     logging.debug(bcolors.OKGREEN + "Game length: " + str(game.end().board().fullmove_number))
     logging.debug(
-      bcolors.OKBLUE +
-      ("Scanning game for puzzles (depth: %d)..." % settings.depth) +
-      bcolors.ENDC
+        bcolors.OKBLUE +
+        ("Scanning game for puzzles (depth: %d)..." % settings.depth) +
+        bcolors.ENDC
     )
     engine.ucinewgame()
 
@@ -106,8 +106,6 @@ while True:
             puzzle = Puzzle(
                 board,
                 next_node.move,
-                str(game_id),
-                info_handler,
                 game,
                 settings.strict
             )
@@ -117,14 +115,15 @@ while True:
         prev_score = cur_score
         node = next_node
 
-    logging.debug(bcolors.WARNING + "# positions to consider as puzzles = " + str(len(puzzles)))
+    n = len(puzzles)
+    logging.debug(bcolors.WARNING + ("# positions to consider as puzzles = %d" % n))
     if settings.scan_only:
         continue
     for i, puzzle in enumerate(puzzles):
         logging.debug("")
-        logging.debug(bcolors.HEADER + ("Considering position %d of %d..." % (i+1, len(puzzles))) + bcolors.ENDC)
+        logging.debug(bcolors.HEADER + ("Considering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
         # use depth 22 to explore puzzle positions
-        puzzle.generate(22)
+        puzzle.generate()
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.to_pgn())
             logging.debug(bcolors.HEADER + "NEW PUZZLE GENERATED" + bcolors.ENDC)

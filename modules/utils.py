@@ -10,12 +10,18 @@ def sign(score):
     return 0
 
 def material_total(board):
+    """ Total material value on the board
+    """
     return sum(v * (len(board.pieces(pt, True)) + len(board.pieces(pt, False))) for v, pt in zip([0,3,3,5.5,9], chess.PIECE_TYPES))
 
 def material_difference(board):
+    """ Difference in material value (positive means white has more)
+    """
     return sum(v * (len(board.pieces(pt, True)) - len(board.pieces(pt, False))) for v, pt in zip([0,3,3,5.5,9], chess.PIECE_TYPES))
 
 def material_count(board):
+    """ Count the number of pieces on the board
+    """
     return chess.popcount(board.occupied)
 
 def fullmove_string(board):
