@@ -8,7 +8,7 @@ from modules.bcolors import bcolors
 from modules.candidate_moves import ambiguous
 from modules.utils import material_difference
 
-Analysis = namedtuple("Analysis", ["move", "evaluation"])
+Analysis = namedtuple("Analysis", ["move_uci", "move_san", "evaluation"])
 
 class PositionListNode(object):
     def __init__(self, position, engine, info_handler, player_turn=True, best_move=None, evaluation=None, strict=True):
@@ -103,13 +103,14 @@ class PositionListNode(object):
         info = self.engine.info_handlers[0].info
         for i in range(multipv):
             move = info["pv"].get(i + 1)[0]
+            move_san = self.position.san(move)
             evaluation = info["score"].get(i + 1)
-            self.candidate_moves.append(Analysis(move, evaluation))
+            self.candidate_moves.append(Analysis(move.uci(), move_san, evaluation))
 
         for i, analysis in enumerate(self.candidate_moves):
-            move = analysis.move
-            san = self.position.san(move)
-            logging.debug(bcolors.OKGREEN + "Move %d: %s %s" % (i, move.uci(), san))
+            move_uci = analysis.move_uci
+            move_san = analysis.move_san
+            logging.debug(bcolors.OKGREEN + "Move %d: %s %s" % (i, move_uci, move_san))
             if analysis.evaluation.mate:
                 logging.debug(bcolors.OKBLUE + "   Mate: " + str(analysis.evaluation.mate))
             else:

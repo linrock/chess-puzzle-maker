@@ -31,6 +31,18 @@ class Puzzle(object):
             'move_list': self.position_list_node.move_list()
         }
 
+    def candidate_moves_annotations(self, candidate_moves):
+        """ Returns the scores of the possible candidate moves
+        """
+        comment = ""
+        for analysis in candidate_moves:
+            comment += analysis.move_san
+            if analysis.evaluation.mate:
+                comment += " [mate in %d] " % analysis.evaluation.mate
+            else:
+                comment += " [%d] " % analysis.evaluation.cp
+        return comment.strip()
+
     def to_pgn(self):
         fen = self.last_pos.fen()
         board = chess.Board(fen)
@@ -42,9 +54,13 @@ class Puzzle(object):
             result = '0-1'
 
         node = game.add_variation(self.last_move)
-        for m in self.position_list_node.move_list():
+        position_list_node = self.position_list_node
+        for m in position_list_node.move_list():
             node = node.add_variation(chess.Move.from_uci(m))
-
+            node.comment = self.candidate_moves_annotations(
+                position_list_node.candidate_moves
+            )
+            position_list_node = position_list_node.next_position
         for h in self.game.headers:
             game.headers[h] = self.game.headers[h]
         game.headers['Result'] = result
