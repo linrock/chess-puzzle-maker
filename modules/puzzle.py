@@ -1,11 +1,7 @@
-import os
-import json
 import logging
 
-import chess
-import chess.pgn
-
 from modules.position_list_node import PositionListNode
+from modules.puzzle_pgn import PuzzlePgn
 from modules.bcolors import bcolors
 
 # minimum number of movies required for a puzzle to be considered complete
@@ -32,41 +28,8 @@ class Puzzle(object):
             'move_list': self.position_list_node.move_list()
         }
 
-    def candidate_moves_annotations(self, candidate_moves):
-        """ Returns the scores of the possible candidate moves
-        """
-        comment = ""
-        for analysis in candidate_moves:
-            comment += analysis.move_san
-            if analysis.evaluation.mate:
-                comment += " [mate in %d] " % analysis.evaluation.mate
-            else:
-                comment += " [%d] " % analysis.evaluation.cp
-        return comment.strip()
-
     def to_pgn(self):
-        fen = self.last_pos.fen()
-        board = chess.Board(fen)
-        game = chess.pgn.Game().from_board(board)
-        
-        # In the tactic the first to move is the one who lost
-        result = '1-0' # result of the tactic not the game
-        if board.turn: # turn return true if white
-            result = '0-1'
-
-        node = game.add_variation(self.last_move)
-        position_list_node = self.position_list_node
-        for m in position_list_node.move_list():
-            node = node.add_variation(chess.Move.from_uci(m))
-            node.comment = self.candidate_moves_annotations(
-                position_list_node.candidate_moves
-            )
-            position_list_node = position_list_node.next_position
-        for h in self.game.headers:
-            game.headers[h] = self.game.headers[h]
-        game.headers['PuzzleEngine'] = self.engine.name
-        game.headers['PuzzleResult'] = result
-        return game
+        return PuzzlePgn(self).export()
 
     def color(self):
         return self.position_list_node.position.turn
