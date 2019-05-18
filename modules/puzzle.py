@@ -46,6 +46,7 @@ class Puzzle(object):
         for h in self.game.headers:
             game.headers[h] = self.game.headers[h]
         game.headers['Result'] = result
+        game.headers['PuzzleResult'] = result
         return game
 
     def color(self):

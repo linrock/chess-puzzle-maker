@@ -10,7 +10,7 @@ from modules.utils import material_difference
 Analysis = namedtuple("Analysis", ["move", "evaluation"])
 
 class PositionList(object):
-    def __init__(self, position, engine, info_handler, player_turn=True, best_move=None, evaluation=None, strict = True):
+    def __init__(self, position, engine, info_handler, player_turn=True, best_move=None, evaluation=None, strict=True):
         self.position = position.copy()
         self.engine = engine
         self.info_handler = info_handler
@@ -21,6 +21,7 @@ class PositionList(object):
         self.candidate_moves = []
         self.strict = strict
 
+    # list of UCI moves
     def move_list(self):
         if self.next_position is None or self.next_position.ambiguous() or self.next_position.position.is_game_over():
             if self.best_move is not None:
@@ -116,7 +117,8 @@ class PositionList(object):
             if ((category == 'Mate' and not self.ambiguous())
                 or (category == 'Material' and self.next_position.next_position is not None)):
                 return self.next_position.is_complete(category, color, False, first_val)
-        
+
+        # if the position was converted into a material advantage
         if category == 'Material':
             if color:
                 if (self.material_difference() > 0.2 
