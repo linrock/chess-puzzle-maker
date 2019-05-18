@@ -2,7 +2,9 @@ import chess
 import chess.uci
 
 def sign(score):
-    s = score.cp or score.mate
+    s = score.cp
+    if s is None:
+        s = score.mate
     if s > 0:
         return 1
     elif s < 0:
@@ -70,11 +72,12 @@ def should_investigate(a, b, board):
             # from a major advantage, blundering and getting checkmated
             elif sign(a) != sign(b):
                 return True
-    elif a.mate:
-        # a player blundered from a checkmating position into being checkmated
-        if b.mate and sign(a) != sign(b):
-            return True
-        elif b.cp:
+    elif a.mate is not None:
+        if b.mate is not None:
+            # blundering a checkmating position into being checkmated
+            if sign(a) != sign(b):
+                return True
+        elif b.cp is not None:
             # blundering a mate threat into a major disadvantage
             if sign(a) != sign(b):
                 return True
