@@ -67,6 +67,9 @@ def should_investigate(a, b, board):
             # from an even position, someone is getting checkmated
             if abs(a.cp) < 110:
                 return True
+            # from a major advantage, blundering and getting checkmated
+            if sign(a) != sign(b):
+                return True
     elif a.mate and b.mate:
         # a player blundered from a checkmating position into being checkmated
         if sign(a) != sign(b):
