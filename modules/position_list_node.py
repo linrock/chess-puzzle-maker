@@ -95,6 +95,8 @@ class PositionListNode(object):
     # Analyze the best possible moves from the current position
     def evaluate_candidate_moves(self, depth):
         multipv = min(3, self.position.legal_moves.count())
+        if multipv == 0:
+            return
         logging.debug(bcolors.OKGREEN + ("Evaluating best %d moves..." % multipv) + bcolors.ENDC)
         self.engine.setoption({ "MultiPV": multipv })
         self.engine.position(self.position)
@@ -161,4 +163,4 @@ class PositionListNode(object):
         return ambiguous(self.candidate_moves)
 
     def game_over(self):
-        return self.next_position.position.is_game_over()
+        return self.position.is_game_over() or self.next_position.position.is_game_over()
