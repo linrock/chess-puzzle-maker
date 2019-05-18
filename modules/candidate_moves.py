@@ -28,4 +28,6 @@ def ambiguous(moves):
                 return True
         elif moves[1].evaluation.cp is not None:
             if moves[1].evaluation.cp > 500:
+                # 2nd best move is a decisive material advantage
+                return True
     return False

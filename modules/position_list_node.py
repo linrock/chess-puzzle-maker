@@ -80,7 +80,9 @@ class PositionListNode(object):
                 strict = self.strict
             )
             self.next_position.position.push(self.best_move.bestmove)
-            logging.debug(bcolors.OKGREEN + "Best move: " + self.best_move.bestmove.uci() + bcolors.ENDC)
+            move = self.best_move.bestmove
+            san = self.position.san(move)
+            logging.debug(bcolors.OKGREEN + "Best move: %s %s" % (move.uci(), san))
             if self.evaluation.mate:
                 logging.debug(bcolors.OKBLUE + "   Mate: " + str(self.evaluation.mate) + bcolors.ENDC)
             else:
@@ -104,8 +106,10 @@ class PositionListNode(object):
             evaluation = info["score"].get(i + 1)
             self.candidate_moves.append(Analysis(move, evaluation))
 
-        for analysis in self.candidate_moves:
-            logging.debug(bcolors.OKGREEN + "Move: " + str(analysis.move.uci()) + bcolors.ENDC)
+        for i, analysis in enumerate(self.candidate_moves):
+            move = analysis.move
+            san = self.position.san(move)
+            logging.debug(bcolors.OKGREEN + "Move %d: %s %s" % (i, move.uci(), san))
             if analysis.evaluation.mate:
                 logging.debug(bcolors.OKBLUE + "   Mate: " + str(analysis.evaluation.mate))
             else:
