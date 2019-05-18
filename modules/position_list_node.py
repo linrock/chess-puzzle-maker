@@ -10,7 +10,7 @@ from modules.utils import material_difference
 
 Analysis = namedtuple("Analysis", ["move", "evaluation"])
 
-class PositionList(object):
+class PositionListNode(object):
     def __init__(self, position, engine, info_handler, player_turn=True, best_move=None, evaluation=None, strict=True):
         self.position = position.copy()
         self.engine = engine
@@ -18,12 +18,13 @@ class PositionList(object):
         self.player_turn = player_turn
         self.best_move = best_move
         self.evaluation = evaluation
-        self.next_position = None
+        self.next_position = None  # PositionListNode
         self.candidate_moves = []
         self.strict = strict
 
-    # list of UCI moves
     def move_list(self):
+        """ Returns a list of UCI moves starting from this position list node
+        """
         if self.next_position is None or self.next_position.ambiguous() or self.next_position.position.is_game_over():
             if self.best_move is not None:
                 return [self.best_move.bestmove.uci()]
@@ -42,6 +43,9 @@ class PositionList(object):
             return self.next_position.category()
 
     def generate(self, depth):
+        """ Generates the next position in the position list if the current
+            position does not have an ambiguous next move
+        """
         logging.debug(bcolors.WARNING + str(self.position) + bcolors.ENDC)
         logging.debug(bcolors.WARNING + self.position.fen() + bcolors.ENDC)
         logging.debug(bcolors.OKBLUE + ('Material difference:  %d' % self.material_difference()))
@@ -68,7 +72,8 @@ class PositionList(object):
         self.best_move = self.engine.go(depth=depth)
         if self.best_move.bestmove is not None:
             self.evaluation = self.info_handler.info["score"][1]
-            self.next_position = PositionList(self.position.copy(),
+            self.next_position = PositionListNode(
+                self.position.copy(),
                 self.engine,
                 self.info_handler,
                 not self.player_turn,
@@ -146,8 +151,7 @@ class PositionList(object):
                 return False
 
     def ambiguous(self):
-        """
-        Return True if it's unclear whether there's a single best player move
+        """ True if it's unclear whether there's a single best player move
         """
         return ambiguous(self.candidate_moves)
 
