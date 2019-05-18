@@ -19,11 +19,16 @@ def material_count(board):
     return chess.popcount(board.occupied)
 
 def fullmove_string(board):
-    move_str = str(board.fullmove_number)
+    move_num = board.fullmove_number
+    move_str = str(move_num)
     if board.turn:
-        move_str = "%s.   " % move_str
+        move_str = "%s.    " % move_str
     else:
-        move_str = "%s... " % move_str
+        move_str = "%s...  " % move_str
+    if move_num < 10:
+        move_str += "  "
+    elif move_num < 100:
+        move_str += " "
     return move_str
 
 def normalize_score(board, score):

@@ -76,9 +76,12 @@ while True:
     prev_score = chess.uci.Score(0, None)
     puzzles = []
     
-    logging.debug(bcolors.OKGREEN + "Game Length: " + str(game.end().board().fullmove_number))
-    logging.debug("Analysing Game..." + bcolors.ENDC)
-    
+    logging.debug(bcolors.OKGREEN + "Game length: " + str(game.end().board().fullmove_number))
+    logging.debug(
+      bcolors.OKBLUE +
+      ("Scanning game for puzzles (depth: %d)..." % settings.depth) +
+      bcolors.ENDC
+    )
     engine.ucinewgame()
 
     # Scan through the game, looking for possible puzzles
@@ -90,7 +93,8 @@ while True:
         cur_score = normalize_score(next_board, info_handler.info["score"][1])
         # import pdb; pdb.set_trace()
         board = node.board()
-        log_str = bcolors.OKGREEN + ("%s %s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
+        log_str = bcolors.OKGREEN
+        log_str += ("%s%s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
         if cur_score.mate:
             log_str += bcolors.OKBLUE + "   Mate: " + str(cur_score.mate)
         else:
