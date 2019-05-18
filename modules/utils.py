@@ -74,10 +74,11 @@ def should_investigate(a, b, board):
         # a player blundered from a checkmating position into being checkmated
         if b.mate and sign(a) != sign(b):
             return True
-        # blundering a mate threat into a major disadvantage
-        elif b.cp and sign(a) != sign(b):
-            return True
-        # blundering a mate threat into an even position
-        elif abs(b.cp) < 110:
-            return True
+        elif b.cp:
+            # blundering a mate threat into a major disadvantage
+            if sign(a) != sign(b):
+                return True
+            # blundering a mate threat into an even position
+            if abs(b.cp) < 110:
+                return True
     return False
