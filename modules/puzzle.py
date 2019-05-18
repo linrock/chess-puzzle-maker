@@ -16,6 +16,7 @@ class Puzzle(object):
         self.last_pos = last_pos.copy()
         self.last_move = last_move
         self.game_id = game_id
+        self.engine = engine
         last_pos.push(last_move)
         self.position_list_node = PositionListNode(
             last_pos, engine, info_handler, strict
@@ -63,7 +64,7 @@ class Puzzle(object):
             position_list_node = position_list_node.next_position
         for h in self.game.headers:
             game.headers[h] = self.game.headers[h]
-        game.headers['Result'] = result
+        game.headers['PuzzleEngine'] = self.engine.name
         game.headers['PuzzleResult'] = result
         return game
 
