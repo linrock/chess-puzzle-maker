@@ -15,14 +15,17 @@ Analysis = namedtuple("Analysis", ["move_uci", "move_san", "evaluation"])
 class PositionListNode(object):
     """ Linked list node of positions within a puzzle
     """
-    def __init__(self, position, player_turn=True, best_move=None, evaluation=None, strict=True):
+    def __init__(self, position, first_move, player_turn=True, best_move=None, evaluation=None, strict=True):
+        self.initial_position = position.copy()
+        self.initial_move = first_move
         self.position = position.copy()
+        self.position.push(first_move)
         self.info_handler = engine.info_handlers[0]
         self.player_turn = player_turn
         self.best_move = best_move
         self.evaluation = evaluation
         self.next_position = None  # PositionListNode
-        self.candidate_move_scores = [] # List<chess.uci.Score>
+        self.candidate_moves = [] # List<chess.uci.Score>
         self.strict = strict
 
     def move_list(self):
@@ -49,10 +52,7 @@ class PositionListNode(object):
         """ Generates the next position in the position list if the current
             position does not have an ambiguous next move
         """
-        logging.debug(bcolors.WARNING + str(self.position) + bcolors.ENDC)
-        logging.debug(bcolors.WARNING + self.position.fen() + bcolors.ENDC)
-        logging.debug(bcolors.BLUE + ('Material difference:  %d' % self.material_difference()))
-        logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.position.legal_moves.count()) + bcolors.ENDC)
+        self._log_position()
         has_best = self.evaluate_best(depth)
         if not has_best:
             logging.debug(bcolors.WARNING + "Not going deeper: game over" + bcolors.ENDC)
@@ -62,7 +62,7 @@ class PositionListNode(object):
             return
         self.evaluate_candidate_moves(depth)
         if has_best and not self.ambiguous() and not self.game_over():
-            logging.debug(bcolors.GREEN + "Going deeper...")
+            logging.debug(bcolors.DIM + "Going deeper..." + bcolors.ENDC)
             self.next_position.generate(depth)
         else:
             log_str = "Not going deeper: "
@@ -71,6 +71,14 @@ class PositionListNode(object):
             elif self.game_over():
                 log_str += "game over"
             logging.debug(bcolors.WARNING + log_str + bcolors.ENDC)
+
+    def _log_position(self):
+        move_san = self.initial_position.san(self.initial_move)
+        logging.debug(bcolors.BLUE + ("\nAfter %s %s" % (fullmove_string(self.initial_position).strip(), move_san)))
+        logging.debug(bcolors.BLUE + self.position.fen())
+        logging.debug(bcolors.WARNING + str(self.position) + bcolors.ENDC)
+        logging.debug(bcolors.DIM + ('Material difference:  %d' % self.material_difference()))
+        logging.debug(bcolors.DIM + ("# legal moves:        %d" % self.position.legal_moves.count()) + bcolors.ENDC)
 
     def _log_move(self, move, score):
         board = self.position
@@ -92,11 +100,10 @@ class PositionListNode(object):
             self.evaluation = self.info_handler.info["score"][1]
             self.next_position = PositionListNode(
                 self.position.copy(),
-                self.info_handler,
-                not self.player_turn,
-                strict = self.strict
+                self.best_move.bestmove,
+                player_turn=not self.player_turn,
+                strict=self.strict
             )
-            self.next_position.position.push(self.best_move.bestmove)
             self._log_move(self.best_move.bestmove, self.evaluation)
             return True
         else:
@@ -117,7 +124,9 @@ class PositionListNode(object):
             move = info["pv"].get(i + 1)[0]
             evaluation = info["score"].get(i + 1)
             self._log_move(move, evaluation)
-            self.candidate_move_scores.append(evaluation)
+            self.candidate_moves.append(
+                Analysis(move.uci(), self.position.san(move), evaluation)
+            )
         engine.setoption({ "MultiPV": 1 })
 
     def material_difference(self):
@@ -158,7 +167,7 @@ class PositionListNode(object):
     def ambiguous(self):
         """ True if it's unclear whether there's a single best player move
         """
-        return ambiguous(self.candidate_move_scores)
+        return ambiguous([move.evaluation for move in self.candidate_moves])
 
     def game_over(self):
         return self.position.is_game_over() or self.next_position.position.is_game_over()

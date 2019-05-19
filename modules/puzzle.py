@@ -14,8 +14,11 @@ class Puzzle(object):
         self.last_pos = last_pos.copy()
         self.last_move = last_move
         self.game = game
-        last_pos.push(last_move)
-        self.position_list_node = PositionListNode(last_pos, strict=strict)
+        self.position_list_node = PositionListNode(
+            last_pos,
+            last_move,
+            strict=strict
+        )
 
     def to_pgn(self):
         return PuzzlePgn(self).export()

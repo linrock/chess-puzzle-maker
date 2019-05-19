@@ -13,12 +13,12 @@ class PuzzlePgn(object):
         """ Returns the scores of the possible candidate moves
         """
         comment = ""
-        for analysis in candidate_moves:
-            comment += analysis.move_san
-            if analysis.evaluation.mate:
-                comment += " (mate in %d) " % analysis.evaluation.mate
+        for candidate_move in candidate_moves:
+            comment += candidate_move.move_san
+            if candidate_move.evaluation.mate:
+                comment += " (mate in %d) " % candidate_move.evaluation.mate
             else:
-                comment += " (%d) " % analysis.evaluation.cp
+                comment += " (%d) " % candidate_move.evaluation.cp
         return comment.strip()
 
     def export(self):
