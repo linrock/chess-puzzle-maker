@@ -75,7 +75,7 @@ def should_investigate(a, b, board):
     elif a.mate is not None:
         if b.mate is not None:
             # blundering a checkmating position into being checkmated
-            if sign(a) != sign(b):
+            if b.mate != 0 and sign(a) != sign(b):
                 return True
         elif b.cp is not None:
             # blundering a mate threat into a major disadvantage

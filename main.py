@@ -96,7 +96,7 @@ while True:
         board = node.board()
         log_str = bcolors.GREEN
         log_str += ("%s%s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
-        if cur_score.mate:
+        if cur_score.mate is not None:
             log_str += bcolors.BLUE + ("   Mate: " + str(cur_score.mate)).ljust(12)
         else:
             log_str += bcolors.BLUE + ("   CP: " + str(cur_score.cp)).ljust(12)

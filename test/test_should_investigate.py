@@ -125,6 +125,11 @@ class TestShouldInvestigate(unittest.TestCase):
         b = chess.uci.Score(None, -5)
         self.assertFalse(should_investigate(a, b, board))
 
+    def test_investigating_mate_threat_to_checkmate(self):
+        a = chess.uci.Score(None, 1)
+        b = chess.uci.Score(None, 0)
+        self.assertFalse(should_investigate(a, b, board))
+
 
 if __name__ == '__main__':
     unittest.main()
