@@ -63,8 +63,6 @@ engine.setoption({
   'Contempt': 0,
 })
 engine.uci()
-info_handler = chess.uci.InfoHandler()
-engine.info_handlers.append(info_handler)
 
 game_id = 0
 
@@ -94,7 +92,8 @@ while True:
         next_board = next_node.board()
         engine.position(next_board)
         engine.go(depth=settings.depth)
-        cur_score = normalize_score(next_board, info_handler.info["score"][1])
+        info = engine.info_handlers[0].info
+        cur_score = normalize_score(next_board, info["score"][1])
         # import pdb; pdb.set_trace()
         board = node.board()
         log_str = bcolors.GREEN
@@ -130,7 +129,7 @@ while True:
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.to_pgn())
             logging.debug(bcolors.HEADER + "NEW PUZZLE GENERATED" + bcolors.ENDC)
-            logging.info(bcolors.WARNING + puzzle_pgn + bcolors.ENDC)
+            logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
             tactics_file = open(settings.output, "a")
             tactics_file.write(puzzle_pgn)
             tactics_file.write("\n\n")

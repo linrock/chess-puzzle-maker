@@ -4,6 +4,7 @@ class bcolors:
     HEADER = '\033[95m'
     BLUE = '\033[94m'
     GREEN = '\033[92m'
+    CYAN = '\033[96m'
     DIM = Style.DIM
 
     WARNING = '\033[93m'
