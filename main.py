@@ -70,8 +70,6 @@ while True:
     game = chess.pgn.read_game(all_games)
     if game == None:
         break
-    node = game
-
     game_id = game_id + 1 
     logging.debug(bcolors.MAGENTA + "\nGame ID: " + str(game_id) + bcolors.ENDC)
     logging.debug(bcolors.BLUE + str(game)  + bcolors.ENDC)
@@ -87,6 +85,7 @@ while True:
     engine.ucinewgame()
 
     # Scan through the game, looking for possible puzzles
+    node = game
     while not node.is_end():
         next_node = node.variation(0)
         next_board = next_node.board()

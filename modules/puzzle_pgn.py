@@ -21,6 +21,16 @@ class PuzzlePgn(object):
                 comment += " (%d) " % candidate_move.evaluation.cp
         return comment.strip()
 
+    def puzzle_winner(self):
+      node = self.puzzle.position_list_node
+      while node.next_position and node.next_position.evaluation:
+          node = node.next_position
+      score = node.evaluation
+      if score.mate == 1:
+          return "White"
+      elif score.mate == -1:
+          return "Black"
+
     def export(self):
         """ Returns a chess.Game instance
         """
@@ -28,22 +38,19 @@ class PuzzlePgn(object):
         fen = puzzle.last_pos.fen()
         board = chess.Board(fen)
         game = chess.pgn.Game().from_board(board)
-        
-        # In the tactic the first to move is the one who lost
-        result = '1-0' # result of the tactic not the game
-        if board.turn: # turn return true if white
-            result = '0-1'
-
-        node = game.add_variation(puzzle.last_move)
+        game_node = game.add_variation(puzzle.last_move)
         position_list_node = puzzle.position_list_node
         for m in position_list_node.move_list():
-            node = node.add_variation(chess.Move.from_uci(m))
-            node.comment = self.candidate_moves_annotations(
+            game_node = game_node.add_variation(chess.Move.from_uci(m))
+            game_node.comment = self.candidate_moves_annotations(
                 position_list_node.candidate_moves
             )
             position_list_node = position_list_node.next_position
         for h in puzzle.game.headers:
             game.headers[h] = puzzle.game.headers[h]
         game.headers['PuzzleEngine'] = engine.name
-        game.headers['PuzzleResult'] = result
+        # import ipdb ; ipdb.set_trace()
+        puzzle_winner = self.puzzle_winner()
+        if puzzle_winner:
+            game.headers['PuzzleWinner'] = puzzle_winner
         return game
