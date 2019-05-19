@@ -7,7 +7,7 @@ import chess
 from modules.bcolors import bcolors
 from modules.candidate_moves import ambiguous
 from modules.analysis import engine
-from modules.utils import material_difference, material_count, fullmove_string
+from modules.utils import material_difference, material_count, fullmove_string, normalize_score
 
 
 CandidateMove = namedtuple("CandidateMove", ["move_uci", "move_san", "evaluation"])
@@ -90,6 +90,7 @@ class PositionListNode(object):
         log_str = bcolors.GREEN
         log_str += ("%s%s (%s)" % (fullmove_string(board), move_san, move.uci())).ljust(22)
         log_str += bcolors.BLUE
+        score = normalize_score(self.position, score)
         if score.mate is not None:
             log_str += "   Mate: %d" % score.mate
         else:
