@@ -10,20 +10,23 @@ from modules.analysis import engine
 from modules.utils import material_difference, material_count, fullmove_string
 
 
-Analysis = namedtuple("Analysis", ["move_uci", "move_san", "evaluation"])
+CandidateMove = namedtuple("CandidateMove", ["move_uci", "move_san", "evaluation"])
 
 class PositionListNode(object):
     """ Linked list node of positions within a puzzle
     """
-    def __init__(self, position, first_move, player_turn=True, best_move=None, evaluation=None, strict=True):
+    def __init__(self, position, initial_move, player_turn=True, strict=True):
+        """ initial_move - the move leading into the position to evaluate
+            position - chess.Board instance. The position being evaluated
+        """
         self.initial_position = position.copy()
-        self.initial_move = first_move
+        self.initial_move = initial_move
         self.position = position.copy()
-        self.position.push(first_move)
+        self.position.push(initial_move)
         self.info_handler = engine.info_handlers[0]
         self.player_turn = player_turn
-        self.best_move = best_move
-        self.evaluation = evaluation
+        self.best_move = None
+        self.evaluation = None
         self.next_position = None  # PositionListNode
         self.candidate_moves = [] # List<chess.uci.Score>
         self.strict = strict
@@ -58,11 +61,12 @@ class PositionListNode(object):
             logging.debug(bcolors.WARNING + "Not going deeper: game over" + bcolors.ENDC)
             return
         if not self.player_turn:
+            logging.debug(bcolors.DIM + "Going deeper...\n" + bcolors.ENDC)
             self.next_position.generate(depth)
             return
         self.evaluate_candidate_moves(depth)
         if has_best and not self.ambiguous() and not self.game_over():
-            logging.debug(bcolors.DIM + "Going deeper..." + bcolors.ENDC)
+            logging.debug(bcolors.DIM + "Going deeper...\n" + bcolors.ENDC)
             self.next_position.generate(depth)
         else:
             log_str = "Not going deeper: "
@@ -74,11 +78,11 @@ class PositionListNode(object):
 
     def _log_position(self):
         move_san = self.initial_position.san(self.initial_move)
-        logging.debug(bcolors.BLUE + ("\nAfter %s %s" % (fullmove_string(self.initial_position).strip(), move_san)))
+        logging.debug(bcolors.BLUE + ("After %s %s" % (fullmove_string(self.initial_position).strip(), move_san)))
         logging.debug(bcolors.BLUE + self.position.fen())
         logging.debug(bcolors.WARNING + str(self.position) + bcolors.ENDC)
-        logging.debug(bcolors.DIM + ('Material difference:  %d' % self.material_difference()))
-        logging.debug(bcolors.DIM + ("# legal moves:        %d" % self.position.legal_moves.count()) + bcolors.ENDC)
+        logging.debug(bcolors.BLUE + ('Material difference:  %d' % self.material_difference()))
+        logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.position.legal_moves.count()) + bcolors.ENDC)
 
     def _log_move(self, move, score):
         board = self.position
@@ -93,7 +97,7 @@ class PositionListNode(object):
         logging.debug(log_str + bcolors.ENDC)
 
     def evaluate_best(self, depth):
-        logging.debug(bcolors.DIM + "Evaluating best move..." + bcolors.ENDC)
+        logging.debug(bcolors.DIM + ("Evaluating best move (depth %d)..." % depth) + bcolors.ENDC)
         engine.position(self.position)
         self.best_move = engine.go(depth=depth)
         if self.best_move.bestmove is not None:
@@ -115,7 +119,7 @@ class PositionListNode(object):
         multipv = min(3, self.position.legal_moves.count())
         if multipv == 0:
             return
-        logging.debug(bcolors.DIM + ("Evaluating best %d moves..." % multipv) + bcolors.ENDC)
+        logging.debug(bcolors.DIM + ("Evaluating best %d moves (depth %d)..." % (multipv, depth)) + bcolors.ENDC)
         engine.setoption({ "MultiPV": multipv })
         engine.position(self.position)
         engine.go(depth=depth)
@@ -125,7 +129,7 @@ class PositionListNode(object):
             evaluation = info["score"].get(i + 1)
             self._log_move(move, evaluation)
             self.candidate_moves.append(
-                Analysis(move.uci(), self.position.san(move), evaluation)
+                CandidateMove(move.uci(), self.position.san(move), evaluation)
             )
         engine.setoption({ "MultiPV": 1 })
 

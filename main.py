@@ -77,7 +77,6 @@ while True:
     prev_score = chess.uci.Score(0, None)
     puzzles = []
     
-    logging.debug(bcolors.DIM + "Game length: " + str(game.end().board().fullmove_number) + bcolors.ENDC)
     logging.debug(
         bcolors.DIM +
         ("Scanning game for puzzles (depth: %d)..." % settings.depth) +
