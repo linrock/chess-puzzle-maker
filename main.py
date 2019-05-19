@@ -18,9 +18,11 @@ from modules.utils import fullmove_string, normalize_score, should_investigate
 from modules.analysis import engine
 
 
-parser = argparse.ArgumentParser(description=__doc__)
-
-parser.add_argument("games", metavar="GAMES", default="games.pgn",
+parser = argparse.ArgumentParser(
+    description=__doc__,
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+parser.add_argument("games", metavar="GAMES", nargs="?", type=str, default="games.pgn",
                     help="A PGN file with games to scan for puzzles")
 
 parser.add_argument("--threads", metavar="THREADS", nargs="?", type=int, default=2,
@@ -53,6 +55,8 @@ logging.basicConfig(format="%(message)s", level=settings.loglevel, stream=sys.st
 logging.getLogger("requests.packages.urllib3").setLevel(logging.WARNING)
 logging.getLogger("chess").setLevel(logging.WARNING)
 
+all_games = open(settings.games, "r")
+
 engine.setoption({
   'Threads': settings.threads,
   'Hash': settings.memory,
@@ -62,7 +66,6 @@ engine.uci()
 info_handler = chess.uci.InfoHandler()
 engine.info_handlers.append(info_handler)
 
-all_games = open(settings.games, "r")
 game_id = 0
 
 while True:

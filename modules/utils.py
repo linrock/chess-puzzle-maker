@@ -28,16 +28,11 @@ def material_count(board):
 
 def fullmove_string(board):
     move_num = board.fullmove_number
-    move_str = str(move_num)
     if board.turn:
-        move_str = "%s.    " % move_str
+        move_str = "%s." % move_num
     else:
-        move_str = "%s...  " % move_str
-    if move_num < 10:
-        move_str += "  "
-    elif move_num < 100:
-        move_str += " "
-    return move_str
+        move_str = "%s..." % move_num
+    return move_str.ljust(7)
 
 def normalize_score(board, score):
     """ flip the signs of the score to be from white's perspective
