@@ -22,7 +22,7 @@ class PositionListNode(object):
         self.best_move = best_move
         self.evaluation = evaluation
         self.next_position = None  # PositionListNode
-        self.candidate_moves = []
+        self.candidate_move_scores = [] # List<chess.uci.Score>
         self.strict = strict
 
     def move_list(self):
@@ -54,6 +54,9 @@ class PositionListNode(object):
         logging.debug(bcolors.BLUE + ('Material difference:  %d' % self.material_difference()))
         logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.position.legal_moves.count()) + bcolors.ENDC)
         has_best = self.evaluate_best(depth)
+        if not has_best:
+            logging.debug(bcolors.WARNING + "Not going deeper: game over" + bcolors.ENDC)
+            return
         if not self.player_turn:
             self.next_position.generate(depth)
             return
@@ -69,6 +72,18 @@ class PositionListNode(object):
                 log_str += "game over"
             logging.debug(bcolors.WARNING + log_str + bcolors.ENDC)
 
+    def _log_move(self, move, score):
+        board = self.position
+        move_san = board.san(move)
+        log_str = bcolors.GREEN
+        log_str += ("%s%s (%s)" % (fullmove_string(board), move_san, move.uci())).ljust(22)
+        log_str += bcolors.BLUE
+        if score.mate is not None:
+            log_str += "   Mate: %d" % score.mate
+        else:
+            log_str += "   CP: %d" % score.cp
+        logging.debug(log_str + bcolors.ENDC)
+
     def evaluate_best(self, depth):
         logging.debug(bcolors.DIM + "Evaluating best move..." + bcolors.ENDC)
         engine.position(self.position)
@@ -82,15 +97,7 @@ class PositionListNode(object):
                 strict = self.strict
             )
             self.next_position.position.push(self.best_move.bestmove)
-            move = self.best_move.bestmove
-            move_san = self.position.san(move)
-            log_str = bcolors.GREEN
-            log_str += ("%s%s (%s)" % (fullmove_string(self.position), move_san, move.uci())).ljust(22)
-            if self.evaluation.mate:
-                log_str += bcolors.BLUE + "   Mate: " + str(self.evaluation.mate)
-            else:
-                log_str += bcolors.BLUE + "   CP: " + str(self.evaluation.cp)
-            logging.debug(log_str + bcolors.ENDC)
+            self._log_move(self.best_move.bestmove, self.evaluation)
             return True
         else:
             logging.debug(bcolors.FAIL + "No best move!" + bcolors.ENDC)
@@ -108,18 +115,9 @@ class PositionListNode(object):
         info = self.info_handler.info
         for i in range(multipv):
             move = info["pv"].get(i + 1)[0]
-            move_uci = move.uci()
-            move_san = self.position.san(move)
             evaluation = info["score"].get(i + 1)
-            analysis = Analysis(move_uci, move_san, evaluation)
-            log_str = bcolors.GREEN
-            log_str += ("%s%s (%s)" % (fullmove_string(self.position), move_san, move_uci)).ljust(22)
-            if evaluation.mate:
-                log_str += bcolors.BLUE + "   Mate: " + str(evaluation.mate)
-            else:
-                log_str += bcolors.BLUE + "   CP: " + str(evaluation.cp)
-            logging.debug(log_str + bcolors.ENDC)
-            self.candidate_moves.append(analysis)
+            self._log_move(move, evaluation)
+            self.candidate_move_scores.append(evaluation)
         engine.setoption({ "MultiPV": 1 })
 
     def material_difference(self):
@@ -160,7 +158,7 @@ class PositionListNode(object):
     def ambiguous(self):
         """ True if it's unclear whether there's a single best player move
         """
-        return ambiguous([move.evaluation for move in self.candidate_moves])
+        return ambiguous(self.candidate_move_scores)
 
     def game_over(self):
         return self.position.is_game_over() or self.next_position.position.is_game_over()
