@@ -62,12 +62,8 @@ class PositionListNode(object):
             if not has_best:
                 logging.debug(bcolors.WARNING + "Not going deeper: game over" + bcolors.ENDC)
                 return
-        if not self.player_turn:
-            logging.debug(bcolors.DIM + "Going deeper...\n" + bcolors.ENDC)
-            self.next_position.generate(depth)
-            return
         self.evaluate_candidate_moves(depth)
-        if has_best and not self.ambiguous() and not self.game_over():
+        if not self.player_turn or (has_best and not self.ambiguous() and not self.game_over()):
             logging.debug(bcolors.DIM + "Going deeper...\n" + bcolors.ENDC)
             self.next_position.generate(depth)
         else:
