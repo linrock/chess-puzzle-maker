@@ -23,7 +23,6 @@ class PositionListNode(object):
         self.initial_move = initial_move
         self.position = position.copy()
         self.position.push(initial_move)
-        self.info_handler = engine.info_handlers[0]
         self.player_turn = player_turn
         self.best_move = None
         self.evaluation = None
@@ -105,7 +104,7 @@ class PositionListNode(object):
         engine.position(self.position)
         self.best_move = engine.go(depth=depth)
         if self.best_move.bestmove is not None:
-            self.evaluation = self.info_handler.info["score"][1]
+            self.evaluation = engine.info_handlers[0].info["score"][1]
             self.next_position = PositionListNode(
                 self.position.copy(),
                 self.best_move.bestmove,
@@ -127,7 +126,7 @@ class PositionListNode(object):
         engine.setoption({ "MultiPV": multipv })
         engine.position(self.position)
         engine.go(depth=depth)
-        info = self.info_handler.info
+        info = engine.info_handlers[0].info
         for i in range(multipv):
             move = info["pv"].get(i + 1)[0]
             evaluation = info["score"].get(i + 1)

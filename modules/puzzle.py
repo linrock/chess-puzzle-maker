@@ -8,7 +8,14 @@ from modules.bcolors import bcolors
 MIN_MOVES = 3
 
 class Puzzle(object):
-    """ last_pos = chess.Board instance
+    """ last_pos [chess.Board]:
+          board before the first move in the puzzle
+
+        last_move [chess.uci.Move]:
+          the first move in the puzzle
+
+        position_list_node [PositionListNode]:
+          the first position in the list of puzzle positions
     """
     def __init__(self, last_pos, last_move, game, strict):
         self.last_pos = last_pos.copy()
