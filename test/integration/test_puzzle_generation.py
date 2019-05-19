@@ -31,6 +31,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         )
         puzzle.generate()
         self.assertTrue(puzzle.is_complete())
+        # self.assertTrue(len(str(puzzle.to_pgn()) > 0))
 
 
 if __name__ == '__main__':

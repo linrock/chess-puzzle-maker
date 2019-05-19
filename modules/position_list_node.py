@@ -55,11 +55,11 @@ class PositionListNode(object):
         """
         self._log_position()
         if self.position.legal_moves.count() == 0:
-            logging.debug(bcolors.WARNING + "Not going deeper: no legal moves" + bcolors.ENDC)
+            logging.debug(bcolors.YELLOW + "Not going deeper: no legal moves" + bcolors.ENDC)
             return
         has_best = self.evaluate_best(depth)
         if not has_best:
-            logging.debug(bcolors.WARNING + "Not going deeper: game over" + bcolors.ENDC)
+            logging.debug(bcolors.YELLOW + "Not going deeper: game over" + bcolors.ENDC)
             return
         self.evaluate_candidate_moves(depth)
         if not self.player_turn or (has_best and not self.ambiguous() and not self.game_over()):
@@ -71,13 +71,13 @@ class PositionListNode(object):
                 log_str += "ambiguous"
             elif self.game_over():
                 log_str += "game over"
-            logging.debug(bcolors.WARNING + log_str + bcolors.ENDC)
+            logging.debug(bcolors.YELLOW + log_str + bcolors.ENDC)
 
     def _log_position(self):
         move_san = self.initial_position.san(self.initial_move)
         logging.debug(bcolors.BLUE + ("After %s %s" % (fullmove_string(self.initial_position).strip(), move_san)))
         logging.debug(bcolors.BLUE + self.position.fen())
-        logging.debug(bcolors.WARNING + str(self.position) + bcolors.ENDC)
+        logging.debug(bcolors.YELLOW + str(self.position) + bcolors.ENDC)
         logging.debug(bcolors.BLUE + ('Material difference:  %d' % self.material_difference()))
         logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.position.legal_moves.count()) + bcolors.ENDC)
 
@@ -109,7 +109,7 @@ class PositionListNode(object):
             self._log_move(self.best_move.bestmove, self.evaluation)
             return True
         else:
-            logging.debug(bcolors.FAIL + "No best move!" + bcolors.ENDC)
+            logging.debug(bcolors.RED + "No best move!" + bcolors.ENDC)
             return False
 
     # Analyze the best possible moves from the current position

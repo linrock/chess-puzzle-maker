@@ -73,7 +73,7 @@ while True:
     node = game
 
     game_id = game_id + 1 
-    logging.debug(bcolors.HEADER + "\nGame ID: " + str(game_id) + bcolors.ENDC)
+    logging.debug(bcolors.MAGENTA + "\nGame ID: " + str(game_id) + bcolors.ENDC)
     logging.debug(bcolors.BLUE + str(game)  + bcolors.ENDC)
     
     prev_score = chess.uci.Score(0, None)
@@ -104,7 +104,7 @@ while True:
             log_str += bcolors.BLUE + ("   CP: " + str(cur_score.cp)).ljust(12)
         if should_investigate(prev_score, cur_score, board):
             # Found a possible puzzle
-            log_str += bcolors.WARNING + "   Investigate!" + bcolors.ENDC
+            log_str += bcolors.YELLOW + "   Investigate!" + bcolors.ENDC
             puzzle = Puzzle(
                 board,
                 next_node.move,
@@ -118,17 +118,17 @@ while True:
         node = next_node
 
     n = len(puzzles)
-    logging.debug(bcolors.WARNING + ("# positions to consider as puzzles = %d" % n))
+    logging.debug(bcolors.YELLOW + ("# positions to consider as puzzles = %d" % n))
     if settings.scan_only:
         continue
     for i, puzzle in enumerate(puzzles):
         logging.debug("")
-        logging.debug(bcolors.HEADER + ("Considering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
+        logging.debug(bcolors.MAGENTA + ("Considering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
         # use depth 22 to explore puzzle positions
         puzzle.generate()
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.to_pgn())
-            logging.debug(bcolors.HEADER + "NEW PUZZLE GENERATED" + bcolors.ENDC)
+            logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED" + bcolors.ENDC)
             logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
             tactics_file = open(settings.output, "a")
             tactics_file.write(puzzle_pgn)

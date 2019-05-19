@@ -1,14 +1,14 @@
 from colorama import Fore, Style
 
 class bcolors:
-    HEADER = '\033[95m'
     BLUE = '\033[94m'
-    GREEN = '\033[92m'
     CYAN = '\033[96m'
-    DIM = Style.DIM
+    GREEN = '\033[92m'
+    MAGENTA = '\033[95m'
+    RED = '\033[91m'
+    YELLOW = '\033[93m'
 
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
+    DIM = Style.DIM
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'

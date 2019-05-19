@@ -49,7 +49,7 @@ class Puzzle(object):
         if self.is_complete():
             logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
         else:
-            logging.debug(bcolors.FAIL + "Puzzle incomplete" + bcolors.ENDC)
+            logging.debug(bcolors.RED + "Puzzle incomplete" + bcolors.ENDC)
 
     def category(self):
         return self.position_list_node.category()
