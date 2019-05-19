@@ -13,7 +13,6 @@ class TestPuzzleIsComplete(unittest.TestCase):
             board,
             chess.Move.from_uci("e2e4"),
             chess.pgn.Game(),
-            False,
         )
         puzzle.generate()
         self.assertFalse(puzzle.is_complete())
@@ -27,11 +26,13 @@ class TestPuzzleIsComplete(unittest.TestCase):
             board,
             board.parse_san('Rxh7+'),
             chess.pgn.Game(),
-            False,
         )
         puzzle.generate()
         self.assertTrue(puzzle.is_complete())
-        # self.assertTrue(len(str(puzzle.to_pgn()) > 0))
+        self.assertEqual(
+            puzzle.position_list_node.move_list(),
+            ['h8h7', 'f1h1', 'h7g7', 'd2h6'],
+        )
 
 
 if __name__ == '__main__':
