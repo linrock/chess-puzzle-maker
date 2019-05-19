@@ -36,8 +36,6 @@ parser.add_argument("--quiet", dest="loglevel",
                     help="substantially reduce the number of logged messages")
 parser.add_argument("--output", metavar="OUTPUT_PGN", default="tactics.out.pgn",
                     help="An output pgn file")
-parser.add_argument("--strict", metavar="STRICT", default=True,
-                    help="If False then it will be generate more tactics but maybe a little ambiguous")
 parser.add_argument("--scan-only", default=False, action="store_true",
                     help="Only scan for possible puzzles. Don't analyze positions")
 settings = parser.parse_args()
@@ -108,7 +106,6 @@ while True:
                 board,
                 next_node.move,
                 game,
-                settings.strict
             )
             puzzles.append(puzzle)
         logging.debug(log_str + bcolors.ENDC)

@@ -7,8 +7,6 @@ def ambiguous(scores):
     """
     if len(scores) <= 1:
         return False
-    # If strict == False then it will generate more tactics but more ambiguous
-    # move_number = 1 if self.strict == True else 2
     best_move_score = scores[0].cp
     second_best_move_score = scores[1].cp
     if (best_move_score is not None and second_best_move_score is not None):

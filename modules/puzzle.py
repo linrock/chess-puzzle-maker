@@ -17,14 +17,13 @@ class Puzzle(object):
         position_list_node [PositionListNode]:
           the first position in the list of puzzle positions
     """
-    def __init__(self, last_pos, last_move, game, strict):
+    def __init__(self, last_pos, last_move, game):
         self.last_pos = last_pos.copy()
         self.last_move = last_move
         self.game = game
         self.position_list_node = PositionListNode(
             last_pos,
             last_move,
-            strict=strict
         )
 
     def to_pgn(self):

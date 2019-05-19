@@ -15,7 +15,7 @@ CandidateMove = namedtuple("CandidateMove", ["move_uci", "move_san", "evaluation
 class PositionListNode(object):
     """ Linked list node of positions within a puzzle
     """
-    def __init__(self, position, initial_move, player_turn=True, strict=True):
+    def __init__(self, position, initial_move, player_turn=True):
         """ initial_move - the move leading into the position to evaluate
             position - chess.Board instance. The position being evaluated
         """
@@ -28,7 +28,6 @@ class PositionListNode(object):
         self.evaluation = None
         self.next_position = None  # PositionListNode
         self.candidate_moves = [] # List<chess.uci.Score>
-        self.strict = strict
 
     def move_list(self):
         """ Returns a list of UCI moves starting from this position list node
@@ -104,7 +103,6 @@ class PositionListNode(object):
                 self.position.copy(),
                 self.best_move.bestmove,
                 player_turn=not self.player_turn,
-                strict=self.strict
             )
             self._log_move(self.best_move.bestmove, self.evaluation)
             return True
