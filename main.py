@@ -27,7 +27,7 @@ parser.add_argument("games", metavar="GAMES", nargs="?", type=str, default="game
 
 parser.add_argument("--threads", metavar="THREADS", nargs="?", type=int, default=2,
                     help="number of engine threads")
-parser.add_argument("--memory", metavar="MEMORY", nargs="?", type=int, default=4096,
+parser.add_argument("--memory", metavar="MEMORY", nargs="?", type=int, default=2048,
                     help="memory in MB to use for engine hashtables")
 parser.add_argument("--depth", metavar="DEPTH", nargs="?", type=int, default=15,
                     help="stockfish depth for scanning for candidate puzzles")

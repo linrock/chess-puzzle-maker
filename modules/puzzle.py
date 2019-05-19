@@ -23,7 +23,7 @@ class Puzzle(object):
     def to_pgn(self):
         return PuzzlePgn(self).export()
 
-    def color(self):
+    def white_to_move(self):
         return self.position_list_node.position.turn
 
     def is_complete(self):
@@ -33,8 +33,7 @@ class Puzzle(object):
             return False
         return self.position_list_node.is_complete(
             self.position_list_node.category(),
-            self.color(),
-            True,
+            self.white_to_move(),
             self.position_list_node.material_difference()
         )
 

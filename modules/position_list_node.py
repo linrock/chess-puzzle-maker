@@ -43,13 +43,12 @@ class PositionListNode(object):
             return [self.best_move.bestmove.uci()] + self.next_position.move_list()
 
     def category(self):
-        if self.next_position is None:
-            if self.position.is_game_over():
-                return 'Mate'
-            else:
-                return 'Material'
-        else:
+        if self.next_position:
             return self.next_position.category()
+        elif self.position.is_game_over():
+            return 'Mate'
+        else:
+            return 'Material'
 
     def generate(self, depth):
         """ Generates the next position in the position list if the current
@@ -141,19 +140,21 @@ class PositionListNode(object):
     def material_difference(self):
         return material_difference(self.position)
 
-    def is_complete(self, category, color, first_node, first_val):
-        if self.next_position is not None:
-            if ((category == 'Mate' and not self.ambiguous())
-                or (category == 'Material' and self.next_position.next_position is not None)):
-                return self.next_position.is_complete(category, color, False, first_val)
+    def is_complete(self, category, white_to_move, initial_material_diff):
+        if self.next_position:
+            if category == 'Mate' and not self.ambiguous():
+                return self.next_position.is_complete(category, white_to_move, initial_material_diff)
+            elif category == 'Material' and self.next_position.next_position:
+                return self.next_position.is_complete(category, white_to_move, initial_material_diff)
 
         # if the position was converted into a material advantage
-        num_pieces = material_count(self.position)
         if category == 'Material':
-            if color:
+            num_pieces = material_count(self.position)
+            final_material_change = abs(self.material_difference() - initial_material_diff)
+            if white_to_move:
                 if (self.material_difference() > 0.2 
-                    and abs(self.material_difference() - first_val) > 0.1 
-                    and first_val < 2
+                    and final_material_change > 0.1
+                    and initial_material_diff < 2
                     and self.evaluation.mate is None
                     and num_pieces > 6):
                     return True
@@ -161,8 +162,8 @@ class PositionListNode(object):
                     return False
             else:
                 if (self.material_difference() < -0.2 
-                    and abs(self.material_difference() - first_val) > 0.1
-                    and first_val > -2
+                    and final_material_change > 0.1
+                    and initial_material_diff > -2
                     and self.evaluation.mate is None
                     and num_pieces > 6):
                     return True
