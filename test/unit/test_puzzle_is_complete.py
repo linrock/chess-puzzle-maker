@@ -13,7 +13,6 @@ class TestPuzzleIsComplete(unittest.TestCase):
             board,
             chess.Move.from_uci("e2e4"),
             chess.pgn.Game(),
-            False,
         )
         self.assertFalse(puzzle.is_complete())
 
