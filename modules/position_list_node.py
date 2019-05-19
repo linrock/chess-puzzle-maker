@@ -56,10 +56,14 @@ class PositionListNode(object):
             position does not have an ambiguous next move
         """
         self._log_position()
-        has_best = self.evaluate_best(depth)
-        if not has_best:
-            logging.debug(bcolors.WARNING + "Not going deeper: game over" + bcolors.ENDC)
+        if self.position.legal_moves.count() == 0:
+            logging.debug(bcolors.WARNING + "Not going deeper: no legal moves" + bcolors.ENDC)
             return
+        else:
+            has_best = self.evaluate_best(depth)
+            if not has_best:
+                logging.debug(bcolors.WARNING + "Not going deeper: game over" + bcolors.ENDC)
+                return
         if not self.player_turn:
             logging.debug(bcolors.DIM + "Going deeper...\n" + bcolors.ENDC)
             self.next_position.generate(depth)
