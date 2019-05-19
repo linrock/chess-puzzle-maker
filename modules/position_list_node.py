@@ -57,11 +57,10 @@ class PositionListNode(object):
         if self.position.legal_moves.count() == 0:
             logging.debug(bcolors.WARNING + "Not going deeper: no legal moves" + bcolors.ENDC)
             return
-        else:
-            has_best = self.evaluate_best(depth)
-            if not has_best:
-                logging.debug(bcolors.WARNING + "Not going deeper: game over" + bcolors.ENDC)
-                return
+        has_best = self.evaluate_best(depth)
+        if not has_best:
+            logging.debug(bcolors.WARNING + "Not going deeper: game over" + bcolors.ENDC)
+            return
         self.evaluate_candidate_moves(depth)
         if not self.player_turn or (has_best and not self.ambiguous() and not self.game_over()):
             logging.debug(bcolors.DIM + "Going deeper...\n" + bcolors.ENDC)

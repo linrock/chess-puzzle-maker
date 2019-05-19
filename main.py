@@ -76,7 +76,7 @@ while True:
 
     game_id = game_id + 1 
     logging.debug(bcolors.HEADER + "\nGame ID: " + str(game_id) + bcolors.ENDC)
-    logging.debug(bcolors.WARNING + str(game)  + bcolors.ENDC)
+    logging.debug(bcolors.BLUE + str(game)  + bcolors.ENDC)
     
     prev_score = chess.uci.Score(0, None)
     puzzles = []
@@ -130,7 +130,7 @@ while True:
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.to_pgn())
             logging.debug(bcolors.HEADER + "NEW PUZZLE GENERATED" + bcolors.ENDC)
-            logging.info(bcolors.BLUE + puzzle_pgn + bcolors.ENDC)
+            logging.info(bcolors.WARNING + puzzle_pgn + bcolors.ENDC)
             tactics_file = open(settings.output, "a")
             tactics_file.write(puzzle_pgn)
             tactics_file.write("\n\n")
