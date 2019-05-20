@@ -30,6 +30,17 @@ class PuzzlePgn(object):
             return "White"
         elif position.score.mate == -1:
             return "Black"
+        initial_cp = self.puzzle.initial_score.cp
+        final_cp = self.puzzle.final_score.cp
+        if initial_cp and final_cp:
+            if final_cp - initial_cp > 100:
+                return "White"
+            elif final_cp - initial_cp < -100:
+                return "Black"
+            elif initial_cp < 0 and abs(final_cp) < 50:
+                return "White"
+            elif initial_cp > 0 and abs(final_cp) < 50:
+                return "Black"
 
     def export(self, pgn_headers=None) -> chess.pgn.Game:
         fen = self.puzzle.initial_board.fen()
@@ -53,9 +64,9 @@ class PuzzlePgn(object):
         if pgn_headers:
             for h in pgn_headers:
                 game.headers[h] = pgn_headers[h]
-        game.headers['PuzzleEngine'] = engine.name or ""
         game.headers['PuzzleCategory'] = self.puzzle.category()
         puzzle_winner = self._puzzle_winner()
         if puzzle_winner:
             game.headers['PuzzleWinner'] = puzzle_winner
+        game.headers['PuzzleEngine'] = engine.name or ""
         return game
