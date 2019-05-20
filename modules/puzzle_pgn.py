@@ -15,7 +15,7 @@ class PuzzlePgn(object):
     def __init__(self, puzzle):
         self.puzzle = puzzle
 
-    def candidate_moves_annotations(self, candidate_moves):
+    def _candidate_moves_annotations(self, candidate_moves):
         """ Returns the scores of the possible candidate moves
         """
         comment = ""
@@ -24,7 +24,7 @@ class PuzzlePgn(object):
             comment += " (%s) " % score_to_str(candidate_move.score)
         return comment.strip()
 
-    def puzzle_winner(self):
+    def _puzzle_winner(self):
         position = self.puzzle.positions[-2]
         if position.score.mate == 1:
             return "White"
@@ -44,7 +44,7 @@ class PuzzlePgn(object):
             )
             if comment:
                 game_node.comment = comment
-            comment = self.candidate_moves_annotations(
+            comment = self._candidate_moves_annotations(
                 position.candidate_moves
             )
         if pgn_headers:
@@ -52,7 +52,7 @@ class PuzzlePgn(object):
                 game.headers[h] = pgn_headers[h]
         game.headers['PuzzleEngine'] = engine.name or ""
         game.headers['PuzzleCategory'] = self.puzzle.category()
-        puzzle_winner = self.puzzle_winner()
+        puzzle_winner = self._puzzle_winner()
         if puzzle_winner:
             game.headers['PuzzleWinner'] = puzzle_winner
         return game

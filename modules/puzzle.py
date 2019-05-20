@@ -37,16 +37,13 @@ class Puzzle(object):
         # self.check_ambiguity = check_ambiguity
         self.check_ambiguity = True
 
-    def export(self, pgn_headers=None) -> chess.pgn.Game:
-        return PuzzlePgn(self).export(pgn_headers)
-
-    def calculate_initial_score(self, depth):
+    def _calculate_initial_score(self, depth):
         engine.setoption({ "MultiPV": 1 })
         engine.position(self.initial_board)
         engine.go(depth=depth)
         self.initial_score = engine.info_handlers[0].info["score"][1]
 
-    def calculate_final_score(self, depth):
+    def _calculate_final_score(self, depth):
         final_score = self.positions[-1].score
         if final_score:
             self.final_score = final_score
@@ -56,6 +53,9 @@ class Puzzle(object):
             engine.go(depth=depth)
             self.final_score = engine.info_handlers[0].info["score"][1]
 
+    def export(self, pgn_headers=None) -> chess.pgn.Game:
+        return PuzzlePgn(self).export(pgn_headers)
+
     def generate(self, depth):
         """ Generate new positions until a final position is reached
         """
@@ -64,7 +64,7 @@ class Puzzle(object):
         else:
             logging.debug(bcolors.DIM + "Not checking this puzzle for move ambiguity" + bcolors.ENDC)
             is_player_move = None
-        self.calculate_initial_score(depth)
+        self._calculate_initial_score(depth)
         position = self.initial_position
         position.evaluate(depth)
         while True:
@@ -89,7 +89,7 @@ class Puzzle(object):
             position.evaluate(depth)
             if self.check_ambiguity:
                 is_player_move = not is_player_move
-        self.calculate_final_score(depth)
+        self._calculate_final_score(depth)
         if self.is_complete():
             logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
         else:

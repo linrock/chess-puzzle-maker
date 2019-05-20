@@ -14,8 +14,8 @@ class PuzzlePosition(object):
     def __init__(self, initial_board, initial_move):
         """ board [chess.Board] - board representing the position to evaluate
             initial_move [chess.uci.Move] - the move leading into the position to evaluate
-            best_move [chess.uci.Move] - the best move from the board position
-            score [chess.uci.Score] - score for the current position
+            best_move [chess.uci.Move] - the best move from the board position (after initial_move)
+            score [chess.uci.Score] - the score for the board position (after initial_move)
             candidate_moves [List<CandidateMove>] - list of candidate moves from this position
         """
         self.initial_board = initial_board.copy()
@@ -26,15 +26,12 @@ class PuzzlePosition(object):
         self.score = None
         self.candidate_moves = []
 
-    def _material_difference(self):
-        return material_difference(self.board)
-
     def _log_position(self):
         move_san = self.initial_board.san(self.initial_move)
         logging.debug(bcolors.BLUE + ("After %s %s" % (fullmove_string(self.initial_board).strip(), move_san)))
         logging.debug(bcolors.BLUE + self.board.fen())
         logging.debug(bcolors.YELLOW + str(self.board) + bcolors.ENDC)
-        logging.debug(bcolors.BLUE + ('Material difference:  %d' % self._material_difference()))
+        logging.debug(bcolors.BLUE + ('Material difference:  %d' % material_difference(self.board)))
         logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.board.legal_moves.count()) + bcolors.ENDC)
 
     def _log_move(self, move, score):
@@ -49,16 +46,7 @@ class PuzzlePosition(object):
             log_str += "   CP: %d" % score.cp
         logging.debug(log_str + bcolors.ENDC)
 
-    def evaluate(self, depth):
-        self._log_position()
-        if self.board.legal_moves.count() == 0:
-            return
-        self.calculate_best_move(depth)
-        if not self.best_move:
-            return
-        self.calculate_candidate_moves(depth)
-
-    def calculate_best_move(self, depth):
+    def _calculate_best_move(self, depth):
         """ Find the best move from board position using multipv 1
         """
         logging.debug(
@@ -73,7 +61,7 @@ class PuzzlePosition(object):
         else:
             logging.debug(bcolors.RED + "No best move!" + bcolors.ENDC)
 
-    def calculate_candidate_moves(self, depth):
+    def _calculate_candidate_moves(self, depth):
         """ Find the best move from board position using multipv 3
         """
         multipv = min(3, self.board.legal_moves.count())
@@ -93,20 +81,29 @@ class PuzzlePosition(object):
             )
         engine.setoption({ "MultiPV": 1 })
 
-    def is_ambiguous(self):
+    def evaluate(self, depth):
+        self._log_position()
+        if self.board.legal_moves.count() == 0:
+            return
+        self._calculate_best_move(depth)
+        if not self.best_move:
+            return
+        self._calculate_candidate_moves(depth)
+
+    def is_ambiguous(self) -> bool:
         """ True if it's unclear whether there's a single best move from
             this position
         """
         return ambiguous([move.score for move in self.candidate_moves])
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         """ Is a valid puzzle position
         """
         if not self.best_move or len(self.candidate_moves) == 0:
             return False
         return not self.is_ambiguous() and not self.board.is_game_over()
 
-    def is_final(self, is_player_move=None):
+    def is_final(self, is_player_move=None) -> bool:
         """ No more positions can exist after this position in a puzzle
             either because the position is ambiguous or because the game is over
         """

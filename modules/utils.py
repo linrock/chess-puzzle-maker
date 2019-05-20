@@ -1,7 +1,7 @@
 import chess
 import chess.uci
 
-def sign(score):
+def sign(score) -> int:
     s = score.cp
     if s is None:
         s = score.mate
@@ -11,22 +11,22 @@ def sign(score):
         return -1
     return 0
 
-def material_total(board):
+def material_total(board) -> float:
     """ Total material value on the board
     """
     return sum(v * (len(board.pieces(pt, True)) + len(board.pieces(pt, False))) for v, pt in zip([0,3,3,5.5,9], chess.PIECE_TYPES))
 
-def material_difference(board):
+def material_difference(board) -> float:
     """ Difference in material value (positive means white has more)
     """
     return sum(v * (len(board.pieces(pt, True)) - len(board.pieces(pt, False))) for v, pt in zip([0,3,3,5.5,9], chess.PIECE_TYPES))
 
-def material_count(board):
+def material_count(board) -> int:
     """ Count the number of pieces on the board
     """
     return chess.popcount(board.occupied)
 
-def fullmove_string(board):
+def fullmove_string(board) -> str:
     move_num = board.fullmove_number
     if board.turn:
         move_str = "%s." % move_num
@@ -34,7 +34,7 @@ def fullmove_string(board):
         move_str = "%s..." % move_num
     return move_str.ljust(7)
 
-def normalize_score(board, score):
+def normalize_score(board, score) -> chess.uci.Score:
     """ flip the signs of the score to be from white's perspective
     """
     polarity = 1 if board.turn else -1
@@ -43,7 +43,7 @@ def normalize_score(board, score):
     else:
         return chess.uci.Score(score.cp * polarity, None)
 
-def should_investigate(a, b, board):
+def should_investigate(a: chess.uci.Score, b: chess.uci.Score , board) -> bool:
     """ determine if the difference between scores A and B
         makes the position worth investigating for a puzzle.
 
