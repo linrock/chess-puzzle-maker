@@ -114,7 +114,6 @@ while True:
             puzzle = Puzzle(
                 board,
                 next_node.move,
-                game,
                 check_ambiguity=i > 0
             )
             puzzles.append(puzzle)
@@ -133,7 +132,7 @@ while True:
         logging.debug(bcolors.MAGENTA + ("Considering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
         puzzle.generate(settings.search_depth)
         if puzzle.is_complete():
-            puzzle_pgn = str(puzzle.to_pgn())
+            puzzle_pgn = str(puzzle.export(headers=game.headers))
             n_puzzles += 1
             logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED" + bcolors.ENDC)
             logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)

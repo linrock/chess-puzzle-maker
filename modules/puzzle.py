@@ -19,22 +19,24 @@ class Puzzle(object):
         initial_score [chess.uci.Score]:
           the initial score before the first move of the puzzle
 
+        positions [List[PuzzlePosition]]:
+          list of all positions included in the puzzle
+
         check_ambiguity [Boolean]:
           if true, don't generate new positions when the best move is ambiguous
     """
-    def __init__(self, initial_board, initial_move, game=game, check_ambiguity=True):
+    def __init__(self, initial_board, initial_move, check_ambiguity=True):
         self.initial_board = initial_board.copy()
         self.initial_move = initial_move
         self.initial_position = PuzzlePosition(initial_board, initial_move)
         self.initial_score = None
         self.final_score = None
         self.positions = []
-        self.game = game
         # self.check_ambiguity = check_ambiguity
         self.check_ambiguity = True
 
-    def to_pgn(self):
-        return PuzzlePgn(self).export()
+    def export(self, pgn_headers=None):
+        return PuzzlePgn(self).export(pgn_headers)
 
     def generate(self, depth=22):
         self.position_list_node.generate(depth)

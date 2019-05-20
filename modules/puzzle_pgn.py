@@ -28,7 +28,7 @@ class PuzzlePgn(object):
         elif position.score.mate == -1:
             return "Black"
 
-    def export(self):
+    def export(self, pgn_headers=None):
         fen = self.puzzle.initial_board.fen()
         board = chess.Board(fen)
         game = chess.pgn.Game().from_board(board)
@@ -43,9 +43,9 @@ class PuzzlePgn(object):
             comment = self.candidate_moves_annotations(
                 position.candidate_moves
             )
-        if self.puzzle.game:
-            for h in self.puzzle.game.headers:
-                game.headers[h] = self.puzzle.game.headers[h]
+        if pgn_headers:
+            for h in pgn_headers:
+                game.headers[h] = pgn_headers[h]
         game.headers['PuzzleEngine'] = engine.name or ""
         game.headers['PuzzleCategory'] = self.puzzle.category()
         puzzle_winner = self.puzzle_winner()

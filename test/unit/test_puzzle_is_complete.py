@@ -9,11 +9,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
 
     def test_puzzle_is_not_complete(self):
         board = chess.Board()
-        puzzle = Puzzle(
-            board,
-            chess.Move.from_uci("e2e4"),
-            chess.pgn.Game(),
-        )
+        puzzle = Puzzle(board, chess.Move.from_uci("e2e4"))
         self.assertFalse(puzzle.is_complete())
 
 
