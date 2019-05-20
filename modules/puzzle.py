@@ -113,12 +113,13 @@ class Puzzle(object):
         if initial_cp is not None and final_cp is not None:
             if abs(initial_cp) > 2 and abs(final_cp) < 0.9:
                 return "Equalize"
-        initial_material_diff = material_difference(self.positions[0].board)
-        final_material_diff = material_difference(self.positions[-1].board)
         # otherwise, the puzzle is complete only if the position was converted
         # into a material advantage
-        if abs(final_material_diff - initial_material_diff) > 0.1:
-            return "Material"
+        if abs(final_cp - initial_cp) > 100:
+            initial_material_diff = material_difference(self.positions[0].board)
+            final_material_diff = material_difference(self.positions[-1].board)
+            if abs(final_material_diff - initial_material_diff) > 0.1:
+                return "Material"
 
     def is_complete(self) -> bool:
         """ Verify that this sequence of moves represents a complete puzzle

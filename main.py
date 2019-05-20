@@ -100,7 +100,7 @@ while True:
         cur_score = normalize_score(next_board, engine.info_handlers[0].info["score"][1])
         board = node.board()
         log_str = bcolors.GREEN
-        log_str += ("%s%s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
+        log_str += ("  %s%s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
         if cur_score.mate is not None:
             log_str += bcolors.BLUE + ("   Mate: " + str(cur_score.mate)).ljust(12)
         else:
@@ -131,13 +131,13 @@ while True:
         puzzle.generate(settings.search_depth)
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.export(pgn_headers=game.headers))
-            n_puzzles += 1
             logging.debug(bcolors.MAGENTA + "\nNEW PUZZLE GENERATED" + bcolors.ENDC)
             logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
             tactics_file = open(settings.output, "a")
             tactics_file.write(puzzle_pgn)
             tactics_file.write("\n\n")
             tactics_file.close()
+            n_puzzles += 1
 
 logging.debug(
     bcolors.MAGENTA +
