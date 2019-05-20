@@ -65,6 +65,16 @@ class TestAmbiguous(unittest.TestCase):
             Score(85, None),
             Score(89, None),
         ]))
+        self.assertFalse(ambiguous([
+            Score(-101, None),
+            Score(103, None),
+            Score(282, None),
+        ]))
+        self.assertFalse(ambiguous([
+            Score(53, None),
+            Score(-75, None),
+            Score(-122, None),
+        ]))
 
     def test_not_ambiguous_slight_advantage_vs_significant_disadvantage(self):
         self.assertFalse(ambiguous([

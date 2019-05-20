@@ -1,3 +1,5 @@
+from modules.utils import sign
+
 def ambiguous(scores):
     """
     Looks at a list of candidate scores (best move first) to determine
@@ -23,7 +25,7 @@ def ambiguous(scores):
             if abs(second_best_move_score) < 50 and score_change > 110:
                 return False
             # Slight advantage vs slight disadvantage
-            if abs(second_best_move_score) < 90 and score_change > 180:
+            if sign(scores[0]) != sign(scores[1]) and score_change > 120:
                 return False
             # Unclear if the best move leads to a decisive advantage
             return True
