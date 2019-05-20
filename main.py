@@ -99,7 +99,6 @@ while True:
         engine.position(next_board)
         engine.go(depth=settings.scan_depth)
         cur_score = normalize_score(next_board, engine.info_handlers[0].info["score"][1])
-        # import pdb; pdb.set_trace()
         board = node.board()
         log_str = bcolors.GREEN
         log_str += ("%s%s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
