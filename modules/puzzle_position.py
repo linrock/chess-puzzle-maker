@@ -39,7 +39,6 @@ class PuzzlePosition(object):
         log_str = bcolors.GREEN
         log_str += ("%s%s (%s)" % (fullmove_string(self.board), move_san, move.uci())).ljust(22)
         log_str += bcolors.BLUE
-        score = normalize_score(self.board, score)
         if score.mate is not None:
             log_str += "   Mate: %d" % score.mate
         else:
@@ -56,7 +55,10 @@ class PuzzlePosition(object):
         engine.position(self.board)
         self.best_move = engine.go(depth=depth).bestmove
         if self.best_move:
-            self.score = engine.info_handlers[0].info["score"][1]
+            self.score = normalize_score(
+                self.board,
+                engine.info_handlers[0].info["score"][1]
+            )
             self._log_move(self.best_move, self.score)
         else:
             logging.debug(bcolors.RED + "No best move!" + bcolors.ENDC)
@@ -74,7 +76,10 @@ class PuzzlePosition(object):
         info = engine.info_handlers[0].info
         for i in range(multipv):
             move = info["pv"].get(i + 1)[0]
-            score = info["score"].get(i + 1)
+            score = normalize_score(
+                self.board,
+                info["score"].get(i + 1)
+            )
             self._log_move(move, score)
             self.candidate_moves.append(
                 CandidateMove(move.uci(), self.board.san(move), score)

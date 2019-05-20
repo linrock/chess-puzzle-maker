@@ -132,7 +132,7 @@ while True:
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.export(pgn_headers=game.headers))
             n_puzzles += 1
-            logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED" + bcolors.ENDC)
+            logging.debug(bcolors.MAGENTA + "\nNEW PUZZLE GENERATED" + bcolors.ENDC)
             logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
             tactics_file = open(settings.output, "a")
             tactics_file.write(puzzle_pgn)

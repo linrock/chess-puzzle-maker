@@ -36,7 +36,10 @@ class PuzzlePgn(object):
         board = chess.Board(fen)
         game = chess.pgn.Game().from_board(board)
         game_node = game
-        game_node.comment = "initial score: %s" % score_to_str(self.puzzle.initial_score)
+        game_node.comment = "score: %s -> %s" % (
+            score_to_str(self.puzzle.initial_score),
+            score_to_str(self.puzzle.final_score)
+        )
         comment = None
         for position in self.puzzle.positions:
             game_node = game_node.add_variation(

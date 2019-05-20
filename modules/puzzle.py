@@ -41,7 +41,10 @@ class Puzzle(object):
         engine.setoption({ "MultiPV": 1 })
         engine.position(self.initial_board)
         engine.go(depth=depth)
-        self.initial_score = engine.info_handlers[0].info["score"][1]
+        self.initial_score = normalize_score(
+            self.initial_board,
+            engine.info_handlers[0].info["score"][1],
+        )
 
     def _calculate_final_score(self, depth):
         final_score = self.positions[-1].score
@@ -51,7 +54,10 @@ class Puzzle(object):
             engine.setoption({ "MultiPV": 1 })
             engine.position(self.positions[-1].board)
             engine.go(depth=depth)
-            self.final_score = engine.info_handlers[0].info["score"][1]
+            self.final_score = normalize_score(
+                self.positions[-1].board,
+                engine.info_handlers[0].info["score"][1],
+            )
 
     def export(self, pgn_headers=None) -> chess.pgn.Game:
         return PuzzlePgn(self).export(pgn_headers)
