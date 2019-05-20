@@ -92,6 +92,7 @@ while True:
 
     # Scan through the game, looking for possible puzzles
     node = game
+    i = 0
     while not node.is_end():
         next_node = node.variation(0)
         next_board = next_node.board()
@@ -109,16 +110,19 @@ while True:
         if should_investigate(prev_score, cur_score, board):
             # Found a possible puzzle
             log_str += bcolors.YELLOW + "   Investigate!" + bcolors.ENDC
+            # don't check for move ambiguity if it's the first position in the PGN
+            # since it might be a puzzle
             puzzle = Puzzle(
                 board,
                 next_node.move,
                 game,
+                check_ambiguity=i > 0
             )
             puzzles.append(puzzle)
         logging.debug(log_str + bcolors.ENDC)
-    
         prev_score = cur_score
         node = next_node
+        i += 1
 
     n = len(puzzles)
     n_positions += n

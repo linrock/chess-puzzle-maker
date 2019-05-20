@@ -123,6 +123,6 @@ class PuzzlePosition(object):
             return True
         if self.score.cp == 0 and self.board.can_claim_draw():
             return True
-        if is_player_move and self.is_ambiguous():
+        if is_player_move is not None and is_player_move and self.is_ambiguous():
             return True
         return False

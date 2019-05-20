@@ -22,8 +22,11 @@ class Puzzle(object):
 
         initial_score [chess.uci.Score]:
           the initial score before the first move of the puzzle
+
+        check_ambiguity [Boolean]:
+          if true, don't generate new positions when the best move is ambiguous
     """
-    def __init__(self, last_pos, last_move, game):
+    def __init__(self, last_pos, last_move, game, check_ambiguity=True):
         self.last_pos = last_pos.copy()
         self.last_move = last_move
         self.game = game
@@ -35,6 +38,7 @@ class Puzzle(object):
         self.initial_score = None
         self.final_score = None
         self.positions = []
+        self.check_ambiguity = check_ambiguity
 
     def to_pgn(self):
         return PuzzlePgn(self).export()
@@ -87,10 +91,14 @@ class Puzzle(object):
     def new_generate(self, depth=22):
         """ Generate new positions until a final position is reached
         """
+        if self.check_ambiguity:
+            is_player_move = True
+        else:
+            logging.debug(bcolors.DIM + "Not checking this puzzle for move ambiguity")
+            is_player_move = None
         self.calculate_initial_score(depth)
         position = self.initial_position
         position.evaluate()
-        is_player_move = True
         while True:
             self.positions.append(position)
             if position.is_final(is_player_move):
@@ -110,7 +118,8 @@ class Puzzle(object):
                 logging.debug(log_str + bcolors.ENDC)
             position = PuzzlePosition(position.board, position.best_move, depth)
             position.evaluate()
-            is_player_move = not is_player_move
+            if self.check_ambiguity:
+                is_player_move = not is_player_move
         self.calculate_final_score(depth)
         if self.new_is_complete():
             logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
