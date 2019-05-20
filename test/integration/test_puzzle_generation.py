@@ -6,7 +6,13 @@ import chess.pgn
 
 from modules.puzzle import Puzzle
 
-SEARCH_DEPTH = 10
+# import sys
+# import logging
+
+# logging.basicConfig(format="%(message)s", level=logging.DEBUG, stream=sys.stdout)
+# logging.getLogger("chess").setLevel(logging.WARNING)
+
+SEARCH_DEPTH = 12
 
 
 class TestPuzzleIsComplete(unittest.TestCase):
@@ -53,6 +59,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle = Puzzle(board, board.parse_san('Qxf2+'))
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
+        self.assertTrue(puzzle.category() == "Mate")
         self.assertTrue(len(puzzle.positions) == 5)
 
     def test_mate_in_3_is_complete_3(self):
@@ -66,6 +73,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
             [str(p.initial_move) for p in puzzle.positions],
             ['h1h7', 'h8h7', 'f1h1', 'h7g7', 'd2h6'],
         )
+        self.assertTrue(puzzle.category() == "Mate")
         self.assertTrue(puzzle.is_complete())
 
     def test_threefold_repetition_detection(self):

@@ -56,7 +56,7 @@ class Puzzle(object):
             engine.go(depth=depth)
             self.final_score = engine.info_handlers[0].info["score"][1]
 
-    def generate(self, depth=22):
+    def generate(self, depth):
         """ Generate new positions until a final position is reached
         """
         if self.check_ambiguity:
@@ -66,7 +66,7 @@ class Puzzle(object):
             is_player_move = None
         self.calculate_initial_score(depth)
         position = self.initial_position
-        position.evaluate()
+        position.evaluate(depth)
         while True:
             self.positions.append(position)
             if position.is_final(is_player_move):
@@ -85,8 +85,8 @@ class Puzzle(object):
                     else:
                         log_str += " not player move"
                 logging.debug(log_str + bcolors.ENDC)
-            position = PuzzlePosition(position.board, position.best_move, depth)
-            position.evaluate()
+            position = PuzzlePosition(position.board, position.best_move)
+            position.evaluate(depth)
             if self.check_ambiguity:
                 is_player_move = not is_player_move
         self.calculate_final_score(depth)

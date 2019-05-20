@@ -9,13 +9,9 @@ from modules.utils import material_difference, material_count, fullmove_string, 
 
 CandidateMove = namedtuple("CandidateMove", ["move_uci", "move_san", "score"])
 
-# The default search depth used to calculate the best move and
-# candidate moves for the board position after the initial move
-SEARCH_DEPTH = 22
-
 class PuzzlePosition(object):
 
-    def __init__(self, initial_board, initial_move, search_depth=SEARCH_DEPTH):
+    def __init__(self, initial_board, initial_move):
         """ board [chess.Board] - board representing the position to evaluate
             initial_move [chess.uci.Move] - the move leading into the position to evaluate
             best_move [chess.uci.Move] - the best move from the board position
@@ -29,7 +25,6 @@ class PuzzlePosition(object):
         self.best_move = None
         self.score = None
         self.candidate_moves = []
-        self.search_depth = search_depth
 
     def _material_difference(self):
         return material_difference(self.board)
@@ -54,19 +49,18 @@ class PuzzlePosition(object):
             log_str += "   CP: %d" % score.cp
         logging.debug(log_str + bcolors.ENDC)
 
-    def evaluate(self):
+    def evaluate(self, depth):
         self._log_position()
         if self.board.legal_moves.count() == 0:
             return
-        self.calculate_best_move()           
+        self.calculate_best_move(depth)
         if not self.best_move:
             return
-        self.calculate_candidate_moves()
+        self.calculate_candidate_moves(depth)
 
-    def calculate_best_move(self):
+    def calculate_best_move(self, depth):
         """ Find the best move from board position using multipv 1
         """
-        depth = self.search_depth
         logging.debug(
             "%sEvaluating best move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
         )
@@ -79,13 +73,12 @@ class PuzzlePosition(object):
         else:
             logging.debug(bcolors.RED + "No best move!" + bcolors.ENDC)
 
-    def calculate_candidate_moves(self):
+    def calculate_candidate_moves(self, depth):
         """ Find the best move from board position using multipv 3
         """
         multipv = min(3, self.board.legal_moves.count())
         if multipv == 0:
             return
-        depth = self.search_depth
         logging.debug(bcolors.DIM + ("Evaluating best %d moves (depth %d)..." % (multipv, depth)) + bcolors.ENDC)
         engine.setoption({ "MultiPV": multipv })
         engine.position(self.board)
