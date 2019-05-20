@@ -38,7 +38,8 @@ class Puzzle(object):
         self.initial_score = None
         self.final_score = None
         self.positions = []
-        self.check_ambiguity = check_ambiguity
+        # self.check_ambiguity = check_ambiguity
+        self.check_ambiguity = True
 
     def to_pgn(self):
         return PuzzlePgn(self).export()
@@ -94,7 +95,7 @@ class Puzzle(object):
         if self.check_ambiguity:
             is_player_move = True
         else:
-            logging.debug(bcolors.DIM + "Not checking this puzzle for move ambiguity")
+            logging.debug(bcolors.DIM + "Not checking this puzzle for move ambiguity" + bcolors.ENDC)
             is_player_move = None
         self.calculate_initial_score(depth)
         position = self.initial_position
@@ -111,10 +112,11 @@ class Puzzle(object):
                 break
             else:
                 log_str = bcolors.DIM + "Going deeper..."
-                if is_player_move:
-                    log_str += " one best move"
-                else:
-                    log_str += " not player move"
+                if is_player_move is not None:
+                    if is_player_move:
+                        log_str += " one best move"
+                    else:
+                        log_str += " not player move"
                 logging.debug(log_str + bcolors.ENDC)
             position = PuzzlePosition(position.board, position.best_move, depth)
             position.evaluate()
