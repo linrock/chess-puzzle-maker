@@ -10,10 +10,10 @@ from modules.utils import material_difference, normalize_score
 MIN_MOVES = 3
 
 class Puzzle(object):
-    """ last_pos [chess.Board]:
-          board before the first move in the puzzle
+    """ initial_board [chess.Board]:
+          the board before the first move in the puzzle
 
-        last_move [chess.uci.Move]:
+        initial_move [chess.uci.Move]:
           the first move in the puzzle
 
         initial_score [chess.uci.Score]:
@@ -22,14 +22,14 @@ class Puzzle(object):
         check_ambiguity [Boolean]:
           if true, don't generate new positions when the best move is ambiguous
     """
-    def __init__(self, last_pos, last_move, game, check_ambiguity=True):
-        self.last_pos = last_pos.copy()
-        self.last_move = last_move
-        self.game = game
-        self.initial_position = PuzzlePosition(last_pos, last_move)
+    def __init__(self, initial_board, initial_move, game=game, check_ambiguity=True):
+        self.initial_board = initial_board.copy()
+        self.initial_move = initial_move
+        self.initial_position = PuzzlePosition(initial_board, initial_move)
         self.initial_score = None
         self.final_score = None
         self.positions = []
+        self.game = game
         # self.check_ambiguity = check_ambiguity
         self.check_ambiguity = True
 
@@ -45,7 +45,7 @@ class Puzzle(object):
 
     def calculate_initial_score(self, depth):
         engine.setoption({ "MultiPV": 1 })
-        engine.position(self.last_pos)
+        engine.position(self.initial_board)
         engine.go(depth=depth)
         self.initial_score = engine.info_handlers[0].info["score"][1]
 

@@ -29,7 +29,7 @@ class PuzzlePgn(object):
             return "Black"
 
     def export(self):
-        fen = self.puzzle.last_pos.fen()
+        fen = self.puzzle.initial_board.fen()
         board = chess.Board(fen)
         game = chess.pgn.Game().from_board(board)
         game_node = game
