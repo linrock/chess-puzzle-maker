@@ -1,6 +1,5 @@
 import logging
 
-from modules.position_list_node import PositionListNode
 from modules.puzzle_position import PuzzlePosition
 from modules.puzzle_pgn import PuzzlePgn
 from modules.bcolors import bcolors
@@ -17,9 +16,6 @@ class Puzzle(object):
         last_move [chess.uci.Move]:
           the first move in the puzzle
 
-        position_list_node [PositionListNode]:
-          the first position in the list of puzzle positions
-
         initial_score [chess.uci.Score]:
           the initial score before the first move of the puzzle
 
@@ -30,10 +26,6 @@ class Puzzle(object):
         self.last_pos = last_pos.copy()
         self.last_move = last_move
         self.game = game
-        self.position_list_node = PositionListNode(
-            last_pos,
-            last_move,
-        )
         self.initial_position = PuzzlePosition(last_pos, last_move)
         self.initial_score = None
         self.final_score = None
@@ -44,34 +36,12 @@ class Puzzle(object):
     def to_pgn(self):
         return PuzzlePgn(self).export()
 
-    def new_to_pgn(self):
-        return PuzzlePgn(self).new_export()
-
-    def white_to_move(self):
-        return self.position_list_node.position.turn
-
-    def is_complete(self):
-        if self.position_list_node.ambiguous():
-            return False
-        if len(self.position_list_node.move_list()) < MIN_MOVES:
-            return False
-        return self.position_list_node.is_complete(
-            self.position_list_node.category(),
-            self.white_to_move(),
-            self.position_list_node.material_difference()
-        )
-
     def generate(self, depth=22):
         self.position_list_node.generate(depth)
         if self.is_complete():
             logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
         else:
             logging.debug(bcolors.RED + "Puzzle incomplete" + bcolors.ENDC)
-
-    def category(self):
-        return self.position_list_node.category()
-
-    # TODO new methods that use the new PuzzlePosition class
 
     def calculate_initial_score(self, depth):
         engine.setoption({ "MultiPV": 1 })
@@ -89,7 +59,7 @@ class Puzzle(object):
             engine.go(depth=depth)
             self.final_score = engine.info_handlers[0].info["score"][1]
 
-    def new_generate(self, depth=22):
+    def generate(self, depth=22):
         """ Generate new positions until a final position is reached
         """
         if self.check_ambiguity:
@@ -123,12 +93,12 @@ class Puzzle(object):
             if self.check_ambiguity:
                 is_player_move = not is_player_move
         self.calculate_final_score(depth)
-        if self.new_is_complete():
+        if self.is_complete():
             logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
         else:
             logging.debug(bcolors.RED + "Puzzle incomplete" + bcolors.ENDC)
 
-    def new_category(self):
+    def category(self):
         """ Mate     - win by checkmate
             Material - gain a material advantage
             Equalize - equalize a losing position
@@ -147,12 +117,12 @@ class Puzzle(object):
         if abs(final_material_diff - initial_material_diff) > 0.1:
             return "Material"
 
-    def new_is_complete(self):
+    def is_complete(self):
         """ Verify that this sequence of moves represents a complete puzzle
             Incomplete if too short or if the puzzle could not be categorized
         """
         if len(self.positions) < MIN_MOVES:
             return False
-        if self.new_category():
+        if self.category():
             return True
         return False
