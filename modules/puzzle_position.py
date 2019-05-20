@@ -37,7 +37,7 @@ class PuzzlePosition(object):
     def _log_move(self, move, score):
         move_san = self.board.san(move)
         log_str = bcolors.GREEN
-        log_str += ("%s%s (%s)" % (fullmove_string(self.board), move_san, move.uci())).ljust(22)
+        log_str += ("  %s%s (%s)" % (fullmove_string(self.board), move_san, move.uci())).ljust(22)
         log_str += bcolors.BLUE
         if score.mate is not None:
             log_str += "   Mate: %d" % score.mate

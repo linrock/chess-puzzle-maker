@@ -63,6 +63,8 @@ class PuzzlePgn(object):
             )
         if pgn_headers:
             for h in pgn_headers:
+                if h == "FEN":
+                    continue
                 game.headers[h] = pgn_headers[h]
         game.headers['PuzzleCategory'] = self.puzzle.category()
         puzzle_winner = self._puzzle_winner()
