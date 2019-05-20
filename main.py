@@ -68,6 +68,8 @@ engine.setoption({
 })
 engine.uci()
 
+n_positions = 0   # number of positions considered
+n_puzzles = 0     # number of puzzles generated
 game_id = 0
 
 while True:
@@ -119,6 +121,7 @@ while True:
         node = next_node
 
     n = len(puzzles)
+    n_positions += n
     logging.debug(bcolors.YELLOW + ("# positions to consider as puzzles = %d" % n))
     if settings.scan_only:
         continue
@@ -126,8 +129,12 @@ while True:
         logging.debug("")
         logging.debug(bcolors.MAGENTA + ("Considering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
         puzzle.generate(settings.search_depth)
+        # puzzle.new_generate(settings.search_depth)
         if puzzle.is_complete():
+        # if puzzle.new_is_complete():
             puzzle_pgn = str(puzzle.to_pgn())
+            # puzzle_pgn = str(puzzle.new_to_pgn())
+            n_puzzles += 1
             logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED" + bcolors.ENDC)
             logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
             tactics_file = open(settings.output, "a")
@@ -135,3 +142,8 @@ while True:
             tactics_file.write("\n\n")
             tactics_file.close()
 
+logging.debug(
+  bcolors.MAGENTA +
+  "\nGenerated %d puzzles from %d positions in %d games" %
+  (n_puzzles, n_positions, game_id)
+)
