@@ -25,17 +25,23 @@ parser = argparse.ArgumentParser(
 parser.add_argument("games", metavar="GAMES", nargs="?", type=str, default="games.pgn",
                     help="A PGN file with games to scan for puzzles")
 
-parser.add_argument("--threads", metavar="THREADS", nargs="?", type=int, default=2,
+parser.add_argument("--output", metavar="OUTPUT_PGN", default="tactics.out.pgn",
+                    help="An output pgn file")
+
+# Chess engine settings
+group = parser.add_argument_group('chess engine settings')
+group.add_argument("--threads", metavar="THREADS", nargs="?", type=int, default=2,
                     help="number of engine threads")
-parser.add_argument("--memory", metavar="MEMORY", nargs="?", type=int, default=2048,
+group.add_argument("--memory", metavar="MEMORY", nargs="?", type=int, default=2048,
                     help="memory in MB to use for engine hashtables")
-parser.add_argument("--depth", metavar="DEPTH", nargs="?", type=int, default=15,
-                    help="stockfish depth for scanning for candidate puzzles")
+group.add_argument("--scan-depth", metavar="DEPTH", nargs="?", type=int, default=15,
+                    help="depth for scanning a game for candidate puzzles")
+group.add_argument("--search-depth", metavar="DEPTH", nargs="?", type=int, default=22,
+                    help="depth for searching a position for candidate moves")
+
 parser.add_argument("--quiet", dest="loglevel",
                     default=logging.DEBUG, action="store_const", const=logging.INFO,
                     help="substantially reduce the number of logged messages")
-parser.add_argument("--output", metavar="OUTPUT_PGN", default="tactics.out.pgn",
-                    help="An output pgn file")
 parser.add_argument("--scan-only", default=False, action="store_true",
                     help="Only scan for possible puzzles. Don't analyze positions")
 settings = parser.parse_args()
@@ -77,7 +83,7 @@ while True:
     
     logging.debug(
         bcolors.DIM +
-        ("Scanning game for puzzles (depth: %d)..." % settings.depth) +
+        ("Scanning game for puzzles (depth: %d)..." % settings.scan_depth) +
         bcolors.ENDC
     )
     engine.ucinewgame()
@@ -88,9 +94,8 @@ while True:
         next_node = node.variation(0)
         next_board = next_node.board()
         engine.position(next_board)
-        engine.go(depth=settings.depth)
-        info = engine.info_handlers[0].info
-        cur_score = normalize_score(next_board, info["score"][1])
+        engine.go(depth=settings.scan_depth)
+        cur_score = normalize_score(next_board, engine.info_handlers[0].info["score"][1])
         # import pdb; pdb.set_trace()
         board = node.board()
         log_str = bcolors.GREEN
@@ -120,8 +125,7 @@ while True:
     for i, puzzle in enumerate(puzzles):
         logging.debug("")
         logging.debug(bcolors.MAGENTA + ("Considering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
-        # use depth 22 to explore puzzle positions
-        puzzle.generate()
+        puzzle.generate(settings.search_depth)
         if puzzle.is_complete():
             puzzle_pgn = str(puzzle.to_pgn())
             logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED" + bcolors.ENDC)

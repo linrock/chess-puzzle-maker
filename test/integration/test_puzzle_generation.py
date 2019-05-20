@@ -7,6 +7,7 @@ from modules.puzzle import Puzzle
 
 SEARCH_DEPTH = 10
 
+
 class TestPuzzleIsComplete(unittest.TestCase):
 
     def test_puzzle_is_not_complete(self):
@@ -61,6 +62,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle = Puzzle(board, board.parse_san('Be6'), chess.pgn.Game())
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
+        # test for threefold repetition
 
 
 if __name__ == '__main__':
