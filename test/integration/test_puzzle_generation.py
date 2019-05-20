@@ -1,3 +1,4 @@
+import io
 import unittest
 
 import chess
@@ -19,6 +20,8 @@ class TestPuzzleIsComplete(unittest.TestCase):
         )
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertFalse(puzzle.is_complete())
+        puzzle.new_generate(depth=SEARCH_DEPTH)
+        self.assertFalse(puzzle.new_is_complete())
 
     def test_mate_in_3_is_complete_1(self):
         # 1. Qxh8+ Kxh8 2. Bf6+ Kg8 3. Re8#
@@ -29,6 +32,15 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(len(puzzle.position_list_node.move_list()) == 4)
+        puzzle.new_generate(depth=SEARCH_DEPTH)
+        self.assertTrue(len(puzzle.positions) == 5)
+        self.assertTrue(puzzle.new_is_complete())
+
+        game = chess.pgn.read_game(io.StringIO(str(puzzle.to_pgn())))
+        moves1 = [m for m in game.mainline_moves()]
+        game = chess.pgn.read_game(io.StringIO(str(puzzle.new_to_pgn())))
+        moves2 = [m for m in game.mainline_moves()]
+        self.assertTrue(moves1 == moves2)
 
     def test_mate_in_3_is_complete_2(self):
         # 1... Qxf2+ 2. Rxf2 Rxf2+ 3. Kh1 Ng3#
@@ -39,6 +51,15 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(len(puzzle.position_list_node.move_list()) == 4)
+        puzzle.new_generate(depth=SEARCH_DEPTH)
+        self.assertTrue(len(puzzle.positions) == 5)
+        self.assertTrue(puzzle.new_is_complete())
+
+        game = chess.pgn.read_game(io.StringIO(str(puzzle.to_pgn())))
+        moves1 = [m for m in game.mainline_moves()]
+        game = chess.pgn.read_game(io.StringIO(str(puzzle.new_to_pgn())))
+        moves2 = [m for m in game.mainline_moves()]
+        self.assertTrue(moves1 == moves2)
 
     def test_mate_in_3_is_complete_3(self):
         # 1. Rxh7+ Kxh7 2. Rh1+ Kg7 3. Qh6#
@@ -52,6 +73,18 @@ class TestPuzzleIsComplete(unittest.TestCase):
             puzzle.position_list_node.move_list(),
             ['h8h7', 'f1h1', 'h7g7', 'd2h6'],
         )
+        puzzle.new_generate(depth=SEARCH_DEPTH)
+        self.assertEqual(
+            [str(p.initial_move) for p in puzzle.positions],
+            ['h1h7', 'h8h7', 'f1h1', 'h7g7', 'd2h6'],
+        )
+        self.assertTrue(puzzle.new_is_complete())
+
+        game = chess.pgn.read_game(io.StringIO(str(puzzle.to_pgn())))
+        moves1 = [m for m in game.mainline_moves()]
+        game = chess.pgn.read_game(io.StringIO(str(puzzle.new_to_pgn())))
+        moves2 = [m for m in game.mainline_moves()]
+        self.assertTrue(moves1 == moves2)
 
     def test_threefold_repetition_detection(self):
         # https://lichess.org/tYLGlqsX
@@ -62,8 +95,14 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle = Puzzle(board, board.parse_san('Be6'), chess.pgn.Game())
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
-        # test for threefold repetition
-
+        # test that the puzzle stops at a threefold repetition position
+        puzzle.new_generate(depth=SEARCH_DEPTH)
+        self.assertEqual(
+            [str(p.initial_move) for p in puzzle.positions],
+            ['c8e6', 'f3f6', 'h8g8', 'f6g5', 'g8h8', 'g5f6', 'h8g8', 'f6g5', 'g8h8'],
+        )
+        self.assertTrue(puzzle.new_is_complete())
+ 
 
 if __name__ == '__main__':
     unittest.main()

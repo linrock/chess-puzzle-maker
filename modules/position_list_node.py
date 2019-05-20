@@ -1,4 +1,3 @@
-import os
 import logging
 from collections import namedtuple
 
@@ -61,7 +60,7 @@ class PositionListNode(object):
             logging.debug(bcolors.YELLOW + "Not going deeper: game over" + bcolors.ENDC)
             return
         self.evaluate_candidate_moves(depth)
-        if not self.player_turn or (has_best and not self.ambiguous() and not self.game_over()):
+        if not self.player_turn or (not self.ambiguous() and not self.game_over()):
             logging.debug(bcolors.DIM + "Going deeper...\n" + bcolors.ENDC)
             self.next_position.generate(depth)
         else:
