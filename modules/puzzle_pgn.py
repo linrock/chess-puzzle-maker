@@ -28,7 +28,7 @@ class PuzzlePgn(object):
         elif position.score.mate == -1:
             return "Black"
 
-    def export(self, pgn_headers=None):
+    def export(self, pgn_headers=None) -> chess.pgn.Game:
         fen = self.puzzle.initial_board.fen()
         board = chess.Board(fen)
         game = chess.pgn.Game().from_board(board)

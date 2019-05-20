@@ -1,5 +1,7 @@
 import logging
 
+import chess.pgn
+
 from modules.puzzle_position import PuzzlePosition
 from modules.puzzle_pgn import PuzzlePgn
 from modules.bcolors import bcolors
@@ -19,7 +21,7 @@ class Puzzle(object):
         initial_score [chess.uci.Score]:
           the initial score before the first move of the puzzle
 
-        positions [List[PuzzlePosition]]:
+        positions [list(PuzzlePosition)]:
           list of all positions included in the puzzle
 
         check_ambiguity [Boolean]:
@@ -35,15 +37,8 @@ class Puzzle(object):
         # self.check_ambiguity = check_ambiguity
         self.check_ambiguity = True
 
-    def export(self, pgn_headers=None):
+    def export(self, pgn_headers=None) -> chess.pgn.Game:
         return PuzzlePgn(self).export(pgn_headers)
-
-    def generate(self, depth=22):
-        self.position_list_node.generate(depth)
-        if self.is_complete():
-            logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
-        else:
-            logging.debug(bcolors.RED + "Puzzle incomplete" + bcolors.ENDC)
 
     def calculate_initial_score(self, depth):
         engine.setoption({ "MultiPV": 1 })
@@ -100,7 +95,7 @@ class Puzzle(object):
         else:
             logging.debug(bcolors.RED + "Puzzle incomplete" + bcolors.ENDC)
 
-    def category(self):
+    def category(self) -> str:
         """ Mate     - win by checkmate
             Material - gain a material advantage
             Equalize - equalize a losing position
@@ -119,7 +114,7 @@ class Puzzle(object):
         if abs(final_material_diff - initial_material_diff) > 0.1:
             return "Material"
 
-    def is_complete(self):
+    def is_complete(self) -> bool:
         """ Verify that this sequence of moves represents a complete puzzle
             Incomplete if too short or if the puzzle could not be categorized
         """
