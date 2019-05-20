@@ -56,7 +56,6 @@ except ImportError:
     pass
 
 logging.basicConfig(format="%(message)s", level=settings.loglevel, stream=sys.stdout)
-logging.getLogger("requests.packages.urllib3").setLevel(logging.WARNING)
 logging.getLogger("chess").setLevel(logging.WARNING)
 
 all_games = open(settings.games, "r")
@@ -128,11 +127,10 @@ while True:
     if settings.scan_only:
         continue
     for i, puzzle in enumerate(puzzles):
-        logging.debug("")
-        logging.debug(bcolors.MAGENTA + ("Considering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
+        logging.debug(bcolors.MAGENTA + ("\nConsidering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
         puzzle.generate(settings.search_depth)
         if puzzle.is_complete():
-            puzzle_pgn = str(puzzle.export(headers=game.headers))
+            puzzle_pgn = str(puzzle.export(pgn_headers=game.headers))
             n_puzzles += 1
             logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED" + bcolors.ENDC)
             logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
@@ -142,7 +140,7 @@ while True:
             tactics_file.close()
 
 logging.debug(
-  bcolors.MAGENTA +
-  "\nGenerated %d puzzles from %d positions in %d games" %
-  (n_puzzles, n_positions, game_id)
+    bcolors.MAGENTA +
+    "\nGenerated %d puzzles from %d positions in %d games" %
+    (n_puzzles, n_positions, game_id)
 )

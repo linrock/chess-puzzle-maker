@@ -3,6 +3,12 @@ import chess.pgn
 
 from modules.analysis import engine
 
+def score_to_str(score):
+    if score.mate:
+        return "mate in %d" % score.mate
+    else:
+        return score.cp
+
 class PuzzlePgn(object):
     """ Exports a puzzle to a PGN file
     """
@@ -15,10 +21,7 @@ class PuzzlePgn(object):
         comment = ""
         for candidate_move in candidate_moves:
             comment += candidate_move.move_san
-            if candidate_move.score.mate:
-                comment += " (mate in %d) " % candidate_move.score.mate
-            else:
-                comment += " (%d) " % candidate_move.score.cp
+            comment += " (%s) " % score_to_str(candidate_move.score)
         return comment.strip()
 
     def puzzle_winner(self):
@@ -33,6 +36,7 @@ class PuzzlePgn(object):
         board = chess.Board(fen)
         game = chess.pgn.Game().from_board(board)
         game_node = game
+        game_node.comment = "initial score: %s" % score_to_str(self.puzzle.initial_score)
         comment = None
         for position in self.puzzle.positions:
             game_node = game_node.add_variation(

@@ -24,6 +24,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         self.assertFalse(puzzle.is_complete())
 
     def test_bishop_fork(self):
+        # source https://lichess.org/training/61079
         # source game https://lichess.org/1n12OmvV
         # 34. Rb7
         board = chess.Board(
