@@ -93,7 +93,15 @@ class Puzzle(object):
         while True:
             self.positions.append(position)
             if position.is_final():
+                log_str = "Not going deeper: "
+                if position.is_ambiguous():
+                    log_str += "ambiguous"
+                elif position.board.is_game_over():
+                    log_str += "game over"
+                logging.debug(bcolors.YELLOW + log_str + bcolors.ENDC)
                 break
+            else:
+                logging.debug(bcolors.DIM + "Going deeper..." + bcolors.ENDC)
             position = PuzzlePosition(position.board, position.best_move, depth)
             position.evaluate()
         self.calculate_final_score(depth)
