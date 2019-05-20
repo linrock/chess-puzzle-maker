@@ -9,8 +9,8 @@ from modules.utils import material_difference, material_count, fullmove_string, 
 
 CandidateMove = namedtuple("CandidateMove", ["move_uci", "move_san", "score"])
 
-# The search depth used to calculate the best move and 
-# candidate moves for the board position
+# The default search depth used to calculate the best move and
+# candidate moves for the board position after the initial move
 SEARCH_DEPTH = 22
 
 class PuzzlePosition(object):
@@ -113,15 +113,16 @@ class PuzzlePosition(object):
             return False
         return not self.is_ambiguous() and not self.board.is_game_over()
 
-    def is_final(self):
+    def is_final(self, is_player_move=None):
         """ No more positions can exist after this position in a puzzle
             either because the position is ambiguous or because the game is over
         """
         if not self.best_move or len(self.candidate_moves) == 0:
             return True
-        if self.is_ambiguous() or self.board.is_game_over():
+        if self.board.is_game_over():
             return True
         if self.score.cp == 0 and self.board.can_claim_draw():
             return True
+        if is_player_move and self.is_ambiguous():
+            return True
         return False
-

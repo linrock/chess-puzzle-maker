@@ -90,9 +90,10 @@ class Puzzle(object):
         self.calculate_initial_score(depth)
         position = self.initial_position
         position.evaluate()
+        is_player_move = True
         while True:
             self.positions.append(position)
-            if position.is_final():
+            if position.is_final(is_player_move):
                 log_str = "Not going deeper: "
                 if position.is_ambiguous():
                     log_str += "ambiguous"
@@ -101,9 +102,15 @@ class Puzzle(object):
                 logging.debug(bcolors.YELLOW + log_str + bcolors.ENDC)
                 break
             else:
-                logging.debug(bcolors.DIM + "Going deeper..." + bcolors.ENDC)
+                log_str = bcolors.DIM + "Going deeper..."
+                if is_player_move:
+                    log_str += " one best move"
+                else:
+                    log_str += " not player move"
+                logging.debug(log_str + bcolors.ENDC)
             position = PuzzlePosition(position.board, position.best_move, depth)
             position.evaluate()
+            is_player_move = not is_player_move
         self.calculate_final_score(depth)
         if self.new_is_complete():
             logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
