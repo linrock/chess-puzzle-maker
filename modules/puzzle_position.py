@@ -40,7 +40,7 @@ class PuzzlePosition(object):
         logging.debug(bcolors.BLUE + self.board.fen())
         logging.debug(bcolors.YELLOW + str(self.board) + bcolors.ENDC)
         logging.debug(bcolors.BLUE + ('Material difference:  %d' % self._material_difference()))
-        logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.position.legal_moves.count()) + bcolors.ENDC)
+        logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.board.legal_moves.count()) + bcolors.ENDC)
 
     def _log_move(self, move, score):
         move_san = self.board.san(move)
@@ -55,6 +55,7 @@ class PuzzlePosition(object):
         logging.debug(log_str + bcolors.ENDC)
 
     def evaluate(self):
+        self._log_position()
         if self.board.legal_moves.count() == 0:
             return
         self.calculate_best_move()           

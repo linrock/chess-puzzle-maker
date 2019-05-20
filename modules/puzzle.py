@@ -97,7 +97,7 @@ class Puzzle(object):
             position = PuzzlePosition(position.board, position.best_move, depth)
             position.evaluate()
         self.calculate_final_score(depth)
-        if self.is_complete():
+        if self.new_is_complete():
             logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
         else:
             logging.debug(bcolors.RED + "Puzzle incomplete" + bcolors.ENDC)

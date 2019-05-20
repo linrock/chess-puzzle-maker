@@ -66,6 +66,13 @@ class PuzzlePgn(object):
             game.headers['PuzzleWinner'] = puzzle_winner
         return game
 
+    def new_puzzle_winner(self):
+      position = self.puzzle.positions[-2]
+      if position.score.mate == 1:
+          return "White"
+      elif position.score.mate == -1:
+          return "Black"
+
     def new_export(self):
         fen = self.puzzle.last_pos.fen()
         board = chess.Board(fen)
@@ -86,7 +93,7 @@ class PuzzlePgn(object):
                 game.headers[h] = self.puzzle.game.headers[h]
         game.headers['PuzzleEngine'] = engine.name or ""
         game.headers['PuzzleCategory'] = self.puzzle.new_category()
-        puzzle_winner = self.puzzle_winner()
+        puzzle_winner = self.new_puzzle_winner()
         if puzzle_winner:
             game.headers['PuzzleWinner'] = puzzle_winner
         return game
