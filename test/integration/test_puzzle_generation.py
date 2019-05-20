@@ -17,6 +17,21 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertFalse(puzzle.is_complete())
 
+    def test_bishop_fork(self):
+        # source game https://lichess.org/1n12OmvV
+        # 34. Rb7
+        board = chess.Board(
+            '6k1/R4p2/1r3npp/2N5/P1b2P2/6P1/3r2BP/4R1K1 w - - 0 34'
+        )
+        puzzle = Puzzle(board, board.parse_san('Rb7'))
+        puzzle.generate(depth=SEARCH_DEPTH)
+        self.assertTrue(puzzle.is_complete())
+        self.assertTrue(puzzle.category() == "Material")
+        self.assertEqual(
+            [str(p.initial_move) for p in puzzle.positions][:6],
+            ['a7b7', 'd2g2', 'g1g2', 'c4d5', 'g2g1', 'd5b7'],
+        )
+
     def test_mate_in_3_is_complete_1(self):
         # 1. Qxh8+ Kxh8 2. Bf6+ Kg8 3. Re8#
         board = chess.Board(
@@ -25,6 +40,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle = Puzzle(board, board.parse_san('Qxh8+'))
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
+        self.assertTrue(puzzle.category() == "Mate")
         self.assertTrue(len(puzzle.positions) == 5)
         # game = chess.pgn.read_game(io.StringIO(str(puzzle.to_pgn())))
         # moves1 = [m for m in game.mainline_moves()]
