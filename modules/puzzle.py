@@ -1,13 +1,17 @@
 import logging
+from collections import namedtuple
 
-import chess.engine
+from chess.engine import Limit
 import chess.pgn
 
 from modules.puzzle_position import PuzzlePosition
 from modules.puzzle_pgn import PuzzlePgn
+from modules.logger import log_move
 from modules.bcolors import bcolors
 from modules.analysis import engine
 from modules.utils import material_difference
+
+AnalyzedMove = namedtuple("AnalyzedMove", ["move_uci", "move_san", "score"])
 
 # minimum number of moves required for a puzzle to be considered complete
 MIN_MOVES = 3
@@ -22,27 +26,66 @@ class Puzzle(object):
         initial_score [chess.uci.Score]:
           the initial score before the first move of the puzzle
 
+        initial_position [PuzzlePosition]:
+          the first position of the puzzle after the initial move
+
         positions [list(PuzzlePosition)]:
           list of all positions included in the puzzle
+
+        analyzed_moves [list(AnalyzedMove)]:
+          list of analyzed possible first moves
 
         check_ambiguity [Boolean]:
           if true, don't generate new positions when the best move is ambiguous
     """
     def __init__(self, initial_board, initial_move, check_ambiguity=True):
+        self.initial_score = None
         self.initial_board = initial_board.copy()
         self.initial_move = initial_move
         self.initial_position = PuzzlePosition(initial_board, initial_move)
-        self.initial_score = None
         self.final_score = None
         self.positions = []
+        self.analyzed_moves = []
         # self.check_ambiguity = check_ambiguity
         self.check_ambiguity = True
 
-    def _calculate_initial_score(self, depth):
-        """ multipv 1 """
-        # engine.setoption({ "MultiPV": 1 })
-        info = engine.analyse(self.initial_board, chess.engine.Limit(depth=depth))
-        self.initial_score = info["score"].white()
+    def _analyze_initial_moves(self, depth):
+        """ get the score of the position before the initial move
+            also get the score of the position after the initial move
+        """
+        logging.debug(
+            "%sEvaluating best initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
+        )
+        info = engine.analyse(self.initial_board, Limit(depth=depth))
+        best_move = info["pv"][0]
+        score = info["score"].white()
+        analyzed_move = AnalyzedMove(
+            best_move.uci(),
+            self.initial_board.san(best_move),
+            score
+        )
+        self.analyzed_moves.append(analyzed_move)
+        self.initial_score = score
+        log_move(self.initial_board, best_move, score, show_uci=True)
+        if self.initial_move == best_move:
+            logging.debug("%sThe best move was made from this position%s" % (bcolors.DIM, bcolors.ENDC))
+        else:
+            logging.debug(
+                "%sEvaluating initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
+            )
+            info = engine.analyse(
+                self.initial_board,
+                Limit(depth=depth),
+                root_moves=[self.initial_move]
+            )
+            score = info["score"].white()
+            analyzed_move = AnalyzedMove(
+                self.initial_move.uci(),
+                self.initial_board.san(self.initial_move),
+                score
+            )
+            self.analyzed_moves.append(analyzed_move)
+            log_move(self.initial_board, self.initial_move, score, show_uci=True)
 
     def _calculate_final_score(self, depth):
         """ multipv 1 """
@@ -50,8 +93,7 @@ class Puzzle(object):
         if final_score:
             self.final_score = final_score
         else:
-            # engine.setoption({ "MultiPV": 1 })
-            info = engine.analyse(self.positions[-1].board, chess.engine.Limit(depth=depth))
+            info = engine.analyse(self.positions[-1].board, Limit(depth=depth))
             self.final_score = info["score"].white()
 
     def export(self, pgn_headers=None) -> chess.pgn.Game:
@@ -65,7 +107,7 @@ class Puzzle(object):
         else:
             logging.debug(bcolors.DIM + "Not checking for move ambiguity" + bcolors.ENDC)
             is_player_move = None
-        self._calculate_initial_score(depth)
+        self._analyze_initial_moves(depth)
         position = self.initial_position
         position.evaluate(depth)
         while True:
@@ -109,8 +151,9 @@ class Puzzle(object):
             # going from a disadvantage to an equal position
             if abs(initial_cp) > 2 and abs(final_cp) < 0.9:
                 return "Equalize"
-            # otherwise, the puzzle is complete only if the evaluation changed from
-            # the initial position and was converted into a material advantage
+            # otherwise, the puzzle is only complete if the score changed
+            # significantly after the initial position and was converted
+            # into a material advantage
             if abs(final_cp - initial_cp) > 100:
                 initial_material_diff = material_difference(self.positions[0].board)
                 final_material_diff = material_difference(self.positions[-1].board)
@@ -118,6 +161,8 @@ class Puzzle(object):
                     return "Material"
 
     def winner(self) -> str:
+        """ Find the winner of the puzzle based on the move sequence
+        """
         position = self.positions[-2]
         if position.score.mate() == 1:
             return "White"

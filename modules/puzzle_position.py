@@ -46,7 +46,6 @@ class PuzzlePosition(object):
         logging.debug(
             "%sEvaluating best move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
         )
-        # engine.setoption({ "MultiPV": 1 })
         info = engine.analyse(self.board, chess.engine.Limit(depth=depth))
         pv = info["pv"]
         if len(pv) > 0:
@@ -76,7 +75,6 @@ class PuzzlePosition(object):
             self.candidate_moves.append(
                 CandidateMove(move.uci(), self.board.san(move), score)
             )
-        # engine.setoption({ "MultiPV": 1 })
 
     def evaluate(self, depth):
         self._log_position()
