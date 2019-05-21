@@ -63,7 +63,7 @@ class Puzzle(object):
         if self.check_ambiguity:
             is_player_move = True
         else:
-            logging.debug(bcolors.DIM + "Not checking this puzzle for move ambiguity" + bcolors.ENDC)
+            logging.debug(bcolors.DIM + "Not checking for move ambiguity" + bcolors.ENDC)
             is_player_move = None
         self._calculate_initial_score(depth)
         position = self.initial_position
@@ -103,8 +103,8 @@ class Puzzle(object):
         """
         if self.final_score.is_mate():
             return "Mate"
-        initial_cp = self.initial_score.cp
-        final_cp = self.final_score.cp
+        initial_cp = self.initial_score.score()
+        final_cp = self.final_score.score()
         if initial_cp is not None and final_cp is not None:
             # going from a disadvantage to an equal position
             if abs(initial_cp) > 2 and abs(final_cp) < 0.9:
@@ -116,6 +116,28 @@ class Puzzle(object):
                 final_material_diff = material_difference(self.positions[-1].board)
                 if abs(final_material_diff - initial_material_diff) > 0.1:
                     return "Material"
+
+    def winner(self) -> str:
+        position = self.positions[-2]
+        if position.score.mate() == 1:
+            return "White"
+        elif position.score.mate() == -1:
+            return "Black"
+        initial_cp = self.initial_score.score()
+        final_cp = self.final_score.score()
+        if initial_cp is not None and final_cp is not None:
+            # evaluation change favors white
+            if final_cp - initial_cp > 100:
+                return "White"
+            # evaluation change favors black
+            elif final_cp - initial_cp < -100:
+                return "Black"
+            # evaluation equalized after initially favoring black
+            elif initial_cp < 0 and abs(final_cp) < 50:
+                return "White"
+            # evaluation equalized after initially favoring white
+            elif initial_cp > 0 and abs(final_cp) < 50:
+                return "Black"
 
     def is_complete(self) -> bool:
         """ Verify that this sequence of moves represents a complete puzzle
