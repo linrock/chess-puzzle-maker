@@ -36,11 +36,17 @@ class TestPuzzleIsComplete(unittest.TestCase):
         )
         puzzle = Puzzle(board, board.parse_san('Rb7'))
         puzzle.generate(depth=SEARCH_DEPTH)
+        expected_uci_moves = ['a7b7', 'd2g2', 'g1g2', 'c4d5', 'g2g1', 'd5b7']
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Material")
         self.assertEqual(
             [str(p.initial_move) for p in puzzle.positions][:6],
-            ['a7b7', 'd2g2', 'g1g2', 'c4d5', 'g2g1', 'd5b7'],
+            expected_uci_moves
+        )
+        game = chess.pgn.read_game(io.StringIO(puzzle.to_pgn()))
+        self.assertEqual(
+            [m.uci() for m in game.mainline_moves()][:6],
+            expected_uci_moves
         )
 
     def test_mate_in_3_is_complete_1(self):
@@ -50,15 +56,19 @@ class TestPuzzleIsComplete(unittest.TestCase):
         )
         puzzle = Puzzle(board, board.parse_san('Qxh8+'))
         puzzle.generate(depth=SEARCH_DEPTH)
+        expected_uci_moves = ['c3h8', 'g8h8', 'e7f6']
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Mate")
         # self.assertTrue(len(puzzle.positions) == 5)
         self.assertEqual(
             [str(p.initial_move) for p in puzzle.positions][:3],
-            ['c3h8', 'g8h8', 'e7f6'],
+            expected_uci_moves
         )
-        # game = chess.pgn.read_game(io.StringIO(str(puzzle.to_pgn())))
-        # moves1 = [m for m in game.mainline_moves()]
+        game = chess.pgn.read_game(io.StringIO(puzzle.to_pgn()))
+        self.assertEqual(
+            [m.uci() for m in game.mainline_moves()][:3],
+            expected_uci_moves
+        )
 
     def test_mate_in_3_is_complete_2(self):
         # 1... Qxf2+ 2. Rxf2 Rxf2+ 3. Kh1 Ng3#
@@ -78,12 +88,19 @@ class TestPuzzleIsComplete(unittest.TestCase):
         )
         puzzle = Puzzle(board, board.parse_san('Rxh7+'))
         puzzle.generate(depth=SEARCH_DEPTH)
+        expected_uci_moves = ['h1h7', 'h8h7', 'f1h1', 'h7g7', 'd2h6']
         self.assertEqual(
             [str(p.initial_move) for p in puzzle.positions],
-            ['h1h7', 'h8h7', 'f1h1', 'h7g7', 'd2h6'],
+            expected_uci_moves
         )
         self.assertTrue(puzzle.category() == "Mate")
         self.assertTrue(puzzle.is_complete())
+        self.assertTrue(puzzle.category() == "Mate")
+        game = chess.pgn.read_game(io.StringIO(puzzle.to_pgn()))
+        self.assertEqual(
+            [m.uci() for m in game.mainline_moves()][:5],
+            expected_uci_moves
+        )
 
     def test_threefold_repetition_detection(self):
         # https://lichess.org/tYLGlqsX
@@ -93,11 +110,19 @@ class TestPuzzleIsComplete(unittest.TestCase):
         )
         puzzle = Puzzle(board, board.parse_san('Be6'))
         puzzle.generate(depth=SEARCH_DEPTH)
+        expected_uci_moves = [
+            'c8e6', 'f3f6', 'h8g8', 'f6g5', 'g8h8', 'g5f6', 'h8g8', 'f6g5', 'g8h8'
+        ]
         self.assertTrue(puzzle.is_complete())
         # test that the puzzle stops at a threefold repetition position
         self.assertEqual(
             [str(p.initial_move) for p in puzzle.positions],
-            ['c8e6', 'f3f6', 'h8g8', 'f6g5', 'g8h8', 'g5f6', 'h8g8', 'f6g5', 'g8h8'],
+            expected_uci_moves
+        )
+        game = chess.pgn.read_game(io.StringIO(puzzle.to_pgn()))
+        self.assertEqual(
+            [m.uci() for m in game.mainline_moves()],
+            expected_uci_moves
         )
  
 
