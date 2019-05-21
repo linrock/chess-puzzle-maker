@@ -1,6 +1,6 @@
-import chess.uci
+import chess.engine
 
 from modules.fishnet import stockfish_command
 
-engine = chess.uci.popen_engine(stockfish_command())
-engine.info_handlers.append(chess.uci.InfoHandler())
+engine = chess.engine.SimpleEngine.popen_uci(stockfish_command())
+# engine.info_handlers.append(chess.uci.InfoHandler())

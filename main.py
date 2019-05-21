@@ -9,7 +9,7 @@ import os
 import sys
 
 import chess
-import chess.uci
+import chess.engine
 import chess.pgn
 
 from modules.logger import log_move
@@ -61,12 +61,11 @@ logging.getLogger("chess").setLevel(logging.WARNING)
 
 all_games = open(settings.games, "r")
 
-engine.setoption({
+engine.configure({
   'Threads': settings.threads,
   'Hash': settings.memory,
   'Contempt': 0,
 })
-engine.uci()
 
 n_positions = 0   # number of positions considered
 n_puzzles = 0     # number of puzzles generated
@@ -80,7 +79,7 @@ while True:
     logging.debug(bcolors.MAGENTA + "\nGame ID: " + str(game_id) + bcolors.ENDC)
     logging.debug(bcolors.BLUE + str(game)  + bcolors.ENDC)
     
-    prev_score = chess.uci.Score(0, None)
+    prev_score = chess.engine.Cp(0)
     puzzles = []
     
     logging.debug(
@@ -88,7 +87,7 @@ while True:
         ("Scanning game for puzzles (depth: %d)..." % settings.scan_depth) +
         bcolors.ENDC
     )
-    engine.ucinewgame()
+    # engine.ucinewgame()
 
     # Scan through the game, looking for possible puzzles
     node = game
@@ -96,12 +95,11 @@ while True:
     while not node.is_end():
         next_node = node.variation(0)
         next_board = next_node.board()
-        engine.position(next_board)
-        engine.go(depth=settings.scan_depth)
-        cur_score = normalize_score(
+        info = engine.analyse(
             next_board,
-            engine.info_handlers[0].info["score"][1]
+            chess.engine.Limit(depth=settings.scan_depth)
         )
+        cur_score = info["score"].white()
         board = node.board()
         highlight_move = False
         if should_investigate(prev_score, cur_score, board):

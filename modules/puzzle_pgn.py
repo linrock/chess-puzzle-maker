@@ -4,8 +4,8 @@ import chess.pgn
 from modules.analysis import engine
 
 def score_to_str(score):
-    if score.mate:
-        return "mate in %d" % score.mate
+    if score.is_mate():
+        return "mate in %d" % score.mate()
     else:
         return score.cp
 
@@ -26,19 +26,23 @@ class PuzzlePgn(object):
 
     def _puzzle_winner(self):
         position = self.puzzle.positions[-2]
-        if position.score.mate == 1:
+        if position.score.mate() == 1:
             return "White"
-        elif position.score.mate == -1:
+        elif position.score.mate() == -1:
             return "Black"
-        initial_cp = self.puzzle.initial_score.cp
-        final_cp = self.puzzle.final_score.cp
+        initial_cp = self.puzzle.initial_score.score()
+        final_cp = self.puzzle.final_score.score()
         if initial_cp and final_cp:
+            # evaluation change favors white
             if final_cp - initial_cp > 100:
                 return "White"
+            # evaluation change favors black
             elif final_cp - initial_cp < -100:
                 return "Black"
+            # evaluation equalized after initially favoring black
             elif initial_cp < 0 and abs(final_cp) < 50:
                 return "White"
+            # evaluation equalized after initially favoring white
             elif initial_cp > 0 and abs(final_cp) < 50:
                 return "Black"
 

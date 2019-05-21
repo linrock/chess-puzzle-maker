@@ -4,11 +4,11 @@ import unittest
 import chess
 import chess.pgn
 
+from modules.analysis import engine
 from modules.puzzle import Puzzle
 
 # import sys
 # import logging
-
 # logging.basicConfig(format="%(message)s", level=logging.DEBUG, stream=sys.stdout)
 # logging.getLogger("chess").setLevel(logging.WARNING)
 
@@ -16,6 +16,10 @@ SEARCH_DEPTH = 12
 
 
 class TestPuzzleIsComplete(unittest.TestCase):
+
+    @classmethod
+    def tearDownClass(self):
+        engine.quit()
 
     def test_puzzle_is_not_complete(self):
         board = chess.Board()
@@ -48,7 +52,11 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Mate")
-        self.assertTrue(len(puzzle.positions) == 5)
+        # self.assertTrue(len(puzzle.positions) == 5)
+        self.assertEqual(
+            [str(p.initial_move) for p in puzzle.positions][:3],
+            ['c3h8', 'g8h8', 'e7f6'],
+        )
         # game = chess.pgn.read_game(io.StringIO(str(puzzle.to_pgn())))
         # moves1 = [m for m in game.mainline_moves()]
 

@@ -1,12 +1,13 @@
 import logging
 
+import chess.engine
 import chess.pgn
 
 from modules.puzzle_position import PuzzlePosition
 from modules.puzzle_pgn import PuzzlePgn
 from modules.bcolors import bcolors
 from modules.analysis import engine
-from modules.utils import material_difference, normalize_score
+from modules.utils import material_difference
 
 # minimum number of moves required for a puzzle to be considered complete
 MIN_MOVES = 3
@@ -38,26 +39,20 @@ class Puzzle(object):
         self.check_ambiguity = True
 
     def _calculate_initial_score(self, depth):
-        engine.setoption({ "MultiPV": 1 })
-        engine.position(self.initial_board)
-        engine.go(depth=depth)
-        self.initial_score = normalize_score(
-            self.initial_board,
-            engine.info_handlers[0].info["score"][1],
-        )
+        """ multipv 1 """
+        # engine.setoption({ "MultiPV": 1 })
+        info = engine.analyse(self.initial_board, chess.engine.Limit(depth=depth))
+        self.initial_score = info["score"].white()
 
     def _calculate_final_score(self, depth):
+        """ multipv 1 """
         final_score = self.positions[-1].score
         if final_score:
             self.final_score = final_score
         else:
-            engine.setoption({ "MultiPV": 1 })
-            engine.position(self.positions[-1].board)
-            engine.go(depth=depth)
-            self.final_score = normalize_score(
-                self.positions[-1].board,
-                engine.info_handlers[0].info["score"][1],
-            )
+            # engine.setoption({ "MultiPV": 1 })
+            info = engine.analyse(self.positions[-1].board, chess.engine.Limit(depth=depth))
+            self.final_score = info["score"].white()
 
     def export(self, pgn_headers=None) -> chess.pgn.Game:
         return PuzzlePgn(self).export(pgn_headers)
@@ -106,7 +101,7 @@ class Puzzle(object):
             Material - gain a material advantage
             Equalize - equalize a losing position
         """
-        if self.final_score.mate is not None:
+        if self.final_score.is_mate():
             return "Mate"
         initial_cp = self.initial_score.cp
         final_cp = self.final_score.cp

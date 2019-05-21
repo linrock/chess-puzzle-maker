@@ -13,10 +13,10 @@ def log_move(board, move, score, show_uci=False, highlight=False):
     else:
         log_str += "  %s" % move_str.ljust(15)
     log_str += bcolors.BLUE
-    if score.mate is not None:
-        log_str += ("   Mate: %d" % score.mate).ljust(12)
+    if score.is_mate():
+        log_str += ("   Mate: %d" % score.mate()).ljust(12)
     else:
-        log_str += ("   CP: %d" % score.cp).ljust(12)
+        log_str += ("   CP: %d" % score.score()).ljust(12)
     if highlight:
         log_str += bcolors.YELLOW + "   Investigate!"
     logging.debug(log_str + bcolors.ENDC)

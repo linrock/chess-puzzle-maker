@@ -1,4 +1,7 @@
+from chess.engine import Score
+
 from modules.utils import sign
+
 
 def ambiguous(scores):
     """
@@ -9,8 +12,8 @@ def ambiguous(scores):
     """
     if len(scores) <= 1:
         return False
-    best_move_score = scores[0].cp
-    second_best_move_score = scores[1].cp
+    best_move_score = scores[0].score()
+    second_best_move_score = scores[1].score()
     if (best_move_score is not None and second_best_move_score is not None):
         score_change = abs(second_best_move_score - best_move_score)
         if abs(best_move_score) < 50:
@@ -37,13 +40,13 @@ def ambiguous(scores):
                 return False
         if second_best_move_score > 90:
             return True
-    if scores[0].mate:
-        if scores[1].mate:
-            if (scores[0].mate > -1 and scores[1].mate > -1):
+    if scores[0].is_mate():
+        if scores[1].is_mate():
+            if (scores[0].mate() > -1 and scores[1].mate() > -1):
                 # More than one possible mate-in-1
                 return True
-        elif scores[1].cp is not None:
-            if scores[1].cp > 500:
+        elif second_best_move_score:
+            if second_best_move_score > 500:
                 # 2nd best move is a decisive material advantage
                 return True
     return False

@@ -1,6 +1,8 @@
 import logging
 from collections import namedtuple
 
+import chess.engine
+
 from modules.logger import log_move
 from modules.bcolors import bcolors
 from modules.candidate_moves import ambiguous
@@ -44,14 +46,13 @@ class PuzzlePosition(object):
         logging.debug(
             "%sEvaluating best move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
         )
-        engine.setoption({ "MultiPV": 1 })
-        engine.position(self.board)
-        self.best_move = engine.go(depth=depth).bestmove
+        # engine.setoption({ "MultiPV": 1 })
+        info = engine.analyse(self.board, chess.engine.Limit(depth=depth))
+        pv = info["pv"]
+        if len(pv) > 0:
+            self.best_move = pv[0]
         if self.best_move:
-            self.score = normalize_score(
-                self.board,
-                engine.info_handlers[0].info["score"][1]
-            )
+            self.score = info["score"].white()
             self._log_move(self.best_move, self.score)
         else:
             logging.debug(bcolors.RED + "No best move!" + bcolors.ENDC)
@@ -63,21 +64,19 @@ class PuzzlePosition(object):
         if multipv == 0:
             return
         logging.debug(bcolors.DIM + ("Evaluating best %d moves (depth %d)..." % (multipv, depth)) + bcolors.ENDC)
-        engine.setoption({ "MultiPV": multipv })
-        engine.position(self.board)
-        engine.go(depth=depth)
-        info = engine.info_handlers[0].info
-        for i in range(multipv):
-            move = info["pv"].get(i + 1)[0]
-            score = normalize_score(
-                self.board,
-                info["score"].get(i + 1)
-            )
+        multipv_info = engine.analyse(
+            self.board,
+            chess.engine.Limit(depth=depth),
+            multipv=multipv,
+        )
+        for info in multipv_info:
+            move = info["pv"][0]
+            score = info["score"].white()
             self._log_move(move, score)
             self.candidate_moves.append(
                 CandidateMove(move.uci(), self.board.san(move), score)
             )
-        engine.setoption({ "MultiPV": 1 })
+        # engine.setoption({ "MultiPV": 1 })
 
     def evaluate(self, depth):
         self._log_position()
@@ -109,7 +108,7 @@ class PuzzlePosition(object):
             return True
         if self.board.is_game_over():
             return True
-        if self.score.cp == 0 and self.board.can_claim_draw():
+        if self.score.score() == 0 and self.board.can_claim_draw():
             return True
         if is_player_move is not None and is_player_move and self.is_ambiguous():
             return True
