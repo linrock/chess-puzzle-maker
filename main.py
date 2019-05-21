@@ -8,14 +8,10 @@ import logging
 import os
 import sys
 
-import chess
-import chess.engine
 import chess.pgn
 
-from modules.logger import log_move
 from modules.bcolors import bcolors
-from modules.puzzle import Puzzle
-from modules.utils import should_investigate
+from modules.puzzle_finder import find_puzzle_candidates
 from modules.analysis import engine
 
 
@@ -78,63 +74,29 @@ while True:
     game_id = game_id + 1 
     logging.debug(bcolors.MAGENTA + "\nGame ID: " + str(game_id) + bcolors.ENDC)
     logging.debug(bcolors.BLUE + str(game)  + bcolors.ENDC)
-    
-    prev_score = chess.engine.Cp(0)
-    puzzles = []
-    
-    logging.debug(
-        bcolors.DIM +
-        ("Scanning game for puzzles (depth: %d)..." % settings.scan_depth) +
-        bcolors.ENDC
-    )
-    # engine.ucinewgame()
-
-    # Scan through the game, looking for possible puzzles
-    node = game
-    i = 0
-    while not node.is_end():
-        next_node = node.variation(0)
-        next_board = next_node.board()
-        info = engine.analyse(
-            next_board,
-            chess.engine.Limit(depth=settings.scan_depth)
-        )
-        cur_score = info["score"].white()
-        board = node.board()
-        highlight_move = False
-        if should_investigate(prev_score, cur_score, board):
-            highlight_move = True
-            # Found a possible puzzle
-            # don't check for move ambiguity if it's the first position in
-            # the PGN since the PGN might be a puzzle instead of a game
-            puzzle = Puzzle(
-                board,
-                next_node.move,
-                check_ambiguity=i > 0
-            )
-            puzzles.append(puzzle)
-        log_move(board, next_node.move, cur_score, highlight=highlight_move)
-        prev_score = cur_score
-        node = next_node
-        i += 1
-
+    puzzles = find_puzzle_candidates(game, scan_depth=settings.scan_depth)
     n = len(puzzles)
     n_positions += n
-    logging.debug(bcolors.YELLOW + ("# positions to consider as puzzles = %d" % n))
+    logging.debug(bcolors.YELLOW + ("# positions to consider: %d" % n))
     if settings.scan_only:
         continue
     for i, puzzle in enumerate(puzzles):
-        logging.debug(bcolors.MAGENTA + ("\nConsidering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
+        logging.debug(
+            bcolors.MAGENTA +
+            ("\nConsidering position %d of %d..." % (i+1, n)) +
+            bcolors.ENDC
+        )
         puzzle.generate(settings.search_depth)
-        if puzzle.is_complete():
-            puzzle_pgn = puzzle.to_pgn(pgn_headers=game.headers)
-            logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED\n" + bcolors.ENDC)
-            logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
-            tactics_file = open(settings.output, "a")
-            tactics_file.write(puzzle_pgn)
-            tactics_file.write("\n\n")
-            tactics_file.close()
-            n_puzzles += 1
+        if not puzzle.is_complete():
+            continue
+        puzzle_pgn = puzzle.to_pgn(pgn_headers=game.headers)
+        logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED\n" + bcolors.ENDC)
+        logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
+        tactics_file = open(settings.output, "a")
+        tactics_file.write(puzzle_pgn)
+        tactics_file.write("\n\n")
+        tactics_file.close()
+        n_puzzles += 1
 
 logging.debug(
     bcolors.MAGENTA +
