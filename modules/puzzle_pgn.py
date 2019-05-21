@@ -35,7 +35,7 @@ class PuzzlePgn(object):
             score_to_str(self.puzzle.initial_score),
             score_to_str(self.puzzle.final_score)
         )
-        comment = None
+        comment = self._candidate_moves_annotations(self.puzzle.analyzed_moves)
         for position in self.puzzle.positions:
             game_node = game_node.add_variation(
                 chess.Move.from_uci(position.initial_move.uci())
