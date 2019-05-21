@@ -1,11 +1,11 @@
 import unittest
 
-import chess
+from chess import Board
 from chess.engine import Cp, Mate
 
-from modules.utils import should_investigate
+from modules.puzzle_finder import should_investigate
 
-board = chess.Board()
+board = Board()
 
 class TestShouldInvestigate(unittest.TestCase):
 
