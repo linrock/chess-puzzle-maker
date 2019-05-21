@@ -125,7 +125,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
             expected_uci_moves
         )
  
-    def test_puzzle_without_initial_move(self):
+    def test_puzzles_without_initial_move(self):
         # https://www.chesstactics.org/removing-the-guard
         # Figure 5.1.1.1
         board = chess.Board(
@@ -135,6 +135,51 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle.generate(depth=14)
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Material")
+
+        # Figure 5.1.1.2
+        board = chess.Board(
+            '1k6/p7/1p1prrB1/7P/4R3/2P3K1/PP3P2/8 b - - 0 1'
+        )
+        puzzle = Puzzle(board)
+        puzzle.generate(depth=14)
+        expected_uci_moves = [
+            'f6g6', 'h5g6', 'e6e4', 'f2f4'
+        ]
+        self.assertTrue(puzzle.is_complete())
+        self.assertTrue(puzzle.category() == "Material")
+        self.assertEqual(
+            [str(p.initial_move) for p in puzzle.positions],
+            expected_uci_moves
+        )
+
+        # Figure 5.1.1.3
+        board = chess.Board(
+            '8/1p6/p3pk2/5nR1/8/P3rN2/1P3KP1/8 w - - 0 1'
+        )
+        puzzle = Puzzle(board)
+        puzzle.generate(depth=14)
+        expected_uci_moves = [
+            'g5f5', 'f6f5', 'f2e3'
+        ]
+        self.assertEqual(
+            [str(p.initial_move) for p in puzzle.positions[:3]],
+            expected_uci_moves
+        )
+
+        # Figure 5.4.1.2
+        board = chess.Board(
+            '6rk/p3qp2/1np5/2b1pP2/4P1nr/1BN2Q2/PP3P2/3R1K1R w - - 0 1'
+        )
+        puzzle = Puzzle(board)
+        puzzle.generate(depth=14)
+        expected_uci_moves = [
+            'f5f6', 'e7f6', 'f3f6', 'g4f6', 'h1h4', 'h8g7'
+        ]
+        self.assertEqual(
+            [str(p.initial_move) for p in puzzle.positions],
+            expected_uci_moves
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
