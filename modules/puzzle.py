@@ -6,7 +6,7 @@ import chess.pgn
 
 from modules.puzzle_position import PuzzlePosition
 from modules.puzzle_pgn import PuzzlePgn
-from modules.logger import log_move
+from modules.logger import log_board, log_move
 from modules.bcolors import bcolors
 from modules.analysis import engine
 from modules.utils import material_difference
@@ -71,7 +71,7 @@ class Puzzle(object):
             logging.debug("%sThe best move was made from this position%s" % (bcolors.DIM, bcolors.ENDC))
         else:
             logging.debug(
-                "%sEvaluating initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
+                "%sEvaluating actual initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
             )
             info = engine.analyse(
                 self.initial_board,
@@ -107,6 +107,7 @@ class Puzzle(object):
         else:
             logging.debug(bcolors.DIM + "Not checking for move ambiguity" + bcolors.ENDC)
             is_player_move = None
+        log_board(self.initial_board)
         self._analyze_initial_moves(depth)
         position = self.initial_position
         position.evaluate(depth)

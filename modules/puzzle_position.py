@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import chess.engine
 
-from modules.logger import log_move
+from modules.logger import log_board, log_move
 from modules.bcolors import bcolors
 from modules.candidate_moves import ambiguous
 from modules.analysis import engine
@@ -32,8 +32,7 @@ class PuzzlePosition(object):
     def _log_position(self):
         move_san = self.initial_board.san(self.initial_move)
         logging.debug(bcolors.BLUE + ("After %s %s" % (fullmove_string(self.initial_board).strip(), move_san)))
-        logging.debug(bcolors.BLUE + self.board.fen())
-        logging.debug(bcolors.YELLOW + str(self.board) + bcolors.ENDC)
+        log_board(self.board)
         logging.debug(bcolors.BLUE + ('Material difference:  %d' % material_difference(self.board)))
         logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.board.legal_moves.count()) + bcolors.ENDC)
 

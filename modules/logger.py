@@ -3,6 +3,13 @@ import logging
 from modules.bcolors import bcolors
 from modules.utils import fullmove_string
 
+
+def log_board(board):
+    """ Logs the fen string and board representation
+    """
+    logging.debug(bcolors.BLUE + board.fen())
+    logging.debug(bcolors.YELLOW + str(board) + bcolors.ENDC)
+
 def log_move(board, move, score, show_uci=False, highlight=False):
     """ 23. Qe4     CP: 123
     """
