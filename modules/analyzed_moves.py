@@ -1,9 +1,14 @@
+from typing import List
+from collections import namedtuple
+
 from chess.engine import Score
 
 from modules.utils import sign
 
 
-def ambiguous(scores):
+AnalyzedMove = namedtuple("AnalyzedMove", ["move", "move_san", "score"])
+
+def ambiguous(scores: List[Score]) -> bool:
     """
     Looks at a list of candidate scores (best move first) to determine
     if there's a single best player move

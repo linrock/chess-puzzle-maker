@@ -5,12 +5,10 @@ import chess.engine
 
 from modules.logger import log_board, log_move
 from modules.bcolors import bcolors
-from modules.candidate_moves import ambiguous
+from modules.analyzed_moves import AnalyzedMove, ambiguous
 from modules.analysis import engine
 from modules.utils import material_difference, material_count, fullmove_string
 
-
-CandidateMove = namedtuple("CandidateMove", ["move_uci", "move_san", "score"])
 
 class PuzzlePosition(object):
 
@@ -19,7 +17,7 @@ class PuzzlePosition(object):
             initial_move [chess.uci.Move] - the move leading into the position to evaluate
             best_move [chess.uci.Move] - the best move from the board position (after initial_move)
             score [chess.uci.Score] - the score for the board position (after initial_move)
-            candidate_moves [List<CandidateMove>] - list of candidate moves from this position
+            candidate_moves [List<AnalyzedMove>] - list of candidate moves from this position
         """
         self.initial_board = initial_board.copy()
         self.initial_move = initial_move
@@ -72,7 +70,7 @@ class PuzzlePosition(object):
             score = info["score"].white()
             self._log_move(move, score)
             self.candidate_moves.append(
-                CandidateMove(move.uci(), self.board.san(move), score)
+                AnalyzedMove(move.uci(), self.board.san(move), score)
             )
 
     def evaluate(self, depth):

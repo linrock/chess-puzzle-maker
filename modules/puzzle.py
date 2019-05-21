@@ -1,6 +1,7 @@
 import logging
 from collections import namedtuple
 
+from chess import Move
 from chess.engine import Limit
 import chess.pgn
 
@@ -9,9 +10,9 @@ from modules.puzzle_pgn import PuzzlePgn
 from modules.logger import log_board, log_move
 from modules.bcolors import bcolors
 from modules.analysis import engine
+from modules.analyzed_moves import AnalyzedMove
 from modules.utils import material_difference
 
-AnalyzedMove = namedtuple("AnalyzedMove", ["move", "move_san", "score"])
 
 # minimum number of moves required for a puzzle to be considered complete
 MIN_MOVES = 3
@@ -53,7 +54,7 @@ class Puzzle(object):
         else:
             self.player_moves_first = True
 
-    def _analyze_best_initial_move(self, depth):
+    def _analyze_best_initial_move(self, depth) -> Move:
         logging.debug(
             "%sEvaluating best initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
         )

@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from chess.engine import Cp, Mate
 
-from modules.candidate_moves import ambiguous
+from modules.analyzed_moves import ambiguous
 
 
 class TestAmbiguous(unittest.TestCase):
