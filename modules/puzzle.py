@@ -96,8 +96,8 @@ class Puzzle(object):
             info = engine.analyse(self.positions[-1].board, Limit(depth=depth))
             self.final_score = info["score"].white()
 
-    def export(self, pgn_headers=None) -> chess.pgn.Game:
-        return PuzzlePgn(self).export(pgn_headers)
+    def to_pgn(self, pgn_headers=None) -> chess.pgn.Game:
+        return PuzzlePgn(self).to_pgn(pgn_headers)
 
     def generate(self, depth):
         """ Generate new positions until a final position is reached

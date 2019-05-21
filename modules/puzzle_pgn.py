@@ -54,3 +54,7 @@ class PuzzlePgn(object):
             game.headers['PuzzleWinner'] = puzzle_winner
         game.headers['PuzzleEngine'] = engine.id["name"] or ""
         return game
+
+    def to_pgn(self, pgn_headers=None) -> str:
+        return str(self.export(pgn_headers)).replace("}", "}\n")
+

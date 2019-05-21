@@ -127,8 +127,8 @@ while True:
         logging.debug(bcolors.MAGENTA + ("\nConsidering position %d of %d..." % (i+1, n)) + bcolors.ENDC)
         puzzle.generate(settings.search_depth)
         if puzzle.is_complete():
-            puzzle_pgn = str(puzzle.export(pgn_headers=game.headers))
-            logging.debug(bcolors.MAGENTA + "\nNEW PUZZLE GENERATED" + bcolors.ENDC)
+            puzzle_pgn = puzzle.to_pgn(pgn_headers=game.headers)
+            logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED\n" + bcolors.ENDC)
             logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
             tactics_file = open(settings.output, "a")
             tactics_file.write(puzzle_pgn)
