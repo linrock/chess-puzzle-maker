@@ -1,6 +1,7 @@
 import logging
 from collections import namedtuple
 
+from modules.logger import log_move
 from modules.bcolors import bcolors
 from modules.candidate_moves import ambiguous
 from modules.analysis import engine
@@ -35,15 +36,7 @@ class PuzzlePosition(object):
         logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.board.legal_moves.count()) + bcolors.ENDC)
 
     def _log_move(self, move, score):
-        move_san = self.board.san(move)
-        log_str = bcolors.GREEN
-        log_str += ("  %s%s (%s)" % (fullmove_string(self.board), move_san, move.uci())).ljust(22)
-        log_str += bcolors.BLUE
-        if score.mate is not None:
-            log_str += "   Mate: %d" % score.mate
-        else:
-            log_str += "   CP: %d" % score.cp
-        logging.debug(log_str + bcolors.ENDC)
+        log_move(self.board, move, score, show_uci=True)
 
     def _calculate_best_move(self, depth):
         """ Find the best move from board position using multipv 1

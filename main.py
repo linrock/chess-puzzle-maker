@@ -12,9 +12,10 @@ import chess
 import chess.uci
 import chess.pgn
 
+from modules.logger import log_move
 from modules.bcolors import bcolors
 from modules.puzzle import Puzzle
-from modules.utils import fullmove_string, normalize_score, should_investigate
+from modules.utils import normalize_score, should_investigate
 from modules.analysis import engine
 
 
@@ -97,26 +98,24 @@ while True:
         next_board = next_node.board()
         engine.position(next_board)
         engine.go(depth=settings.scan_depth)
-        cur_score = normalize_score(next_board, engine.info_handlers[0].info["score"][1])
+        cur_score = normalize_score(
+            next_board,
+            engine.info_handlers[0].info["score"][1]
+        )
         board = node.board()
-        log_str = bcolors.GREEN
-        log_str += ("  %s%s" % (fullmove_string(board), board.san(next_node.move))).ljust(15)
-        if cur_score.mate is not None:
-            log_str += bcolors.BLUE + ("   Mate: " + str(cur_score.mate)).ljust(12)
-        else:
-            log_str += bcolors.BLUE + ("   CP: " + str(cur_score.cp)).ljust(12)
+        highlight_move = False
         if should_investigate(prev_score, cur_score, board):
+            highlight_move = True
             # Found a possible puzzle
-            log_str += bcolors.YELLOW + "   Investigate!" + bcolors.ENDC
-            # don't check for move ambiguity if it's the first position in the PGN
-            # since it might be a puzzle
+            # don't check for move ambiguity if it's the first position in
+            # the PGN since the PGN might be a puzzle instead of a game
             puzzle = Puzzle(
                 board,
                 next_node.move,
                 check_ambiguity=i > 0
             )
             puzzles.append(puzzle)
-        logging.debug(log_str + bcolors.ENDC)
+        log_move(board, next_node.move, cur_score, highlight=highlight_move)
         prev_score = cur_score
         node = next_node
         i += 1
