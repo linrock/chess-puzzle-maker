@@ -68,7 +68,7 @@ def should_investigate(a: Score, b: Score, board: Board) -> bool:
             # from a winning position, a player blundered into a losing position
             elif abs(a_cp) > 200 and sign(b) != sign(a):
                 return True
-        elif b.mate:
+        elif b.is_mate():
             # from an even position, someone is getting checkmated
             if abs(a_cp) < 110:
                 return True

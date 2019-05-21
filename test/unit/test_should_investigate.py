@@ -103,6 +103,11 @@ class TestShouldInvestigate(unittest.TestCase):
         b = Mate(1)
         self.assertTrue(should_investigate(a, b, board))
 
+    def test_investigating_mate_threat_to_checkmate(self):
+        a = Mate(1)
+        b = Mate(0)
+        self.assertFalse(should_investigate(a, b, board))
+
     def test_not_investigating_insignificant_score_changes(self):
         score_changes = [
             [0, 0],
@@ -125,9 +130,15 @@ class TestShouldInvestigate(unittest.TestCase):
         b = Mate(-5)
         self.assertFalse(should_investigate(a, b, board))
 
-    def test_investigating_mate_threat_to_checkmate(self):
-        a = Mate(1)
-        b = Mate(0)
+    def test_not_investigating_even_position(self):
+        board = Board("4k3/8/3n4/3N4/8/8/4K3/8 w - - 0 1")
+
+        a = Cp(0)
+        b = Cp(0)
+        self.assertFalse(should_investigate(a, b, board))
+
+        a = Cp(9)
+        b = Cp(9)
         self.assertFalse(should_investigate(a, b, board))
 
 
