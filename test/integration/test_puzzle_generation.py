@@ -125,6 +125,16 @@ class TestPuzzleIsComplete(unittest.TestCase):
             expected_uci_moves
         )
  
+    def test_puzzle_without_initial_move(self):
+        # https://www.chesstactics.org/removing-the-guard
+        # Figure 5.1.1.1
+        board = chess.Board(
+            '3rr1k1/ppq2pp1/2p1b2p/8/3P2n1/2N3P1/PP3PBP/R2QR1K1 w - - 0 1'
+        )
+        puzzle = Puzzle(board)
+        puzzle.generate(depth=14)
+        self.assertTrue(puzzle.is_complete())
+        self.assertTrue(puzzle.category() == "Material")
 
 if __name__ == '__main__':
     unittest.main()

@@ -11,7 +11,7 @@ from modules.bcolors import bcolors
 from modules.analysis import engine
 from modules.utils import material_difference
 
-AnalyzedMove = namedtuple("AnalyzedMove", ["move_uci", "move_san", "score"])
+AnalyzedMove = namedtuple("AnalyzedMove", ["move", "move_san", "score"])
 
 # minimum number of moves required for a puzzle to be considered complete
 MIN_MOVES = 3
@@ -27,7 +27,9 @@ class Puzzle(object):
           the initial score before the first move of the puzzle
 
         initial_position [PuzzlePosition]:
-          the first position of the puzzle after the initial move
+          the first position of the puzzle
+          uses the initial move if there is one
+          otherwise, uses the best analyzed move
 
         positions [list(PuzzlePosition)]:
           list of all positions included in the puzzle
@@ -38,21 +40,20 @@ class Puzzle(object):
         check_ambiguity [Boolean]:
           if true, don't generate new positions when the best move is ambiguous
     """
-    def __init__(self, initial_board, initial_move, check_ambiguity=True):
+    def __init__(self, initial_board, initial_move=None):
         self.initial_score = None
         self.initial_board = initial_board.copy()
         self.initial_move = initial_move
-        self.initial_position = PuzzlePosition(initial_board, initial_move)
+        self.initial_position = None
         self.final_score = None
         self.positions = []
         self.analyzed_moves = []
-        # self.check_ambiguity = check_ambiguity
-        self.check_ambiguity = True
+        if initial_move:
+            self.player_moves_first = False
+        else:
+            self.player_moves_first = True
 
-    def _analyze_initial_moves(self, depth):
-        """ get the score of the position before the initial move
-            also get the score of the position after the initial move
-        """
+    def _analyze_best_initial_move(self, depth):
         logging.debug(
             "%sEvaluating best initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
         )
@@ -60,14 +61,23 @@ class Puzzle(object):
         best_move = info["pv"][0]
         score = info["score"].white()
         analyzed_move = AnalyzedMove(
-            best_move.uci(),
+            best_move,
             self.initial_board.san(best_move),
             score
         )
         self.analyzed_moves.append(analyzed_move)
         self.initial_score = score
         log_move(self.initial_board, best_move, score, show_uci=True)
-        if self.initial_move == best_move:
+        return best_move
+
+    def _analyze_initial_moves(self, depth):
+        """ get the score of the position before the initial move
+            also get the score of the position after the initial move
+        """
+        best_move = self._analyze_best_initial_move(depth)
+        if not self.initial_move:
+            return
+        elif self.initial_move == best_move:
             logging.debug("%sThe best move was made from this position%s" % (bcolors.DIM, bcolors.ENDC))
         else:
             logging.debug(
@@ -80,12 +90,16 @@ class Puzzle(object):
             )
             score = info["score"].white()
             analyzed_move = AnalyzedMove(
-                self.initial_move.uci(),
+                self.initial_move,
                 self.initial_board.san(self.initial_move),
                 score
             )
             self.analyzed_moves.append(analyzed_move)
             log_move(self.initial_board, self.initial_move, score, show_uci=True)
+
+    def _set_initial_position(self):
+        initial_move = self.initial_move or self.analyzed_moves[0].move
+        self.initial_position = PuzzlePosition(self.initial_board, initial_move)
 
     def _calculate_final_score(self, depth):
         """ multipv 1 """
@@ -100,15 +114,12 @@ class Puzzle(object):
         return PuzzlePgn(self).to_pgn(pgn_headers)
 
     def generate(self, depth):
-        """ Generate new positions until a final position is reached
+        """ Generate new positions for the puzzle until a final position is reached
         """
-        if self.check_ambiguity:
-            is_player_move = True
-        else:
-            logging.debug(bcolors.DIM + "Not checking for move ambiguity" + bcolors.ENDC)
-            is_player_move = None
+        is_player_move = not self.player_moves_first
         log_board(self.initial_board)
         self._analyze_initial_moves(depth)
+        self._set_initial_position()
         position = self.initial_position
         position.evaluate(depth)
         while True:
@@ -131,8 +142,8 @@ class Puzzle(object):
                 logging.debug(log_str + bcolors.ENDC)
             position = PuzzlePosition(position.board, position.best_move)
             position.evaluate(depth)
-            if self.check_ambiguity:
-                is_player_move = not is_player_move
+            # if self.check_ambiguity:
+            is_player_move = not is_player_move
         self._calculate_final_score(depth)
         if self.is_complete():
             logging.debug(bcolors.GREEN + "Puzzle is complete" + bcolors.ENDC)
@@ -155,11 +166,15 @@ class Puzzle(object):
             # otherwise, the puzzle is only complete if the score changed
             # significantly after the initial position and was converted
             # into a material advantage
-            if abs(final_cp - initial_cp) > 100:
-                initial_material_diff = material_difference(self.positions[0].board)
-                final_material_diff = material_difference(self.positions[-1].board)
-                if abs(final_material_diff - initial_material_diff) > 0.1:
+            initial_material_diff = material_difference(self.positions[0].initial_board)
+            final_material_diff = material_difference(self.positions[-1].board)
+            if abs(final_material_diff - initial_material_diff) > 0.1:
+                if abs(final_cp - initial_cp) > 100:
                     return "Material"
+                elif not self.initial_move:
+                    # a puzzle from a position, not a sequence of moves
+                    if final_cp > 100 or final_cp < -100:
+                        return "Material"
 
     def winner(self) -> str:
         """ Find the winner of the puzzle based on the move sequence
@@ -183,6 +198,12 @@ class Puzzle(object):
                 return "White"
             # evaluation equalized after initially favoring white
             elif initial_cp > 0 and abs(final_cp) < 50:
+                return "Black"
+        if not self.initial_move:
+            # a puzzle from a position, not a sequence of moves
+            if final_cp > 100:
+                return "White"
+            elif final_cp < -100:
                 return "Black"
 
     def is_complete(self) -> bool:

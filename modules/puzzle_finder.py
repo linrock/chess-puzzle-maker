@@ -39,7 +39,8 @@ def find_puzzle_candidates(game: Game, scan_depth=16) -> List[Puzzle]:
             puzzle = Puzzle(
                 board,
                 next_node.move,
-                check_ambiguity=i > 0
+                # check_ambiguity=True,
+                # check_ambiguity=i > 0
             )
             puzzles.append(puzzle)
         log_move(board, next_node.move, cur_score, highlight=highlight_move)
