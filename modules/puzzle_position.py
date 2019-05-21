@@ -7,7 +7,7 @@ from modules.logger import log_move
 from modules.bcolors import bcolors
 from modules.candidate_moves import ambiguous
 from modules.analysis import engine
-from modules.utils import material_difference, material_count, fullmove_string, normalize_score
+from modules.utils import material_difference, material_count, fullmove_string
 
 
 CandidateMove = namedtuple("CandidateMove", ["move_uci", "move_san", "score"])

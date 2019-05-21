@@ -35,15 +35,6 @@ def fullmove_string(board) -> str:
         move_str = "%s..." % move_num
     return move_str.ljust(7)
 
-def normalize_score(board, score) -> Score:
-    """ flip the signs of the score to be from white's perspective
-    """
-    polarity = 1 if board.turn else -1
-    if score.mate is not None:
-        return Score(None, score.mate * polarity)
-    else:
-        return Score(score.cp * polarity, None)
-
 def should_investigate(a: Score, b: Score, board: chess.Board) -> bool:
     """ determine if the difference between scores A and B
         makes the position worth investigating for a puzzle.

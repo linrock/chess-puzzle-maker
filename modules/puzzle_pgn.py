@@ -74,5 +74,5 @@ class PuzzlePgn(object):
         puzzle_winner = self._puzzle_winner()
         if puzzle_winner:
             game.headers['PuzzleWinner'] = puzzle_winner
-        game.headers['PuzzleEngine'] = engine.name or ""
+        game.headers['PuzzleEngine'] = engine.id["name"] or ""
         return game

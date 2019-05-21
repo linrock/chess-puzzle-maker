@@ -15,7 +15,7 @@ import chess.pgn
 from modules.logger import log_move
 from modules.bcolors import bcolors
 from modules.puzzle import Puzzle
-from modules.utils import normalize_score, should_investigate
+from modules.utils import should_investigate
 from modules.analysis import engine
 
 
