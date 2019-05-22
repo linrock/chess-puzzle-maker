@@ -9,7 +9,7 @@ from modules.puzzle_position import PuzzlePosition
 from modules.puzzle_pgn import PuzzlePgn
 from modules.logger import log_board, log_move
 from modules.bcolors import bcolors
-from modules.analysis import engine
+from modules.analysis import AnalysisEngine
 from modules.analyzed_moves import AnalyzedMove
 from modules.utils import material_difference
 
@@ -58,7 +58,7 @@ class Puzzle(object):
         logging.debug(
             "%sEvaluating best initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
         )
-        info = engine.analyse(self.initial_board, Limit(depth=depth))
+        info = AnalysisEngine.instance().analyse(self.initial_board, Limit(depth=depth))
         best_move = info["pv"][0]
         score = info["score"].white()
         analyzed_move = AnalyzedMove(
@@ -84,7 +84,7 @@ class Puzzle(object):
             logging.debug(
                 "%sEvaluating actual initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
             )
-            info = engine.analyse(
+            info = AnalysisEngine.instance().analyse(
                 self.initial_board,
                 Limit(depth=depth),
                 root_moves=[self.initial_move]
@@ -108,7 +108,7 @@ class Puzzle(object):
         if final_score:
             self.final_score = final_score
         else:
-            info = engine.analyse(self.positions[-1].board, Limit(depth=depth))
+            info = AnalysisEngine.instance().analyse(self.positions[-1].board, Limit(depth=depth))
             self.final_score = info["score"].white()
 
     def to_pgn(self, pgn_headers=None) -> chess.pgn.Game:

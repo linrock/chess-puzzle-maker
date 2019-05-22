@@ -1,7 +1,8 @@
 import chess
 import chess.pgn
 
-from modules.analysis import engine
+from modules.analysis import AnalysisEngine
+
 
 def score_to_str(score):
     if score.is_mate():
@@ -52,7 +53,7 @@ class PuzzlePgn(object):
         puzzle_winner = self.puzzle.winner()
         if puzzle_winner:
             game.headers['PuzzleWinner'] = puzzle_winner
-        game.headers['PuzzleEngine'] = engine.id["name"] or ""
+        game.headers['PuzzleEngine'] = AnalysisEngine.instance().id["name"] or ""
         return game
 
     def to_pgn(self, pgn_headers=None) -> str:

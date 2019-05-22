@@ -1,12 +1,12 @@
 import logging
 from collections import namedtuple
 
-import chess.engine
+from chess.engine import Limit
 
 from modules.logger import log_board, log_move
 from modules.bcolors import bcolors
 from modules.analyzed_moves import AnalyzedMove, ambiguous
-from modules.analysis import engine
+from modules.analysis import AnalysisEngine 
 from modules.utils import material_difference, material_count, fullmove_string
 
 
@@ -43,7 +43,7 @@ class PuzzlePosition(object):
         logging.debug(
             "%sEvaluating best move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
         )
-        info = engine.analyse(self.board, chess.engine.Limit(depth=depth))
+        info = AnalysisEngine.instance().analyse(self.board, Limit(depth=depth))
         pv = info["pv"]
         if len(pv) > 0:
             self.best_move = pv[0]
@@ -60,11 +60,7 @@ class PuzzlePosition(object):
         if multipv == 0:
             return
         logging.debug(bcolors.DIM + ("Evaluating best %d moves (depth %d)..." % (multipv, depth)) + bcolors.ENDC)
-        multipv_info = engine.analyse(
-            self.board,
-            chess.engine.Limit(depth=depth),
-            multipv=multipv,
-        )
+        multipv_info = AnalysisEngine.instance().analyse(self.board, Limit(depth=depth), multipv=multipv)
         for info in multipv_info:
             move = info["pv"][0]
             score = info["score"].white()

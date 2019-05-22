@@ -13,7 +13,7 @@ import chess.pgn
 from modules.bcolors import bcolors
 from modules.puzzle import Puzzle
 from modules.puzzle_finder import find_puzzle_candidates
-from modules.analysis import engine
+from modules.analysis import AnalysisEngine
 
 
 parser = argparse.ArgumentParser(
@@ -22,10 +22,10 @@ parser = argparse.ArgumentParser(
 )
 
 group = parser.add_argument_group('data inputs')
-group.add_argument("--games", metavar="GAMES", nargs="?", type=str, default=None,
+group.add_argument("--pgn", metavar="PGN", nargs="?", type=str, default=None,
                     help="A PGN file with games to scan for puzzles")
 group.add_argument("--fen", metavar="FEN", nargs="?", type=str, default=None,
-                    help="A FEN position to generate a puzzle from")
+                    help="A FEN position from which to generate a puzzle")
 
 # Chess engine settings
 group = parser.add_argument_group('chess engine settings')
@@ -56,14 +56,15 @@ try:
 except ImportError:
     pass
 
-logging.basicConfig(format="%(message)s", level=settings.loglevel, stream=sys.stdout)
-logging.getLogger("chess").setLevel(logging.WARNING)
-
+engine = AnalysisEngine.instance()
 engine.configure({
   'Threads': settings.threads,
   'Hash': settings.memory,
   'Contempt': 0,
 })
+
+logging.basicConfig(format="%(message)s", level=settings.loglevel, stream=sys.stdout)
+logging.getLogger("chess").setLevel(logging.WARNING)
 
 def write_puzzle_to_file(puzzle, output_file, pgn_headers=None):
     puzzle_pgn = puzzle.to_pgn(pgn_headers=pgn_headers)
@@ -91,10 +92,10 @@ n_positions = 0   # number of positions considered
 n_puzzles = 0     # number of puzzles generated
 game_id = 0
 
-all_games = open(settings.games, "r")
+pgn = open(settings.pgn, "r")
 
 while True:
-    game = chess.pgn.read_game(all_games)
+    game = chess.pgn.read_game(pgn)
     if game == None:
         break
     game_id = game_id + 1 

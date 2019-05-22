@@ -7,7 +7,7 @@ from chess.engine import Score, Cp, Limit
 
 from modules.logger import log_move
 from modules.bcolors import bcolors
-from modules.analysis import engine
+from modules.analysis import AnalysisEngine
 from modules.puzzle import Puzzle
 from modules.utils import sign, material_total, material_count
 
@@ -27,7 +27,7 @@ def find_puzzle_candidates(game: Game, scan_depth=16) -> List[Puzzle]:
     while not node.is_end():
         next_node = node.variation(0)
         next_board = next_node.board()
-        info = engine.analyse(next_board, Limit(depth=scan_depth))
+        info = AnalysisEngine.instance().analyse(next_board, Limit(depth=scan_depth))
         cur_score = info["score"].white()
         board = node.board()
         highlight_move = False

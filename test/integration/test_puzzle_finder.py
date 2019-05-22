@@ -5,7 +5,7 @@ import unittest
 import chess.pgn
 
 from modules.puzzle_finder import find_puzzle_candidates
-from modules.analysis import engine
+from modules.analysis import AnalysisEngine
 
 
 def pgn_file_path(pgn_filename) -> io.TextIOWrapper:
@@ -14,6 +14,14 @@ def pgn_file_path(pgn_filename) -> io.TextIOWrapper:
 
 
 class TestPuzzleFinder(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        AnalysisEngine.instance()
+
+    @classmethod
+    def tearDownClass(self):
+        AnalysisEngine.quit()
 
     def test_finding_blunder(self):
         with pgn_file_path("carlsen-anand-blunder.wc2014.pgn") as f:

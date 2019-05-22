@@ -5,8 +5,8 @@ import unittest
 import chess
 import chess.pgn
 
-from modules.analysis import engine
 from modules.puzzle import Puzzle
+from modules.analysis import AnalysisEngine
 
 # import sys
 # import logging
@@ -23,6 +23,14 @@ def pgn_file_path(pgn_filename) -> io.TextIOWrapper:
 
 
 class TestPuzzleIsComplete(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        AnalysisEngine.instance()
+
+    @classmethod
+    def tearDownClass(self):
+        AnalysisEngine.quit()
 
     def test_puzzle_is_not_complete(self):
         board = chess.Board()
