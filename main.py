@@ -40,6 +40,8 @@ group.add_argument("--search-depth", metavar="DEPTH", nargs="?", type=int, defau
 
 parser.add_argument("--output", metavar="OUTPUT_PGN", default="generated_puzzles.pgn",
                     help="An output PGN file")
+parser.add_argument("--start-index", metavar="INDEX", type=int, default=0,
+                    help="Start at the n-th game in a PGN (starting at 0)")
 parser.add_argument("--quiet", dest="loglevel",
                     default=logging.DEBUG, action="store_const", const=logging.INFO,
                     help="substantially reduce the number of logged messages")
@@ -91,19 +93,22 @@ if settings.fen:
 n_positions = 0   # number of positions considered
 n_puzzles = 0     # number of puzzles generated
 game_id = 0
-
 pgn = open(settings.pgn, "r")
+
+while game_id < settings.start_index:
+    game = chess.pgn.read_game(pgn)
+    if game == None:
+        exit(0)
+    game_id += 1
 
 while True:
     game = chess.pgn.read_game(pgn)
     if game == None:
         break
-    game_id = game_id + 1 
-    logging.debug(bcolors.MAGENTA + "\nGame ID: " + str(game_id) + bcolors.ENDC)
+    logging.debug(bcolors.MAGENTA + "\nGame index: " + str(game_id) + bcolors.ENDC)
     logging.debug(bcolors.BLUE + str(game)  + bcolors.ENDC)
     puzzles = find_puzzle_candidates(game, scan_depth=settings.scan_depth)
     n = len(puzzles)
-    n_positions += n
     logging.debug(bcolors.YELLOW + ("# positions to consider: %d" % n))
     if settings.scan_only:
         continue
@@ -117,6 +122,8 @@ while True:
         if puzzle.is_complete():
             write_puzzle_to_file(puzzle, settings.output, pgn_headers=game.headers)
             n_puzzles += 1
+    game_id += 1
+    n_positions += n
 
 logging.debug(
     bcolors.MAGENTA +
