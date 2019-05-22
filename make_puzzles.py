@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-""" Creates chess puzzles in PGN format from PGN files
+""" Creates chess puzzles from PGN files and FEN strings
 """
 
 import argparse
@@ -22,10 +22,10 @@ parser = argparse.ArgumentParser(
 )
 
 group = parser.add_argument_group('data inputs')
-group.add_argument("--pgn", metavar="PGN", nargs="?", type=str, default=None,
-                    help="A PGN file with games to scan for puzzles")
 group.add_argument("--fen", metavar="FEN", nargs="?", type=str, default=None,
                     help="A FEN position from which to generate a puzzle")
+group.add_argument("--pgn", metavar="PGN", nargs="?", type=str, default=None,
+                    help="A PGN file with games to scan for puzzles")
 
 # Chess engine settings
 group = parser.add_argument_group('chess engine settings')
@@ -38,8 +38,6 @@ group.add_argument("--scan-depth", metavar="DEPTH", nargs="?", type=int, default
 group.add_argument("--search-depth", metavar="DEPTH", nargs="?", type=int, default=22,
                     help="depth for searching a position for candidate moves")
 
-parser.add_argument("--output", metavar="OUTPUT_PGN", default="generated_puzzles.pgn",
-                    help="An output PGN file")
 parser.add_argument("--start-index", metavar="INDEX", type=int, default=0,
                     help="Start at the n-th game in a PGN (starting at 0)")
 parser.add_argument("--quiet", dest="loglevel",
@@ -65,16 +63,13 @@ engine.configure({
   'Contempt': 0,
 })
 
-logging.basicConfig(format="%(message)s", level=settings.loglevel, stream=sys.stdout)
+logging.basicConfig(format="%(message)s", level=settings.loglevel, stream=sys.stderr)
 logging.getLogger("chess").setLevel(logging.WARNING)
 
-def write_puzzle_to_file(puzzle, output_file, pgn_headers=None):
+def print_puzzle_pgn(puzzle, pgn_headers=None):
     puzzle_pgn = puzzle.to_pgn(pgn_headers=pgn_headers)
     logging.debug(bcolors.MAGENTA + "NEW PUZZLE GENERATED\n" + bcolors.ENDC)
-    logging.info(bcolors.CYAN + puzzle_pgn + bcolors.ENDC)
-    with open(output_file, "a") as f:
-        f.write(puzzle_pgn)
-        f.write("\n\n")
+    print(bcolors.CYAN + puzzle_pgn + "\n\n" + bcolors.ENDC)
 
 
 # load a FEN and try to create a puzzle from it
@@ -83,7 +78,7 @@ if settings.fen:
     puzzle = Puzzle(Board(settings.fen))
     puzzle.generate(depth=settings.search_depth)
     if puzzle.is_complete():
-        write_puzzle_to_file(puzzle, settings.output)
+        print_puzzle_pgn(puzzle)
     engine.quit()
     exit(0)
 
@@ -120,7 +115,7 @@ while True:
         )
         puzzle.generate(settings.search_depth)
         if puzzle.is_complete():
-            write_puzzle_to_file(puzzle, settings.output, pgn_headers=game.headers)
+            print_puzzle_pgn(puzzle, pgn_headers=game.headers)
             n_puzzles += 1
     game_id += 1
     n_positions += n
