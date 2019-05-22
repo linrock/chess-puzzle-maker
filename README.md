@@ -28,7 +28,7 @@ Install the required python libraries:
 
 `pip3 install -r requirements.txt`
 
-Download an official Stockfish binary from the [https://stockfishchess.org/download/](Stockfish website) and make sure `stockfish` is available in your `$PATH`
+Download an official Stockfish binary from the [Stockfish website](https://stockfishchess.org/download/) and make sure `stockfish` is available in your `$PATH`
 
 Or run `inv update-stockfish` to get the latest multi-variant Stockfish fork used by Lichess.
 
@@ -73,5 +73,5 @@ You can run the whole test suite with
 
 This program is based on:
 
-* [https://github.com/clarkerubber/Python-Puzzle-Creator](Python-Puzzle-Creator) by [https://github.com/clarkerubber](clarkerubber)
-* [https://github.com/vitogit/pgn-tactics-generator](pgn-tactics-generator) by [https://github.com/vitogit](vitogit)
+* [Python-Puzzle-Creator](https://github.com/clarkerubber/Python-Puzzle-Creator) by [@clarkerubber](https://github.com/clarkerubber)
+* [pgn-tactics-generator](https://github.com/vitogit/pgn-tactics-generator) by [@vitogit](https://github.com/vitogit)
