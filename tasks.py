@@ -1,4 +1,5 @@
 from invoke import task
+from modules.fishnet import stockfish_command
 
 @task
 def test(c, unit=False, integration=False):
@@ -11,6 +12,13 @@ def test(c, unit=False, integration=False):
     else:
         cmd = "python3 -m unittest test/*/test_*.py"
     c.run(cmd, pty=True)
+
+
+@task
+def update_stockfish(c):
+    """ Updates to the latest Stockfish version used by lichess
+    """
+    stockfish_command(update=True)
 
 @task
 def fetch_lichess(c, tournament=''):
