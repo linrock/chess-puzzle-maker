@@ -45,6 +45,11 @@ parser.add_argument("--quiet", dest="loglevel",
                     help="substantially reduce the number of logged messages")
 parser.add_argument("--scan-only", default=False, action="store_true",
                     help="Only scan for possible puzzles. Don't analyze positions")
+
+if len(sys.argv) < 2:
+    parser.print_usage()
+    sys.exit(0)
+
 settings = parser.parse_args()
 try:
     # Optionally fix colors on Windows and in journals if the colorama module
