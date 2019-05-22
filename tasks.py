@@ -21,9 +21,12 @@ def update_stockfish(c):
     stockfish_command(update=True)
 
 @task
-def fetch_lichess(c, tournament=''):
+def fetch_lichess(c, tournament_id='', game_id=''):
     """ Fetch all games played in a lichess tournament
     """
-    if len(tournament):
-        id = tournament
+    if len(tournament_id):
+        id = tournament_id
         c.run("curl https://lichess.org/api/tournament/%s/games > tournament.%s.pgn" % (id, id), pty=True)
+    elif len(game_id):
+        id = game_id
+        c.run("curl https://lichess.org/game/export/%s > game.%s.pgn" % (id, id), pty=True)
