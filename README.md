@@ -1,86 +1,74 @@
-# pgn-tactics-generator
+# Chess puzzle maker
 
-## About
+This program creates chess puzzles from positions with clear sequences of best moves.
+It looks for positions where a player can:
 
-This is a python application dedicated to creating chess puzzles/tactics from a pgn file.
-Also it can download your games from lichess.org and use that file. 
+* Checkmate the opponent in a forced sequence
+* Convert a position into a material advantage after a mistake by the opponent
+* Equalize a losing position after a mistake by the opponent
 
-It's based on the great  [https://github.com/clarkerubber/Python-Puzzle-Creator](https://github.com/clarkerubber/Python-Puzzle-Creator) by @clarkerubber
+Give it a PGN with any number of games or positions and it will look for positions to convert into puzzles:
 
-Things that I changed:
-- Use a local pgn file with games as a source.
-- Write results to a file called tactics.pgn
-- Default engine depth to 8 so it's faster. Before it was nodes=3500000 this is a depth around 20. So it took several minutes to analyze a game. With depth 8 it takes seconds.
-- You can use a param to change the depth if you want more precision.
-- chess.pop_count to chess.popcount because it was failing
+`./main.py --pgn games.pgn`
 
-### This is too complex, give something easy.
-There is another option if you don't want to install and manage python scripts
-I created a more user friendly tactics generator and it's online http://chesstacticsgenerator.vitomd.com
-It uses a different approach to create tactics, so probably it will generate a different set of tactics.
+Or give it a position (FEN) and it will try to create a puzzle:
+
+`./main.py --fen "6rr/1k3p2/1pb1p1np/p1p1P2R/2P3R1/2P1B3/P1BK1PP1/8 b - - 5 26"`
+
 
 
 ## Installation
 
-This script requires the *Requests* and *Python-Chess* libraries to run, as well as a copy of *Stockfish*
+This requires Python 3 and a UCI chess engine.
 
-### Install Requests
+Install the required python libraries:
 
-`pip install requests`
+`pip3 install -r requirements.txt`
 
-### Install Python Chess
+Download an official Stockfish binary from the [https://stockfishchess.org/download/](Stockfish website)
 
-`pip install python-chess`
-
-### Setup
-
-MacOS / Linux : `sh build-stockfish.sh` to obtain the current lichess Stockfish instance.
-
-## Launching Application
-First you can download your games from lichess with
-
-`python download_games.py <lichess username>`
-
-This will download the last 60 games from blitz,rapid and classical. You can add some params like max number of games and the lichess api token that make the download faster. https://lichess.org/api#operation/apiGamesUser
-
-`python download_games.py <lichess username> --max 100 --token 123456789`
+Or run `sh build-stockfish.sh` to get the latest multi-variant Stockfish fork used by Lichess.
 
 
-Then execute the generator (it will look for a file called games.pgn)
-`python main.py --quiet`
+### Usage
 
-You can also use parameters
+For a list of arguments:
 
-- --quiet to reduce the screen output.
-- --depth=8 param to select the stockfish depth analysis. Default is `8` and will take some seconds to analyze a game, with `--depth=18` will take around 6 minutes.
-- --games=ruy_lopez.pgn to select a specific pgn file. Default is `games.pgn`
-- strict=False . False to generate more tactics but a little more ambiguous. Default is `True`
-- Threads and Hash defaults to 4 and 2048
-`python main.py --quiet --depth=18 --games=ruy_lopez.pgn --strict=True <#Threads = 4> <Hash (MBytes) = 2048>`
+`./main.py -h`
 
 
-## Tactics output
+### Output
 
-The resulting file will be a pgn file called tactics.pgn. Each tactic contains the headers from the source game. The result header it's the tactic result and not the game result. It can be loaded to a lichess study or to an app like ichess to practice tactics.
+By default, the resulting puzzles will be printed in PGN format to standard output while errors and log messages are printed to standard error.
 
-## Problems?
+You can specify an output file for the PGN puzzles:
 
-#### Python 2.7
-- For Python 2.7 install futures `pip install futures`
+`./main.py --pgn games.pgn --output-pgn puzzles.pgn`
 
-#### Python 3
-If you have problems with pip maybe it's because your system use a separate version like pip3.
-Or maybe you should execute the scripts with python3 instead of python if you have that installed. 
-Like:
+An example PGN output:
 
-`python3 download_games.py <lichess username> <Secret API Token>`
+```
+[FEN "6rr/1k3p2/1pb1p1np/p1p1P2R/2P3R1/2P1B3/P1BK1PP1/8 b - - 5 26"]
+[PuzzleCategory "Material"]
+[PuzzleEngine "Stockfish 2018-11-29 64 Multi-Variant"]
+[PuzzleWinner "Black"]
+[SetUp "1"]
 
-`python3 main.py <Secret API Token> <#Threads = 4> <Hash (MBytes) = 2048>`
+26... Nxe5   { Nxe5  (-168) }
+27.   Rxg8   { Rxg8  (-166) Rgh4 (-251)  Re4 (-351) }
+27... Nxc4+  { Nxc4+ (-178) Rxg8 ( 382)  Nf3+ (479) }
+28.   Kd3    { Kd3   (-155) Ke2  (-183)  Kd1 (-285) }
+28... Nb2+   { Nb2+  (-178) Rxg8 ( 211)  Ne5+ (344) }
+29.   Ke2    { Kd2   (-164) Ke2  (-174)             }
+```
 
-#### Stockfish errors
-- If you have problems building stockfish try downloading stockfish directly https://stockfishchess.org/download/
+Each move is annotated with the scores for the best possible moves from that position
+as determined by the chess engine.
 
 
-## Want to see all my chess related projects? 
-Check [My projects](http://vitomd.com/blog/projects/) for a full detailed list.
+### Acknowledgements
 
+This program is based on:
+
+* [https://github.com/clarkerubber/Python-Puzzle-Creator](Python-Puzzle-Creator) by [https://github.com/clarkerubber](clarkerubber)
+* [https://github.com/vitogit/pgn-tactics-generator](pgn-tactics-generator) by [https://github.com/vitogit](vitogit)
