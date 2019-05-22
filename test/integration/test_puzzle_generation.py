@@ -23,10 +23,6 @@ def pgn_file_path(pgn_filename) -> io.TextIOWrapper:
 
 class TestPuzzleIsComplete(unittest.TestCase):
 
-    @classmethod
-    def tearDownClass(self):
-        engine.quit()
-
     def test_puzzle_is_not_complete(self):
         board = chess.Board()
         puzzle = Puzzle(board, chess.Move.from_uci("e2e4"))
