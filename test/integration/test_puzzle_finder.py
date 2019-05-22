@@ -18,7 +18,7 @@ class TestPuzzleFinder(unittest.TestCase):
     def test_finding_blunder(self):
         with pgn_file_path("carlsen-anand-blunder.wc2014.pgn") as f:
             game = chess.pgn.read_game(f)
-        puzzles = find_puzzle_candidates(game, scan_depth=12)
+        puzzles = find_puzzle_candidates(game, scan_depth=6)
         found_blunder = False
         fen = '6rr/1k3p2/1pb1p1np/p1p1P2R/2P3R1/2P1B3/P1B2PP1/2K5 w - - 4 26'
         move = 'c1d2'

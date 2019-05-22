@@ -13,6 +13,7 @@ from modules.puzzle import Puzzle
 # logging.basicConfig(format="%(message)s", level=logging.DEBUG, stream=sys.stdout)
 # logging.getLogger("chess").setLevel(logging.WARNING)
 
+# use a lower search depth when possible for faster tests
 SEARCH_DEPTH = 12
 
 
@@ -37,7 +38,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
             '6k1/R4p2/1r3npp/2N5/P1b2P2/6P1/3r2BP/4R1K1 w - - 0 34'
         )
         puzzle = Puzzle(board, board.parse_san('Rb7'))
-        puzzle.generate(depth=SEARCH_DEPTH)
+        puzzle.generate(depth=15)
         expected_uci_moves = ['a7b7', 'd2g2', 'g1g2', 'c4d5', 'g2g1', 'd5b7']
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Material")
@@ -127,7 +128,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         )
  
     def test_puzzles_without_initial_move(self):
-        depth = 13
+        depth = 14
 
         # https://www.chesstactics.org/removing-the-guard
         # Figure 5.1.1.1
@@ -189,7 +190,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
             'r2qr3/2pp1pkp/b1p3p1/p7/P7/1PnBPQ2/2PN1PPP/R4RK1 w - - 0 1'
         )
         puzzle = Puzzle(board)
-        puzzle.generate(depth=SEARCH_DEPTH)
+        puzzle.generate(depth=14)
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Material")
 
@@ -197,7 +198,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         with pgn_file_path("wtharvey.pgn") as f:
             game = chess.pgn.read_game(f)
         puzzle = Puzzle(game.board())
-        puzzle.generate(depth=SEARCH_DEPTH)
+        puzzle.generate(depth=14)
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Material")
         self.assertEqual(
