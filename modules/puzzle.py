@@ -200,7 +200,7 @@ class Puzzle(object):
             # evaluation equalized after initially favoring white
             elif initial_cp > 0 and abs(final_cp) < 50:
                 return "Black"
-        if not self.initial_move:
+        if not self.initial_move and final_cp:
             # a puzzle from a position, not a sequence of moves
             if final_cp > 100:
                 return "White"

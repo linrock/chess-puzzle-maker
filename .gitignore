@@ -2,6 +2,7 @@
 */*.py[cd]
 stockfish-*
 Stockfish
-slack_key.txt
 venv
-*pgn
+/*.pgn
+/inputs
+/outputs

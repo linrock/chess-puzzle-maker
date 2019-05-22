@@ -1,4 +1,5 @@
 import io
+import os
 import unittest
 
 import chess
@@ -13,6 +14,11 @@ from modules.puzzle import Puzzle
 # logging.getLogger("chess").setLevel(logging.WARNING)
 
 SEARCH_DEPTH = 12
+
+
+def pgn_file_path(pgn_filename) -> io.TextIOWrapper:
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    return open(os.path.join(cur_dir, '..', 'fixtures', pgn_filename))
 
 
 class TestPuzzleIsComplete(unittest.TestCase):
@@ -93,7 +99,6 @@ class TestPuzzleIsComplete(unittest.TestCase):
             [str(p.initial_move) for p in puzzle.positions],
             expected_uci_moves
         )
-        self.assertTrue(puzzle.category() == "Mate")
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Mate")
         game = chess.pgn.read_game(io.StringIO(puzzle.to_pgn()))
@@ -126,13 +131,15 @@ class TestPuzzleIsComplete(unittest.TestCase):
         )
  
     def test_puzzles_without_initial_move(self):
+        depth = 13
+
         # https://www.chesstactics.org/removing-the-guard
         # Figure 5.1.1.1
         board = chess.Board(
             '3rr1k1/ppq2pp1/2p1b2p/8/3P2n1/2N3P1/PP3PBP/R2QR1K1 w - - 0 1'
         )
         puzzle = Puzzle(board)
-        puzzle.generate(depth=14)
+        puzzle.generate(depth=depth)
         self.assertTrue(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Material")
 
@@ -141,7 +148,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
             '1k6/p7/1p1prrB1/7P/4R3/2P3K1/PP3P2/8 b - - 0 1'
         )
         puzzle = Puzzle(board)
-        puzzle.generate(depth=14)
+        puzzle.generate(depth=depth)
         expected_uci_moves = [
             'f6g6', 'h5g6', 'e6e4', 'f2f4'
         ]
@@ -157,7 +164,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
             '8/1p6/p3pk2/5nR1/8/P3rN2/1P3KP1/8 w - - 0 1'
         )
         puzzle = Puzzle(board)
-        puzzle.generate(depth=14)
+        puzzle.generate(depth=depth)
         expected_uci_moves = [
             'g5f5', 'f6f5', 'f2e3'
         ]
@@ -171,13 +178,35 @@ class TestPuzzleIsComplete(unittest.TestCase):
             '6rk/p3qp2/1np5/2b1pP2/4P1nr/1BN2Q2/PP3P2/3R1K1R w - - 0 1'
         )
         puzzle = Puzzle(board)
-        puzzle.generate(depth=14)
+        puzzle.generate(depth=depth)
         expected_uci_moves = [
             'f5f6', 'e7f6', 'f3f6', 'g4f6', 'h1h4', 'h8g7'
         ]
         self.assertEqual(
             [str(p.initial_move) for p in puzzle.positions],
             expected_uci_moves
+        )
+
+        # http://wtharvey.com/a01.html
+        # Juan Bellon Lopez vs Ljubomir Ljubojevic, Palma de Majorca, 1972
+        board = chess.Board(
+            'r2qr3/2pp1pkp/b1p3p1/p7/P7/1PnBPQ2/2PN1PPP/R4RK1 w - - 0 1'
+        )
+        puzzle = Puzzle(board)
+        puzzle.generate(depth=SEARCH_DEPTH)
+        self.assertTrue(puzzle.is_complete())
+        self.assertTrue(puzzle.category() == "Material")
+
+    def test_puzzles_loaded_from_pgn(self):
+        with pgn_file_path("wtharvey.pgn") as f:
+            game = chess.pgn.read_game(f)
+        puzzle = Puzzle(game.board())
+        puzzle.generate(depth=SEARCH_DEPTH)
+        self.assertTrue(puzzle.is_complete())
+        self.assertTrue(puzzle.category() == "Material")
+        self.assertEqual(
+            [m.uci() for m in game.mainline_moves()],
+            [str(p.initial_move) for p in puzzle.positions],
         )
 
 

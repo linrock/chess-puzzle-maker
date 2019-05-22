@@ -1,0 +1,19 @@
+[Site "http://wtharvey.com/a01.html"]
+[Event "Juan Bellon Lopez vs Ljubomir Ljubojevic, Palma de Majorca, 1972"]
+[FEN "r2qr3/2pp1pkp/b1p3p1/p7/P7/1PnBPQ2/2PN1PPP/R4RK1 w - - 0 1"]
+[PuzzleCategory "Material"]
+[PuzzleEngine "Stockfish 2018-11-29 64 Multi-Variant"]
+[PuzzleWinner "White"]
+[SetUp "1"]
+
+{ score: 383 -> 426 }
+1. Bxa6 { Bxa6 (383) }
+1... Rxa6 { Rxa6 (374) Qh4 (487) f5 (494) }
+2. e4 { e4 (403) Rae1 (0) Nb1 (0) }
+2... Qf6 { Qf6 (443) Nxe4 (469) Nb5 (500) }
+3. Qd3 { Qd3 (427) Qxf6+ (37) Rfe1 (0) }
+3... c5 { c5 (443) Rb6 (463) Raa8 (515) }
+4. e5 { e5 (431) f3 (-9) f4 (-10) }
+4... Rxe5 { Rxe5 (427) Qe6 (458) Ne2+ (461) }
+5. Qxc3 { Qxc3 (416) Nf3 (-201) Kh1 (-208) }
+5... Re2 { Re2 (420) Rd5 (449) Rf5 (457) }
