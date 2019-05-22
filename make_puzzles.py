@@ -21,10 +21,11 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter
 )
 
-group = parser.add_argument_group('data inputs')
-group.add_argument("--fen", metavar="FEN", nargs="?", type=str, default=None,
+# Data inputs
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("--fen", metavar="FEN", type=str,
                     help="A FEN position from which to generate a puzzle")
-group.add_argument("--pgn", metavar="PGN", nargs="?", type=str, default=None,
+group.add_argument("--pgn", metavar="PGN", type=str,
                     help="A PGN file with games to scan for puzzles")
 
 # Chess engine settings
@@ -38,6 +39,7 @@ group.add_argument("--scan-depth", metavar="DEPTH", nargs="?", type=int, default
 group.add_argument("--search-depth", metavar="DEPTH", nargs="?", type=int, default=22,
                     help="depth for searching a position for candidate moves")
 
+# Misc settings
 parser.add_argument("--start-index", metavar="INDEX", type=int, default=0,
                     help="Start at the n-th game in a PGN (starting at 0)")
 parser.add_argument("--quiet", dest="loglevel",
