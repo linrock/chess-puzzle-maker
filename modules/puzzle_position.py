@@ -1,4 +1,8 @@
+from typing import List
 from collections import namedtuple
+
+from chess import Board, Move
+from chess.engine import Score
 
 from modules.logger import log, log_board, log_move
 from modules.colors import Color
@@ -9,30 +13,33 @@ from modules.utils import material_difference, material_count, fullmove_string
 
 class PuzzlePosition(object):
 
-    def __init__(self, initial_board, initial_move):
+    def __init__(self, initial_board: Board, initial_move: Move):
         """ board [chess.Board] - board representing the position to evaluate
-            initial_move [chess.uci.Move] - the move leading into the position to evaluate
-            best_move [chess.uci.Move] - the best move from the board position (after initial_move)
-            score [chess.uci.Score] - the score for the board position (after initial_move)
+            initial_move [chess.Move] - the move leading into the position to evaluate
+            best_move [chess.Move] - the best move from the board position (after initial_move)
+            score [chess.engine.Score] - the score for the board position (after initial_move)
             candidate_moves [List<AnalyzedMove>] - list of candidate moves from this position
         """
         self.initial_board = initial_board.copy()
         self.initial_move = initial_move
         self.board = initial_board.copy()
         self.board.push(initial_move)
-        self.best_move = None
-        self.score = None
-        self.candidate_moves = []
+        self.best_move: Move = None
+        self.score: Score = None
+        self.candidate_moves: List[AnalyzedMove] = []
 
     def _log_position(self):
         move_san = self.initial_board.san(self.initial_move)
         log(Color.BLUE, "\nAfter %s %s" % (fullmove_string(self.initial_board).strip(), move_san))
         log_board(self.board)
         log(Color.BLUE, "Material difference:  %d" % material_difference(self.board))
-        log(Color.BLUE, "# legal moves:        %d" % self.board.legal_moves.count())
+        log(Color.BLUE, "# legal moves:        %d" % self._num_legal_moves())
 
     def _log_move(self, move, score):
         log_move(self.board, move, score, show_uci=True)
+
+    def _num_legal_moves(self) -> int:
+        return self.board.legal_moves.count()
 
     def _calculate_best_move(self, depth):
         """ Find the best move from board position using multipv 1
@@ -41,13 +48,15 @@ class PuzzlePosition(object):
         best_move = AnalysisEngine.best_move(self.board, depth)
         self.best_move = best_move.move
         self.score = best_move.score
+        if self._num_legal_moves() == 1:
+            self.candidate_moves = [best_move]
         self._log_move(self.best_move, self.score)
 
     def _calculate_candidate_moves(self, depth):
         """ Find the best move from board position using multipv 3
         """
-        multipv = min(3, self.board.legal_moves.count())
-        if multipv == 0:
+        multipv = min(3, self._num_legal_moves())
+        if multipv <= 1:
             return
         log(Color.DIM, "Evaluating best %d moves (depth %d)..." % (multipv, depth))
         self.candidate_moves = AnalysisEngine.best_moves(self.board, depth, multipv)
@@ -56,7 +65,7 @@ class PuzzlePosition(object):
 
     def evaluate(self, depth):
         self._log_position()
-        if self.board.legal_moves.count() == 0:
+        if self._num_legal_moves() == 0:
             return
         self._calculate_best_move(depth)
         if not self.best_move:
