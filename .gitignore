@@ -3,6 +3,7 @@
 stockfish-*
 Stockfish
 venv
+.mypy_cache
 /*.pgn
 /inputs
 /outputs
