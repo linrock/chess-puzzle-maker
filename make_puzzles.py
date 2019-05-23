@@ -12,6 +12,7 @@ import chess.pgn
 
 from modules.colors import Color
 from modules.puzzle import Puzzle
+from modules.logger import log
 from modules.puzzle_finder import find_puzzle_candidates
 from modules.analysis import AnalysisEngine
 from modules.constants import SCAN_DEPTH, SEARCH_DEPTH
@@ -79,7 +80,7 @@ logging.getLogger("chess").setLevel(logging.WARNING)
 
 def print_puzzle_pgn(puzzle, pgn_headers=None):
     puzzle_pgn = puzzle.to_pgn(pgn_headers=pgn_headers)
-    logging.debug(Color.MAGENTA + "NEW PUZZLE GENERATED\n" + Color.ENDC)
+    log(Color.MAGENTA + "NEW PUZZLE GENERATED\n")
     print(Color.CYAN + puzzle_pgn + "\n\n" + Color.ENDC)
 
 
@@ -111,19 +112,15 @@ while True:
     game = chess.pgn.read_game(pgn)
     if game == None:
         break
-    logging.debug(Color.MAGENTA + "\nGame index: " + str(game_id) + Color.ENDC)
-    logging.debug(Color.BLUE + str(game)  + Color.ENDC)
+    log(Color.MAGENTA + "\nGame index: " + str(game_id))
+    log(Color.BLUE + str(game))
     puzzles = find_puzzle_candidates(game, scan_depth=settings.scan_depth)
     n = len(puzzles)
-    logging.debug(Color.YELLOW + ("# positions to consider: %d" % n))
+    log(Color.YELLOW + ("# positions to consider: %d" % n))
     if settings.scan_only:
         continue
     for i, puzzle in enumerate(puzzles):
-        logging.debug(
-            Color.MAGENTA +
-            ("\nConsidering position %d of %d..." % (i+1, n)) +
-            Color.ENDC
-        )
+        log(Color.MAGENTA + ("\nConsidering position %d of %d..." % (i+1, n)))
         puzzle.generate(settings.search_depth)
         if puzzle.is_complete():
             print_puzzle_pgn(puzzle, pgn_headers=game.headers)
@@ -131,7 +128,7 @@ while True:
     game_id += 1
     n_positions += n
 
-logging.debug(
+log(
     Color.MAGENTA +
     "\nGenerated %d puzzles from %d positions in %d games" %
     (n_puzzles, n_positions, game_id)

@@ -8,15 +8,18 @@ from modules.colors import Color
 from modules.utils import fullmove_string
 
 
-def log_board(board):
+def log(message: str):
+    logging.debug(message + Color.ENDC)
+
+def log_board(board: Board):
     """ Logs the fen string and board representation
     """
     color = Color.BLACK
-    logging.debug(Color.BLUE + board.fen())
+    log(Color.BLUE + board.fen())
     board_str = "  " + str(board).replace("\n", "\n  ")
     board_str = re.sub("[a-z]", lambda p: Color.DARK_GREY + p[0] + color, board_str)
     board_str = re.sub("[A-Z]", lambda p: Color.WHITE + p[0] + color, board_str)
-    logging.debug(color + board_str + Color.ENDC)
+    log(color + board_str)
 
 def log_move(board: Board, move: Move, score: Score,
              show_uci=False, highlight=False):
@@ -35,4 +38,4 @@ def log_move(board: Board, move: Move, score: Score,
         log_str += ("   CP: %d" % score.score()).ljust(12)
     if highlight:
         log_str += Color.YELLOW + "   Investigate!"
-    logging.debug(log_str + Color.ENDC)
+    log(log_str)
