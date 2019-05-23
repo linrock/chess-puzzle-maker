@@ -1,6 +1,9 @@
 from colorama import Fore, Style
 
-class bcolors:
+
+class Color(object):
+    """ Foreground colors """
+
     BLUE = '\033[94m'
     CYAN = '\033[96m'
     GREEN = '\033[92m'

@@ -6,7 +6,7 @@ from chess.pgn import Game
 from chess.engine import Score, Cp
 
 from modules.logger import log_move
-from modules.bcolors import bcolors
+from modules.colors import Color
 from modules.analysis import AnalysisEngine
 from modules.puzzle import Puzzle
 from modules.utils import sign, material_total, material_count
@@ -16,9 +16,9 @@ def find_puzzle_candidates(game: Game, scan_depth=16) -> List[Puzzle]:
     """ finds puzzle candidates from a chess game 
     """
     logging.debug(
-        bcolors.DIM +
+        Color.DIM +
         ("Scanning game for puzzles (depth: %d)..." % scan_depth) +
-        bcolors.ENDC
+        Color.ENDC
     )
     prev_score = Cp(0)
     puzzles = []

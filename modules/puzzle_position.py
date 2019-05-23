@@ -2,7 +2,7 @@ import logging
 from collections import namedtuple
 
 from modules.logger import log_board, log_move
-from modules.bcolors import bcolors
+from modules.colors import Color
 from modules.analyzed_moves import ambiguous
 from modules.analysis import AnalysisEngine, AnalyzedMove
 from modules.utils import material_difference, material_count, fullmove_string
@@ -27,10 +27,10 @@ class PuzzlePosition(object):
 
     def _log_position(self):
         move_san = self.initial_board.san(self.initial_move)
-        logging.debug(bcolors.BLUE + ("After %s %s" % (fullmove_string(self.initial_board).strip(), move_san)))
+        logging.debug(Color.BLUE + ("After %s %s" % (fullmove_string(self.initial_board).strip(), move_san)))
         log_board(self.board)
-        logging.debug(bcolors.BLUE + ('Material difference:  %d' % material_difference(self.board)))
-        logging.debug(bcolors.BLUE + ("# legal moves:        %d" % self.board.legal_moves.count()) + bcolors.ENDC)
+        logging.debug(Color.BLUE + ('Material difference:  %d' % material_difference(self.board)))
+        logging.debug(Color.BLUE + ("# legal moves:        %d" % self.board.legal_moves.count()) + Color.ENDC)
 
     def _log_move(self, move, score):
         log_move(self.board, move, score, show_uci=True)
@@ -39,7 +39,7 @@ class PuzzlePosition(object):
         """ Find the best move from board position using multipv 1
         """
         logging.debug(
-            "%sEvaluating best move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
+            "%sEvaluating best move (depth %d)...%s" % (Color.DIM, depth, Color.ENDC)
         )
         best_move = AnalysisEngine.best_move(self.board, depth)
         self.best_move = best_move.move
@@ -52,7 +52,7 @@ class PuzzlePosition(object):
         multipv = min(3, self.board.legal_moves.count())
         if multipv == 0:
             return
-        logging.debug(bcolors.DIM + ("Evaluating best %d moves (depth %d)..." % (multipv, depth)) + bcolors.ENDC)
+        logging.debug(Color.DIM + ("Evaluating best %d moves (depth %d)..." % (multipv, depth)) + Color.ENDC)
         self.candidate_moves = AnalysisEngine.best_moves(self.board, depth, multipv)
         for analyzed_move in self.candidate_moves:
             self._log_move(analyzed_move.move, analyzed_move.score)
