@@ -2,15 +2,13 @@ import logging
 from collections import namedtuple
 
 from chess import Move
-from chess.engine import Limit
 import chess.pgn
 
 from modules.puzzle_position import PuzzlePosition
 from modules.puzzle_pgn import PuzzlePgn
 from modules.logger import log_board, log_move
 from modules.bcolors import bcolors
-from modules.analysis import AnalysisEngine
-from modules.analyzed_moves import AnalyzedMove
+from modules.analysis import AnalysisEngine, AnalyzedMove
 from modules.utils import material_difference
 
 
@@ -58,18 +56,11 @@ class Puzzle(object):
         logging.debug(
             "%sEvaluating best initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
         )
-        info = AnalysisEngine.instance().analyse(self.initial_board, Limit(depth=depth))
-        best_move = info["pv"][0]
-        score = info["score"].white()
-        analyzed_move = AnalyzedMove(
-            best_move,
-            self.initial_board.san(best_move),
-            score
-        )
-        self.analyzed_moves.append(analyzed_move)
-        self.initial_score = score
-        log_move(self.initial_board, best_move, score, show_uci=True)
-        return best_move
+        best_move = AnalysisEngine.best_move(self.initial_board, depth)
+        self.analyzed_moves.append(best_move)
+        self.initial_score = best_move.score
+        log_move(self.initial_board, best_move.move, best_move.score, show_uci=True)
+        return best_move.move
 
     def _analyze_initial_moves(self, depth):
         """ get the score of the position before the initial move
@@ -84,19 +75,9 @@ class Puzzle(object):
             logging.debug(
                 "%sEvaluating actual initial move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
             )
-            info = AnalysisEngine.instance().analyse(
-                self.initial_board,
-                Limit(depth=depth),
-                root_moves=[self.initial_move]
-            )
-            score = info["score"].white()
-            analyzed_move = AnalyzedMove(
-                self.initial_move,
-                self.initial_board.san(self.initial_move),
-                score
-            )
+            analyzed_move = AnalysisEngine.evaluate_move(self.initial_board, self.initial_move, depth)
             self.analyzed_moves.append(analyzed_move)
-            log_move(self.initial_board, self.initial_move, score, show_uci=True)
+            log_move(self.initial_board, self.initial_move, analyzed_move.score, show_uci=True)
 
     def _set_initial_position(self):
         initial_move = self.initial_move or self.analyzed_moves[0].move
@@ -108,8 +89,7 @@ class Puzzle(object):
         if final_score:
             self.final_score = final_score
         else:
-            info = AnalysisEngine.instance().analyse(self.positions[-1].board, Limit(depth=depth))
-            self.final_score = info["score"].white()
+            self.final_score = AnalysisEngine.score(self.positions[-1].board, depth)
 
     def to_pgn(self, pgn_headers=None) -> chess.pgn.Game:
         return PuzzlePgn(self).to_pgn(pgn_headers)

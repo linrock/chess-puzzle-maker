@@ -1,12 +1,10 @@
 import logging
 from collections import namedtuple
 
-from chess.engine import Limit
-
 from modules.logger import log_board, log_move
 from modules.bcolors import bcolors
-from modules.analyzed_moves import AnalyzedMove, ambiguous
-from modules.analysis import AnalysisEngine 
+from modules.analyzed_moves import ambiguous
+from modules.analysis import AnalysisEngine, AnalyzedMove
 from modules.utils import material_difference, material_count, fullmove_string
 
 
@@ -43,15 +41,10 @@ class PuzzlePosition(object):
         logging.debug(
             "%sEvaluating best move (depth %d)...%s" % (bcolors.DIM, depth, bcolors.ENDC)
         )
-        info = AnalysisEngine.instance().analyse(self.board, Limit(depth=depth))
-        pv = info["pv"]
-        if len(pv) > 0:
-            self.best_move = pv[0]
-        if self.best_move:
-            self.score = info["score"].white()
-            self._log_move(self.best_move, self.score)
-        else:
-            logging.debug(bcolors.RED + "No best move!" + bcolors.ENDC)
+        best_move = AnalysisEngine.best_move(self.board, depth)
+        self.best_move = best_move.move
+        self.score = best_move.score
+        self._log_move(self.best_move, self.score)
 
     def _calculate_candidate_moves(self, depth):
         """ Find the best move from board position using multipv 3
@@ -60,14 +53,9 @@ class PuzzlePosition(object):
         if multipv == 0:
             return
         logging.debug(bcolors.DIM + ("Evaluating best %d moves (depth %d)..." % (multipv, depth)) + bcolors.ENDC)
-        multipv_info = AnalysisEngine.instance().analyse(self.board, Limit(depth=depth), multipv=multipv)
-        for info in multipv_info:
-            move = info["pv"][0]
-            score = info["score"].white()
-            self._log_move(move, score)
-            self.candidate_moves.append(
-                AnalyzedMove(move.uci(), self.board.san(move), score)
-            )
+        self.candidate_moves = AnalysisEngine.best_moves(self.board, depth, multipv)
+        for analyzed_move in self.candidate_moves:
+            self._log_move(analyzed_move.move, analyzed_move.score)
 
     def evaluate(self, depth):
         self._log_position()

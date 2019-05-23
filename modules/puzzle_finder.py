@@ -3,7 +3,7 @@ from typing import List
 
 from chess import Board
 from chess.pgn import Game
-from chess.engine import Score, Cp, Limit
+from chess.engine import Score, Cp
 
 from modules.logger import log_move
 from modules.bcolors import bcolors
@@ -27,8 +27,7 @@ def find_puzzle_candidates(game: Game, scan_depth=16) -> List[Puzzle]:
     while not node.is_end():
         next_node = node.variation(0)
         next_board = next_node.board()
-        info = AnalysisEngine.instance().analyse(next_board, Limit(depth=scan_depth))
-        cur_score = info["score"].white()
+        cur_score = AnalysisEngine.best_move(next_board, scan_depth).score
         board = node.board()
         highlight_move = False
         if should_investigate(prev_score, cur_score, board):

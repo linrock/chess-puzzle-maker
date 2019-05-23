@@ -1,5 +1,8 @@
 import logging
 
+from chess import Move, Board
+from chess.engine import Score
+
 from modules.bcolors import bcolors
 from modules.utils import fullmove_string
 
@@ -10,7 +13,8 @@ def log_board(board):
     logging.debug(bcolors.BLUE + board.fen())
     logging.debug(bcolors.YELLOW + str(board) + bcolors.ENDC)
 
-def log_move(board, move, score, show_uci=False, highlight=False):
+def log_move(board: Board, move: Move, score: Score,
+             show_uci=False, highlight=False):
     """ 23. Qe4     CP: 123
     """
     move_str = "%s%s" % (fullmove_string(board), board.san(move))

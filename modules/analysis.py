@@ -1,7 +1,8 @@
+from typing import List
 from collections import namedtuple
 import shutil
 
-from chess.engine import SimpleEngine, Limit
+from chess.engine import SimpleEngine, Limit, Score
 
 from modules.fishnet import stockfish_command
 
@@ -24,25 +25,35 @@ class AnalysisEngine(object):
             AnalysisEngine.engine = SimpleEngine.popen_uci(_stockfish_command())
         return AnalysisEngine.engine
 
+    def name() -> str:
+        return AnalysisEngine.instance().id["name"]
+
     def quit():
         if AnalysisEngine.engine:
             AnalysisEngine.engine.quit()
             AnalysisEngine.engine = None
 
+    def best_move(board, depth) -> AnalyzedMove:
+        info = AnalysisEngine.instance().analyse(board, Limit(depth=depth))
+        best_move = info["pv"][0]
+        score = info["score"].white()
+        return AnalyzedMove(best_move, board.san(best_move), score)
 
-def analyze_position(self, board, depth) -> AnalyzedMove:
-    info = self.engine.analyse(board, Limit(depth=depth))
-    best_move = info["pv"][0]
-    score = info["score"].white()
-    analyzed_move = AnalyzedMove(best_move, board.san(best_move), score)
-    return analyzed_move
+    def best_moves(board, depth, multipv=3) -> List[AnalyzedMove]:
+        best_moves = []
+        infos = AnalysisEngine.instance().analyse(board, Limit(depth=depth), multipv=multipv)
+        for info in infos:
+            move = info["pv"][0]
+            score = info["score"].white()
+            best_moves.append(AnalyzedMove(move, board.san(move), score))
+        return best_moves
 
-def compare_move_with_best_move(board, move, depth):
-    info = engine.analyse(board, Limit(depth=depth))
-    best_move = info["pv"][0]
-    score = info["score"].white()
-    print(board.san(best_move), score)
-    info = engine.analyse(board, Limit(depth=depth), root_moves=[move])
-    best_move = info["pv"][0]
-    score = info["score"].white()
-    print(board.san(best_move), score)
+    def evaluate_move(board, move, depth) -> AnalyzedMove:
+        info = AnalysisEngine.instance().analyse(board, Limit(depth=depth), root_moves=[move])
+        assert move == info["pv"][0]
+        score = info["score"].white()
+        return AnalyzedMove(move, board.san(move), score)
+
+    def score(board, depth) -> Score:
+        info = AnalysisEngine.instance().analyse(board, Limit(depth=depth))
+        return info["score"].white()

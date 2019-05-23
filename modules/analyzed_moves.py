@@ -1,12 +1,9 @@
 from typing import List
-from collections import namedtuple
 
 from chess.engine import Score
 
 from modules.utils import sign
 
-
-AnalyzedMove = namedtuple("AnalyzedMove", ["move", "move_san", "score"])
 
 def ambiguous(scores: List[Score]) -> bool:
     """
