@@ -1,4 +1,5 @@
 from collections import namedtuple
+import shutil
 
 from chess.engine import SimpleEngine, Limit
 
@@ -6,14 +7,21 @@ from modules.fishnet import stockfish_command
 
 AnalyzedMove = namedtuple("AnalyzedMove", ["move", "move_san", "score"])
 
+def _stockfish_command() -> str:
+    cmd = stockfish_command()
+    if shutil.which(cmd):
+        return stockfish_command()
+    else:
+        return shutil.which("stockfish")
+
 class AnalysisEngine(object):
     """ Light wrapper around chess.engine
     """
     engine: SimpleEngine = None
 
-    def instance():
+    def instance() -> SimpleEngine:
         if not AnalysisEngine.engine:
-            AnalysisEngine.engine = SimpleEngine.popen_uci(stockfish_command())
+            AnalysisEngine.engine = SimpleEngine.popen_uci(_stockfish_command())
         return AnalysisEngine.engine
 
     def quit():
