@@ -9,6 +9,7 @@ from modules.colors import Color
 from modules.analyzed_moves import ambiguous
 from modules.analysis import AnalysisEngine, AnalyzedMove
 from modules.utils import material_difference, material_count, fullmove_string
+from modules.constants import NUM_CANDIDATE_MOVES
 
 
 class PuzzlePosition(object):
@@ -55,9 +56,7 @@ class PuzzlePosition(object):
     def _calculate_candidate_moves(self, depth):
         """ Find the best move from board position using multipv 3
         """
-        multipv = min(3, self._num_legal_moves())
-        if multipv <= 1:
-            return
+        multipv = NUM_CANDIDATE_MOVES
         log(Color.DIM, "Evaluating best %d moves (depth %d)..." % (multipv, depth))
         self.candidate_moves = AnalysisEngine.best_moves(self.board, depth, multipv)
         for analyzed_move in self.candidate_moves:
@@ -70,7 +69,8 @@ class PuzzlePosition(object):
         self._calculate_best_move(depth)
         if not self.best_move:
             return
-        self._calculate_candidate_moves(depth)
+        if self._num_legal_moves() > 1:
+            self._calculate_candidate_moves(depth)
 
     def is_ambiguous(self) -> bool:
         """ True if it's unclear whether there's a single best move from
@@ -79,7 +79,7 @@ class PuzzlePosition(object):
         return ambiguous([move.score for move in self.candidate_moves])
 
     def is_valid(self) -> bool:
-        """ Is a valid puzzle position
+        """ Is a valid position for generating a follow-up position
         """
         if not self.best_move or len(self.candidate_moves) == 0:
             return False
