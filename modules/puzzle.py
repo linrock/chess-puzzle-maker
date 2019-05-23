@@ -50,7 +50,7 @@ class Puzzle(object):
             self.player_moves_first = True
 
     def _analyze_best_initial_move(self, depth) -> Move:
-        log("%sEvaluating best initial move (depth %d)..." % (Color.DIM, depth))
+        log(Color.DIM, "Evaluating best initial move (depth %d)..." % depth)
         best_move = AnalysisEngine.best_move(self.initial_board, depth)
         self.analyzed_moves.append(best_move)
         self.initial_score = best_move.score
@@ -65,9 +65,9 @@ class Puzzle(object):
         if not self.initial_move:
             return
         elif self.initial_move == best_move:
-            log("%sThe best move was made from this position" % Color.DIM)
+            log(Color.DIM, "The move played was the best move")
         else:
-            log("%sEvaluating actual initial move (depth %d)..." % (Color.DIM, depth))
+            log(Color.DIM, "Evaluating played initial move (depth %d)..." % depth)
             analyzed_move = AnalysisEngine.evaluate_move(self.initial_board, self.initial_move, depth)
             self.analyzed_moves.append(analyzed_move)
             log_move(self.initial_board, self.initial_move, analyzed_move.score, show_uci=True)
@@ -104,25 +104,28 @@ class Puzzle(object):
                     log_str += "ambiguous"
                 elif position.board.is_game_over():
                     log_str += "game over"
-                log(Color.YELLOW + log_str)
+                log(Color.YELLOW, log_str)
                 break
             else:
-                log_str = Color.DIM + "Going deeper..."
+                log_str = "Going deeper..."
                 if is_player_move is not None:
                     if is_player_move:
-                        log_str += " one best move"
+                        if len(position.candidate_moves) == 1:
+                            log_str += " only one move"
+                        else:
+                            log_str += " one clear best move"
                     else:
                         log_str += " not player move"
-                log(log_str + Color.ENDC)
+                log(Color.DIM, log_str)
             position = PuzzlePosition(position.board, position.best_move)
             position.evaluate(depth)
             # if self.check_ambiguity:
             is_player_move = not is_player_move
         self._calculate_final_score(depth)
         if self.is_complete():
-            log(Color.GREEN + "Puzzle is complete")
+            log(Color.GREEN, "Puzzle is complete")
         else:
-            log(Color.RED + "Puzzle incomplete")
+            log(Color.RED, "Puzzle incomplete")
 
     def category(self) -> str:
         """ Mate     - win by checkmate

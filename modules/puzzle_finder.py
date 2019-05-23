@@ -14,7 +14,7 @@ from modules.utils import sign, material_total, material_count
 def find_puzzle_candidates(game: Game, scan_depth=16) -> List[Puzzle]:
     """ finds puzzle candidates from a chess game 
     """
-    log(Color.DIM + ("Scanning game for puzzles (depth: %d)..." % scan_depth))
+    log(Color.DIM, "Scanning game for puzzles (depth: %d)..." % scan_depth)
     prev_score = Cp(0)
     puzzles = []
     i = 0

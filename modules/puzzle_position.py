@@ -26,10 +26,10 @@ class PuzzlePosition(object):
 
     def _log_position(self):
         move_san = self.initial_board.san(self.initial_move)
-        log(Color.BLUE + ("After %s %s" % (fullmove_string(self.initial_board).strip(), move_san)))
+        log(Color.BLUE, "\nAfter %s %s" % (fullmove_string(self.initial_board).strip(), move_san))
         log_board(self.board)
-        log(Color.BLUE + ('Material difference:  %d' % material_difference(self.board)))
-        log(Color.BLUE + ("# legal moves:        %d" % self.board.legal_moves.count()))
+        log(Color.BLUE, "Material difference:  %d" % material_difference(self.board))
+        log(Color.BLUE, "# legal moves:        %d" % self.board.legal_moves.count())
 
     def _log_move(self, move, score):
         log_move(self.board, move, score, show_uci=True)
@@ -37,7 +37,7 @@ class PuzzlePosition(object):
     def _calculate_best_move(self, depth):
         """ Find the best move from board position using multipv 1
         """
-        log("%sEvaluating best move (depth %d)..." % (Color.DIM, depth))
+        log(Color.DIM, "Evaluating best move (depth %d)..." % depth)
         best_move = AnalysisEngine.best_move(self.board, depth)
         self.best_move = best_move.move
         self.score = best_move.score
@@ -49,7 +49,7 @@ class PuzzlePosition(object):
         multipv = min(3, self.board.legal_moves.count())
         if multipv == 0:
             return
-        log(Color.DIM + ("Evaluating best %d moves (depth %d)..." % (multipv, depth)))
+        log(Color.DIM, "Evaluating best %d moves (depth %d)..." % (multipv, depth))
         self.candidate_moves = AnalysisEngine.best_moves(self.board, depth, multipv)
         for analyzed_move in self.candidate_moves:
             self._log_move(analyzed_move.move, analyzed_move.score)

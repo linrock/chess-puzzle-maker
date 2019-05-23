@@ -79,7 +79,7 @@ configure_logging(level=settings.loglevel)
 
 def print_puzzle_pgn(puzzle, pgn_headers=None):
     puzzle_pgn = puzzle.to_pgn(pgn_headers=pgn_headers)
-    log(Color.MAGENTA + "NEW PUZZLE GENERATED\n")
+    log(Color.MAGENTA, "NEW PUZZLE GENERATED\n")
     print(Color.CYAN + puzzle_pgn + "\n\n" + Color.ENDC)
 
 
@@ -111,15 +111,15 @@ while True:
     game = chess.pgn.read_game(pgn)
     if game == None:
         break
-    log(Color.MAGENTA + "\nGame index: " + str(game_id))
-    log(Color.BLUE + str(game))
+    log(Color.MAGENTA, "\nGame index: %d" % game_id)
+    log(Color.BLUE, str(game))
     puzzles = find_puzzle_candidates(game, scan_depth=settings.scan_depth)
     n = len(puzzles)
-    log(Color.YELLOW + ("# positions to consider: %d" % n))
+    log(Color.YELLOW, "# positions to consider: %d" % n)
     if settings.scan_only:
         continue
     for i, puzzle in enumerate(puzzles):
-        log(Color.MAGENTA + ("\nConsidering position %d of %d..." % (i+1, n)))
+        log(Color.MAGENTA, "\nConsidering position %d of %d..." % (i+1, n))
         puzzle.generate(settings.search_depth)
         if puzzle.is_complete():
             print_puzzle_pgn(puzzle, pgn_headers=game.headers)
@@ -128,8 +128,7 @@ while True:
     n_positions += n
 
 log(
-    Color.MAGENTA +
-    "\nGenerated %d puzzles from %d positions in %d games" %
-    (n_puzzles, n_positions, game_id)
+    Color.MAGENTA,
+    "\nGenerated %d puzzles from %d positions in %d games" % (n_puzzles, n_positions, game_id)
 )
 engine.quit()
