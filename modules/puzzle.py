@@ -184,7 +184,9 @@ class Puzzle(object):
         """ Verify that this sequence of moves represents a complete puzzle
             Incomplete if too short or if the puzzle could not be categorized
         """
-        if len(self.positions) / 2 < MIN_PLAYER_MOVES:
+        n_player_moves = 1 if self.player_moves_first else 0
+        n_player_moves += (len(self.positions) - 1) / 2
+        if n_player_moves < MIN_PLAYER_MOVES:
             return False
         if self.category():
             return True
