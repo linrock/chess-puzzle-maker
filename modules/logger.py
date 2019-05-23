@@ -1,3 +1,4 @@
+import re
 import logging
 
 from chess import Move, Board
@@ -10,8 +11,12 @@ from modules.utils import fullmove_string
 def log_board(board):
     """ Logs the fen string and board representation
     """
+    color = bcolors.BLACK
     logging.debug(bcolors.BLUE + board.fen())
-    logging.debug(bcolors.YELLOW + str(board) + bcolors.ENDC)
+    board_str = "  " + str(board).replace("\n", "\n  ")
+    board_str = re.sub("[a-z]", lambda p: bcolors.DARK_GREY + p[0] + color, board_str)
+    board_str = re.sub("[A-Z]", lambda p: bcolors.WHITE + p[0] + color, board_str)
+    logging.debug(color + board_str + bcolors.ENDC)
 
 def log_move(board: Board, move: Move, score: Score,
              show_uci=False, highlight=False):
@@ -31,4 +36,3 @@ def log_move(board: Board, move: Move, score: Score,
     if highlight:
         log_str += bcolors.YELLOW + "   Investigate!"
     logging.debug(log_str + bcolors.ENDC)
-
