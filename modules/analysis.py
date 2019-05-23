@@ -38,7 +38,10 @@ class AnalysisEngine(object):
 
     def best_move(board, depth) -> AnalyzedMove:
         info = AnalysisEngine.instance().analyse(board, Limit(depth=depth))
-        best_move = info["pv"][0]
+        if info.get("pv"):
+            best_move = info["pv"][0]
+        else:
+            best_move = None
         score = info["score"].white()
         return AnalyzedMove(best_move, board.san(best_move), score)
 
