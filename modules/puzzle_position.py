@@ -31,10 +31,10 @@ class PuzzlePosition(object):
 
     def _log_position(self):
         move_san = self.initial_board.san(self.initial_move)
-        log(Color.BLUE, "\nAfter %s %s" % (fullmove_string(self.initial_board).strip(), move_san))
+        log(Color.VIOLET, "\nAfter %s %s" % (fullmove_string(self.initial_board).strip(), move_san))
         log_board(self.board)
-        log(Color.BLUE, "Material difference:  %d" % material_difference(self.board))
-        log(Color.BLUE, "# legal moves:        %d" % self._num_legal_moves())
+        log(Color.DARK_BLUE, "Material difference:  %d" % material_difference(self.board))
+        log(Color.DARK_BLUE, "# legal moves:        %d" % self._num_legal_moves())
 
     def _log_move(self, move, score):
         log_move(self.board, move, score, show_uci=True)

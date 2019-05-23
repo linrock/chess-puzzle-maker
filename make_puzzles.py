@@ -112,7 +112,7 @@ while True:
     if game == None:
         break
     log(Color.MAGENTA, "\nGame index: %d" % game_id)
-    log(Color.BLUE, str(game))
+    log(Color.DARK_BLUE, str(game))
     puzzles = find_puzzle_candidates(game, scan_depth=settings.scan_depth)
     n = len(puzzles)
     log(Color.YELLOW, "# positions to consider: %d" % n)

@@ -20,11 +20,11 @@ def log_board(board: Board):
     """ Logs the fen string and board representation
     """
     color = Color.BLACK
-    log(Color.BLUE, board.fen())
-    board_str = "  " + str(board).replace("\n", "\n  ")
+    log(Color.VIOLET, board.fen())
+    board_str = "\n  " + str(board).replace("\n", "\n  ")
     board_str = re.sub("[a-z]", lambda p: Color.DARK_GREY + p[0] + color, board_str)
     board_str = re.sub("[A-Z]", lambda p: Color.WHITE + p[0] + color, board_str)
-    log(color, board_str)
+    log(color, board_str + "\n")
 
 def log_move(board: Board, move: Move, score: Score,
              show_uci=False, highlight=False):

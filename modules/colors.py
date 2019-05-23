@@ -11,6 +11,10 @@ class Color(object):
     RED = '\033[91m'
     YELLOW = '\033[93m'
 
+    VIOLET = Fore.MAGENTA
+    DARK_GREEN = Fore.GREEN
+    DARK_BLUE = Fore.BLUE
+
     BLACK = Style.DIM + Fore.LIGHTBLACK_EX
     DARK_GREY = Style.DIM + Fore.WHITE
     WHITE = Style.NORMAL + Fore.LIGHTWHITE_EX
