@@ -15,6 +15,12 @@ def test(c, unit=False, integration=False):
 
 
 @task
+def type_check(c):
+    """ Check types
+    """
+    c.run("mypy --ignore-missing-imports modules")
+
+@task
 def update_stockfish(c):
     """ Updates to the latest Stockfish version used by lichess
     """

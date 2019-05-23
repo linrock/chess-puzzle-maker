@@ -20,14 +20,17 @@ class AnalysisEngine(object):
     """
     engine: SimpleEngine = None
 
+    @staticmethod
     def instance() -> SimpleEngine:
         if not AnalysisEngine.engine:
             AnalysisEngine.engine = SimpleEngine.popen_uci(_stockfish_command())
         return AnalysisEngine.engine
 
+    @staticmethod
     def name() -> str:
         return AnalysisEngine.instance().id["name"]
 
+    @staticmethod
     def quit():
         if AnalysisEngine.engine:
             AnalysisEngine.engine.quit()
