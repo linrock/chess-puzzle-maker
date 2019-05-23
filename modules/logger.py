@@ -1,4 +1,5 @@
 import re
+import sys
 import logging
 
 from chess import Move, Board
@@ -7,6 +8,10 @@ from chess.engine import Score
 from modules.colors import Color
 from modules.utils import fullmove_string
 
+
+def configure_logging(level=logging.DEBUG):
+    logging.basicConfig(format="%(message)s", level=level, stream=sys.stderr)
+    logging.getLogger("chess").setLevel(logging.WARNING)
 
 def log(message: str):
     logging.debug(message + Color.ENDC)

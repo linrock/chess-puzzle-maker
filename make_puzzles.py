@@ -12,7 +12,7 @@ import chess.pgn
 
 from modules.colors import Color
 from modules.puzzle import Puzzle
-from modules.logger import log
+from modules.logger import configure_logging, log
 from modules.puzzle_finder import find_puzzle_candidates
 from modules.analysis import AnalysisEngine
 from modules.constants import SCAN_DEPTH, SEARCH_DEPTH
@@ -75,8 +75,7 @@ engine.configure({
   'Contempt': 0,
 })
 
-logging.basicConfig(format="%(message)s", level=settings.loglevel, stream=sys.stderr)
-logging.getLogger("chess").setLevel(logging.WARNING)
+configure_logging(level=settings.loglevel)
 
 def print_puzzle_pgn(puzzle, pgn_headers=None):
     puzzle_pgn = puzzle.to_pgn(pgn_headers=pgn_headers)

@@ -8,10 +8,8 @@ import chess.pgn
 from modules.puzzle import Puzzle
 from modules.analysis import AnalysisEngine
 
-# import sys
-# import logging
-# logging.basicConfig(format="%(message)s", level=logging.DEBUG, stream=sys.stdout)
-# logging.getLogger("chess").setLevel(logging.WARNING)
+# from modules.logger import configure_logging
+# configure_logging()
 
 # use a lower search depth when possible for faster tests
 SEARCH_DEPTH = 12
