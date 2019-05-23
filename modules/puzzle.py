@@ -10,10 +10,8 @@ from modules.logger import log_board, log_move
 from modules.colors import Color
 from modules.analysis import AnalysisEngine, AnalyzedMove
 from modules.utils import material_difference
+from modules.constants import MIN_PLAYER_MOVES
 
-
-# minimum number of moves required for a puzzle to be considered complete
-MIN_MOVES = 3
 
 class Puzzle(object):
     """ initial_board [chess.Board]:
@@ -191,7 +189,7 @@ class Puzzle(object):
         """ Verify that this sequence of moves represents a complete puzzle
             Incomplete if too short or if the puzzle could not be categorized
         """
-        if len(self.positions) < MIN_MOVES:
+        if len(self.positions) / 2 < MIN_PLAYER_MOVES:
             return False
         if self.category():
             return True

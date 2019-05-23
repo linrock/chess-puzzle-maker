@@ -14,7 +14,7 @@ from modules.colors import Color
 from modules.puzzle import Puzzle
 from modules.puzzle_finder import find_puzzle_candidates
 from modules.analysis import AnalysisEngine
-
+from modules.constants import SCAN_DEPTH, SEARCH_DEPTH
 
 parser = argparse.ArgumentParser(
     description=__doc__,
@@ -30,13 +30,17 @@ group.add_argument("--pgn", metavar="PGN", type=str,
 
 # Chess engine settings
 group = parser.add_argument_group('chess engine settings')
-group.add_argument("--threads", metavar="THREADS", nargs="?", type=int, default=2,
+group.add_argument("--threads", metavar="THREADS", nargs="?",
+                    type=int, default=2,
                     help="number of engine threads")
-group.add_argument("--memory", metavar="MEMORY", nargs="?", type=int, default=2048,
+group.add_argument("--memory", metavar="MEMORY", nargs="?",
+                    type=int, default=2048,
                     help="memory in MB to use for engine hashtables")
-group.add_argument("--scan-depth", metavar="DEPTH", nargs="?", type=int, default=15,
+group.add_argument("--scan-depth", metavar="DEPTH", nargs="?",
+                    type=int, default=SCAN_DEPTH,
                     help="depth for scanning a game for candidate puzzles")
-group.add_argument("--search-depth", metavar="DEPTH", nargs="?", type=int, default=22,
+group.add_argument("--search-depth", metavar="DEPTH", nargs="?",
+                    type=int, default=SEARCH_DEPTH,
                     help="depth for searching a position for candidate moves")
 
 # Misc settings
