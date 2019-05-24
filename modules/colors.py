@@ -20,6 +20,7 @@ class Color(object):
     WHITE = Style.NORMAL + Fore.LIGHTWHITE_EX
 
     DIM = Style.DIM
+
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
