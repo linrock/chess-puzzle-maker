@@ -86,6 +86,7 @@ def print_puzzle_pgn(puzzle, pgn_headers=None):
 # load a FEN and try to create a puzzle from it
 
 if settings.fen:
+    log(Color.DIM, AnalysisEngine.name())
     puzzle = Puzzle(Board(settings.fen))
     puzzle.generate(depth=settings.search_depth)
     if puzzle.is_complete():
@@ -107,6 +108,7 @@ while game_id < settings.start_index:
         exit(0)
     game_id += 1
 
+log(Color.DIM, AnalysisEngine.name())
 while True:
     game = chess.pgn.read_game(pgn)
     if game == None:

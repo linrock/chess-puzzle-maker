@@ -46,8 +46,8 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle = Puzzle(board, board.parse_san('Rb7'))
         puzzle.generate(depth=15)
         self.assertTrue(puzzle.is_complete())
-        self.assertTrue(puzzle.category() == "Material")
         self.assertFalse(puzzle.player_moves_first)
+        self.assertEqual(puzzle.category(), "Material")
         expected_uci_moves = ['a7b7', 'd2g2', 'g1g2', 'c4d5', 'g2g1', 'd5b7']
         self.assertEqual(
             [str(p.initial_move) for p in puzzle.positions][:6],
@@ -67,8 +67,8 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle = Puzzle(board)
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
-        self.assertTrue(puzzle.category() == "Mate")
         self.assertTrue(puzzle.player_moves_first)
+        self.assertEqual(puzzle.category(), "Mate")
         # self.assertTrue(len(puzzle.positions) == 5)
         expected_uci_moves = ['c3h8', 'g8h8', 'e7f6']
         self.assertEqual(
@@ -89,7 +89,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle = Puzzle(board, board.parse_san('Qxf2+'))
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.player_moves_first)
-        self.assertTrue(puzzle.category() == "Mate")
+        self.assertEqual(puzzle.category(), "Mate")
         # self.assertTrue(puzzle.is_complete())
         # self.assertTrue(len(puzzle.positions) == 5)
 
@@ -101,8 +101,8 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle = Puzzle(board, board.parse_san('Rxh7+'))
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
-        self.assertTrue(puzzle.category() == "Mate")
         self.assertTrue(puzzle.player_moves_first)
+        self.assertEqual(puzzle.category(), "Mate")
         expected_uci_moves = ['h1h7', 'h8h7', 'f1h1', 'h7g7', 'd2h6']
         self.assertEqual(
             [str(p.initial_move) for p in puzzle.positions],
@@ -124,6 +124,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle.generate(depth=SEARCH_DEPTH)
         self.assertTrue(puzzle.is_complete())
         self.assertFalse(puzzle.player_moves_first)
+        self.assertEqual(puzzle.category(), "Equalize")
         # test that the puzzle stops at a threefold repetition position
         expected_uci_moves = [
             'c8e6', 'f3f6', 'h8g8', 'f6g5', 'g8h8', 'g5f6', 'h8g8', 'f6g5', 'g8h8'
@@ -149,8 +150,8 @@ class TestPuzzleIsComplete(unittest.TestCase):
         puzzle = Puzzle(board)
         puzzle.generate(depth=depth)
         self.assertTrue(puzzle.is_complete())
-        self.assertTrue(puzzle.category() == "Material")
         self.assertTrue(puzzle.player_moves_first)
+        self.assertEqual(puzzle.category(), "Material")
 
         # Figure 5.1.1.2
         board = chess.Board(
@@ -158,12 +159,12 @@ class TestPuzzleIsComplete(unittest.TestCase):
         )
         puzzle = Puzzle(board)
         puzzle.generate(depth=depth)
+        self.assertTrue(puzzle.is_complete())
+        self.assertTrue(puzzle.player_moves_first)
+        self.assertEqual(puzzle.category(), "Material")
         expected_uci_moves = [
             'f6g6', 'h5g6', 'e6e4', 'f2f4'
         ]
-        self.assertTrue(puzzle.is_complete())
-        self.assertTrue(puzzle.category() == "Material")
-        self.assertTrue(puzzle.player_moves_first)
         self.assertEqual(
             [str(p.initial_move) for p in puzzle.positions],
             expected_uci_moves

@@ -16,12 +16,18 @@ def sign(score: Score) -> int:
 def material_total(board: Board) -> float:
     """ Total material value on the board
     """
-    return sum(v * (len(board.pieces(pt, True)) + len(board.pieces(pt, False))) for v, pt in zip([0,3,3,5.5,9], PIECE_TYPES))
+    value = 0
+    for v, pt in zip([0,3,3,5.5,9], PIECE_TYPES):
+        value += v * (len(board.pieces(pt, True)) + len(board.pieces(pt, False)))
+    return value
 
 def material_difference(board: Board) -> float:
     """ Difference in material value (positive means white has more)
     """
-    return sum(v * (len(board.pieces(pt, True)) - len(board.pieces(pt, False))) for v, pt in zip([0,3,3,5.5,9], PIECE_TYPES))
+    diff = 0
+    for v, pt in zip([0,3,3,5.5,9], PIECE_TYPES):
+        diff += v * (len(board.pieces(pt, True)) - len(board.pieces(pt, False)))
+    return diff
 
 def material_count(board: Board) -> int:
     """ Count the number of pieces on the board

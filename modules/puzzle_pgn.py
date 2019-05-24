@@ -26,7 +26,7 @@ class PuzzlePgn(object):
         return comment.strip()
 
     def export(self, pgn_headers=None) -> chess.pgn.Game:
-        """ pgn_headders - PGN headers to include in the exported PGN
+        """ pgn_headers - PGN headers to include in the exported PGN
         """
         fen = self.puzzle.initial_board.fen()
         board = chess.Board(fen)
@@ -53,7 +53,7 @@ class PuzzlePgn(object):
         puzzle_winner = self.puzzle.winner()
         if puzzle_winner:
             game.headers['PuzzleWinner'] = puzzle_winner
-        game.headers['PuzzleEngine'] = AnalysisEngine.instance().id["name"] or ""
+        game.headers['PuzzleEngine'] = AnalysisEngine.name()
         return game
 
     def to_pgn(self, pgn_headers=None) -> str:
