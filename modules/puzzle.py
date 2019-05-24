@@ -45,10 +45,6 @@ class Puzzle(object):
         self.final_score = None
         self.positions = []
         self.analyzed_moves = []
-        if initial_move:
-            self.player_moves_first = False
-        else:
-            self.player_moves_first = True
 
     def _analyze_best_initial_move(self, depth) -> Move:
         log(Color.DIM, "Evaluating best initial move (depth %d)..." % depth)
@@ -77,6 +73,27 @@ class Puzzle(object):
         initial_move = self.initial_move or self.analyzed_moves[0].move
         self.initial_position = PuzzlePosition(self.initial_board, initial_move)
 
+    def _player_moves_first(self) -> bool:
+        if self.initial_score.is_mate() and not self.initial_move:
+            # it's a checkmate puzzle without a move sequence
+            white_to_move = self.initial_board.turn
+            if white_to_move and self.initial_score.mate() > 0:
+                return True
+            elif not white_to_move and self.initial_score.mate() < 0:
+                return True
+        elif self.initial_position.score.is_mate() and self.initial_move:
+            # player just moved and has a winning position to checkmate the opponent
+            white_just_moved = not self.initial_position.board.turn
+            if white_just_moved and self.initial_score.mate() > 0:
+                return True
+            elif not white_just_moved and self.initial_score.mate() < 0:
+                return True
+        # assume the initial move is a blunder/mistake by the opponent
+        if self.initial_move:
+            return False
+        else:
+            return True
+
     def _calculate_final_score(self, depth):
         """ multipv 1 """
         final_score = self.positions[-1].score
@@ -88,12 +105,13 @@ class Puzzle(object):
     def generate(self, depth):
         """ Generate new positions for the puzzle until a final position is reached
         """
-        is_player_move = not self.player_moves_first
         log_board(self.initial_board)
         self._analyze_initial_moves(depth)
         self._set_initial_position()
         position = self.initial_position
         position.evaluate(depth)
+        self.player_moves_first = self._player_moves_first()
+        is_player_move = not self.player_moves_first
         while True:
             self.positions.append(position)
             if position.is_final(is_player_move):

@@ -14,14 +14,14 @@ from modules.constants import NUM_CANDIDATE_MOVES
 class PuzzlePosition(object):
 
     def __init__(self, initial_board: Board, initial_move: Move):
-        """ board [chess.Board] - board representing the position to evaluate
-            initial_move [chess.Move] - the move leading into the position to evaluate
-            best_move [chess.Move] - the best move from the board position (after initial_move)
-            score [chess.engine.Score] - the score for the board position (after initial_move)
-            candidate_moves [List<AnalyzedMove>] - list of candidate moves from this position
+        """ board [Board] - board representing the position to evaluate
+            initial_move [Move] - the move leading into the position to evaluate
+            best_move [Move] - the best move from the board position (after initial_move)
+            score [Score] - the score for the board position (after initial_move)
+            candidate_moves [List<AnalyzedMove>] - best candidate moves from this position
         """
-        self.initial_board = initial_board.copy()
-        self.initial_move = initial_move
+        self.initial_board: Board = initial_board.copy()
+        self.initial_move: Move = initial_move
         self.board = initial_board.copy()
         self.board.push(initial_move)
         self.best_move: Move = None
