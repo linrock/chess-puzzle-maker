@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 from __future__ import division
 
 import json
@@ -12,20 +11,9 @@ import stat
 import platform
 import ctypes
 
-try:
-    import httplib
-except ImportError:
-    import http.client as httplib
-
-try:
-    import urlparse
-except ImportError:
-    import urllib.parse as urlparse
-
-try:
-    import urllib.request as urllib
-except ImportError:
-    import urllib
+import http.client as httplib
+import urllib.parse as urlparse
+import urllib
 
 
 def stockfish_command(update=False):

@@ -31,6 +31,7 @@ class AnalysisEngine(object):
             AnalysisEngine.engine.quit()
             AnalysisEngine.engine = None
 
+    @staticmethod
     def best_move(board, depth) -> AnalyzedMove:
         info = AnalysisEngine.instance().analyse(board, Limit(depth=depth))
         if info.get("pv"):
@@ -40,6 +41,7 @@ class AnalysisEngine(object):
         score = info["score"].white()
         return AnalyzedMove(best_move, board.san(best_move), score)
 
+    @staticmethod
     def best_moves(board, depth, multipv=3) -> List[AnalyzedMove]:
         best_moves = []
         infos = AnalysisEngine.instance().analyse(board, Limit(depth=depth), multipv=multipv)
@@ -49,12 +51,14 @@ class AnalysisEngine(object):
             best_moves.append(AnalyzedMove(move, board.san(move), score))
         return best_moves
 
+    @staticmethod
     def evaluate_move(board, move, depth) -> AnalyzedMove:
         info = AnalysisEngine.instance().analyse(board, Limit(depth=depth), root_moves=[move])
         assert move == info["pv"][0]
         score = info["score"].white()
         return AnalyzedMove(move, board.san(move), score)
 
+    @staticmethod
     def score(board, depth) -> Score:
         info = AnalysisEngine.instance().analyse(board, Limit(depth=depth))
         return info["score"].white()

@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import Optional
 
 from chess import Move
 import chess.pgn
@@ -84,9 +85,6 @@ class Puzzle(object):
         else:
             self.final_score = AnalysisEngine.score(self.positions[-1].board, depth)
 
-    def to_pgn(self, pgn_headers=None) -> chess.pgn.Game:
-        return PuzzlePgn(self).to_pgn(pgn_headers)
-
     def generate(self, depth):
         """ Generate new positions for the puzzle until a final position is reached
         """
@@ -127,7 +125,10 @@ class Puzzle(object):
         else:
             log(Color.RED, "Puzzle incomplete")
 
-    def category(self) -> str:
+    def to_pgn(self, pgn_headers=None) -> chess.pgn.Game:
+        return PuzzlePgn(self).to_pgn(pgn_headers)
+
+    def category(self) -> Optional[str]:
         """ Mate     - win by checkmate
             Material - gain a material advantage
             Equalize - equalize a losing position
@@ -153,7 +154,7 @@ class Puzzle(object):
                     if final_cp > 100 or final_cp < -100:
                         return "Material"
 
-    def winner(self) -> str:
+    def winner(self) -> Optional[str]:
         """ Find the winner of the puzzle based on the move sequence
         """
         position = self.positions[-2]
@@ -188,7 +189,7 @@ class Puzzle(object):
             Incomplete if too short or if the puzzle could not be categorized
         """
         n_player_moves = 1 if self.player_moves_first else 0
-        n_player_moves += (len(self.positions) - 1) / 2
+        n_player_moves += int((len(self.positions) - 1) / 2)
         if n_player_moves < MIN_PLAYER_MOVES:
             return False
         if self.category():

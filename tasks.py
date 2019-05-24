@@ -18,7 +18,7 @@ def test(c, unit=False, integration=False):
 def type_check(c):
     """ Check types
     """
-    c.run("mypy --ignore-missing-imports modules")
+    c.run("mypy --ignore-missing-imports --no-warn-no-return modules")
 
 @task
 def update_stockfish(c):
