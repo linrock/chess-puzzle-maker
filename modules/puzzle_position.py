@@ -6,8 +6,7 @@ from chess.engine import Score
 
 from modules.logger import log, log_board, log_move
 from modules.colors import Color
-from modules.analyzed_moves import ambiguous
-from modules.analysis import AnalysisEngine, AnalyzedMove
+from modules.analysis import AnalysisEngine, AnalyzedMove, ambiguous_best_move
 from modules.utils import material_difference, material_count, fullmove_string
 from modules.constants import NUM_CANDIDATE_MOVES
 
@@ -76,7 +75,7 @@ class PuzzlePosition(object):
         """ True if it's unclear whether there's a single best move from
             this position
         """
-        return ambiguous([move.score for move in self.candidate_moves])
+        return ambiguous_best_move([move.score for move in self.candidate_moves])
 
     def is_valid(self) -> bool:
         """ Is a valid position for generating a follow-up position

@@ -63,7 +63,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         board = chess.Board(
             'r1b3kr/ppp1Bp1p/1b6/n2P4/2p3q1/2Q2N2/P4PPP/RN2R1K1 w - - 1 0'
         )
-        puzzle = Puzzle(board, board.parse_san('Qxh8+'))
+        puzzle = Puzzle(board)
         puzzle.generate(depth=SEARCH_DEPTH)
         expected_uci_moves = ['c3h8', 'g8h8', 'e7f6']
         self.assertTrue(puzzle.is_complete())
