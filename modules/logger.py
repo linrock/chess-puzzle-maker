@@ -44,11 +44,13 @@ def log_move(board: Board, move: Move, score: Score,
     """ 23. Qe4     CP: 123
     """
     move_str = "%s%s" % (fullmove_string(board), board.san(move))
+    log_str = "  %s" % move_str
     if show_uci:
-        log_str = ("  %s (%s)" % (move_str, move.uci())).ljust(22)
+        log_str += "%s (%s)" % (Color.DARK_GREEN, move.uci())
+        log_str = log_str.ljust(22 + len(Color.DARK_GREEN))
     else:
-        log_str = "  %s" % move_str.ljust(15)
-    log_str += Color.BLUE
+        log_str = log_str.ljust(15)
+    log_str += Color.ENDC + Color.BLUE
     if score.is_mate():
         log_str += ("   Mate: %d" % score.mate()).ljust(12)
     else:
