@@ -20,12 +20,12 @@ def log_board(board: Board, unicode_pieces=True):
     """ Logs the fen string and board representation
     """
     log(Color.VIOLET, board.fen())
+    w_color = Color.WHITE
+    b_color = Color.DARK_GREY
     sq_color = Color.BLACK
-    white_color = Color.WHITE
-    black_color = Color.DARK_GREY
     board_str = "\n  " + str(board).replace("\n", "\n  ")
-    board_str = re.sub("[a-z]", lambda p: white_color + p[0] + sq_color, board_str)
-    board_str = re.sub("[A-Z]", lambda p: black_color + p[0] + sq_color, board_str)
+    board_str = re.sub("[a-z]", lambda p: b_color + p[0] + sq_color, board_str)
+    board_str = re.sub("[A-Z]", lambda p: w_color + p[0] + sq_color, board_str)
     if unicode_pieces:
         piece_map = {
             "k": "\u2654",

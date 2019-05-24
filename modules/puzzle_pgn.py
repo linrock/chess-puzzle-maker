@@ -4,7 +4,7 @@ import chess.pgn
 from modules.analysis import AnalysisEngine
 
 
-def score_to_str(score):
+def _score_to_str(score) -> str:
     if score.is_mate():
         return "mate in %d" % score.mate()
     else:
@@ -22,7 +22,7 @@ class PuzzlePgn(object):
         comment = ""
         for candidate_move in candidate_moves:
             comment += candidate_move.move_san
-            comment += " (%s) " % score_to_str(candidate_move.score)
+            comment += " (%s) " % _score_to_str(candidate_move.score)
         return comment.strip()
 
     def export(self, pgn_headers=None) -> chess.pgn.Game:
@@ -33,8 +33,8 @@ class PuzzlePgn(object):
         game = chess.pgn.Game().from_board(board)
         game_node = game
         game_node.comment = "score: %s -> %s" % (
-            score_to_str(self.puzzle.initial_score),
-            score_to_str(self.puzzle.final_score)
+            _score_to_str(self.puzzle.initial_score),
+            _score_to_str(self.puzzle.final_score)
         )
         comment = self._candidate_moves_annotations(self.puzzle.analyzed_moves)
         for position in self.puzzle.positions:
