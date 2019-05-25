@@ -228,6 +228,15 @@ class TestPuzzleIsComplete(unittest.TestCase):
             [str(p.initial_move) for p in puzzle.positions],
         )
 
+    def test_crash(self):
+        board = chess.Board(
+            '8/p6P/R7/2q5/1p1b4/1kp5/5PP1/3Q2K1 b - - 9 44'
+        )
+        puzzle = Puzzle(board, board.parse_san('Kc4'))
+        puzzle.generate(depth=SEARCH_DEPTH)
+        self.assertFalse(puzzle.is_complete())
+        self.assertTrue(puzzle.category() == "Mate")
+
 
 if __name__ == '__main__':
     unittest.main()
