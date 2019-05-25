@@ -74,6 +74,10 @@ class Puzzle(object):
         self.initial_position = PuzzlePosition(self.initial_board, initial_move)
 
     def _player_moves_first(self) -> bool:
+        """ Determines if the player makes the first move in this puzzle
+            If yes, the first move is the best move (i.e. winning position, checkmate puzzle)
+            If no, the first move is a blunder/mistake by the opponent
+        """
         if self.initial_score.is_mate() and not self.initial_move:
             # it's a checkmate puzzle without a move sequence
             white_to_move = self.initial_board.turn
@@ -96,7 +100,9 @@ class Puzzle(object):
             return True
 
     def _calculate_final_score(self, depth):
-        """ multipv 1 """
+        """ Get the score of the final board position in the puzzle
+            after the last move is made
+        """
         final_score = self.positions[-1].score
         if final_score:
             self.final_score = final_score

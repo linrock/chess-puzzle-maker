@@ -9,9 +9,10 @@ from modules.colors import Color
 from modules.analysis import AnalysisEngine
 from modules.puzzle import Puzzle
 from modules.utils import sign, material_total, material_count
+from modules.constants import SCAN_DEPTH
 
 
-def find_puzzle_candidates(game: Game, scan_depth=16) -> List[Puzzle]:
+def find_puzzle_candidates(game: Game, scan_depth=SCAN_DEPTH) -> List[Puzzle]:
     """ finds puzzle candidates from a chess game 
     """
     log(Color.DIM, "Scanning game for puzzles (depth: %d)..." % scan_depth)
@@ -27,14 +28,9 @@ def find_puzzle_candidates(game: Game, scan_depth=16) -> List[Puzzle]:
         highlight_move = False
         if should_investigate(prev_score, cur_score, board):
             highlight_move = True
-            # Found a possible puzzle
-            # don't check for move ambiguity if it's the first position in
-            # the PGN since the PGN might be a puzzle instead of a game
             puzzle = Puzzle(
                 board,
                 next_node.move,
-                # check_ambiguity=True,
-                # check_ambiguity=i > 0
             )
             puzzles.append(puzzle)
         log_move(board, next_node.move, cur_score, highlight=highlight_move)
