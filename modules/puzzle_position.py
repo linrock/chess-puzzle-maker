@@ -72,6 +72,9 @@ class PuzzlePosition(object):
         if self._num_legal_moves() > 1:
             self._calculate_candidate_moves(depth)
 
+    def is_mate(self) -> bool:
+        return self.score and self.score.is_mate()
+
     def is_ambiguous(self) -> bool:
         """ True if it's unclear whether there's a single best move from
             this position

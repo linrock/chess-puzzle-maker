@@ -88,7 +88,7 @@ class Puzzle(object):
                 return True
             elif not white_to_move and self.initial_score.mate() < 0:
                 return True
-        elif self.initial_move and self.initial_position.score.is_mate():
+        elif self.initial_move and self.initial_position.is_mate():
             # player just moved and has a winning position to checkmate the opponent
             white_just_moved = not self.initial_position.board.turn
             if self.initial_score.is_mate():

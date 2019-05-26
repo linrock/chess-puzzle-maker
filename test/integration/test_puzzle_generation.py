@@ -239,10 +239,17 @@ class TestPuzzleIsComplete(unittest.TestCase):
 
     def test_game_over_position(self):
         board = chess.Board(
+            '2Q5/k7/5B2/2P5/5RK1/6P1/8/8 w - - 1 57'
+        )
+        puzzle = Puzzle(board, board.parse_san('Bd4'))
+        puzzle.generate(depth=SEARCH_DEPTH)
+        self.assertFalse(puzzle.is_complete())
+        board = chess.Board(
             '2Q5/k7/8/2P5/3B1RK1/6P1/8/8 b - - 2 57'
         )
         puzzle = Puzzle(board)
         puzzle.generate(depth=SEARCH_DEPTH)
+        self.assertFalse(puzzle.is_complete())
 
 
 if __name__ == '__main__':
