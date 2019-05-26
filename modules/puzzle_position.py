@@ -23,7 +23,8 @@ class PuzzlePosition(object):
         self.initial_board: Board = initial_board.copy()
         self.initial_move: Move = initial_move
         self.board = initial_board.copy()
-        self.board.push(initial_move)
+        if initial_move:
+            self.board.push(initial_move)
         self.best_move: Move = None
         self.score: Score = None
         self.candidate_moves: List[AnalyzedMove] = []
@@ -44,7 +45,7 @@ class PuzzlePosition(object):
     def _calculate_best_move(self, depth):
         """ Find the best move from board position using multipv 1
         """
-        log(Color.DIM, "Evaluating best move (depth %d)..." % depth)
+        log(Color.BLACK, "Evaluating best move (depth %d)..." % depth)
         best_move = AnalysisEngine.best_move(self.board, depth)
         self.best_move = best_move.move
         self.score = best_move.score
@@ -56,7 +57,7 @@ class PuzzlePosition(object):
         """ Find the best move from board position using multipv 3
         """
         multipv = NUM_CANDIDATE_MOVES
-        log(Color.DIM, "Evaluating best %d moves (depth %d)..." % (multipv, depth))
+        log(Color.BLACK, "Evaluating best %d moves (depth %d)..." % (multipv, depth))
         self.candidate_moves = AnalysisEngine.best_moves(self.board, depth, multipv)
         for analyzed_move in self.candidate_moves:
             self._log_move(analyzed_move.move, analyzed_move.score)

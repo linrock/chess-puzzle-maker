@@ -237,6 +237,13 @@ class TestPuzzleIsComplete(unittest.TestCase):
         self.assertFalse(puzzle.is_complete())
         self.assertTrue(puzzle.category() == "Mate")
 
+    def test_game_over_position(self):
+        board = chess.Board(
+            '2Q5/k7/8/2P5/3B1RK1/6P1/8/8 b - - 2 57'
+        )
+        puzzle = Puzzle(board)
+        puzzle.generate(depth=SEARCH_DEPTH)
+
 
 if __name__ == '__main__':
     unittest.main()

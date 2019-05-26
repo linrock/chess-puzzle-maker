@@ -47,11 +47,12 @@ class Puzzle(object):
         self.analyzed_moves = []
 
     def _analyze_best_initial_move(self, depth) -> Move:
-        log(Color.DIM, "Evaluating best initial move (depth %d)..." % depth)
+        log(Color.BLACK, "Evaluating best initial move (depth %d)..." % depth)
         best_move = AnalysisEngine.best_move(self.initial_board, depth)
-        self.analyzed_moves.append(best_move)
+        if best_move.move:
+            self.analyzed_moves.append(best_move)
+            log_move(self.initial_board, best_move.move, best_move.score, show_uci=True)
         self.initial_score = best_move.score
-        log_move(self.initial_board, best_move.move, best_move.score, show_uci=True)
         return best_move.move
 
     def _analyze_initial_moves(self, depth):
@@ -62,15 +63,17 @@ class Puzzle(object):
         if not self.initial_move:
             return
         elif self.initial_move == best_move:
-            log(Color.DIM, "The move played was the best move")
+            log(Color.BLACK, "The move played was the best move")
         else:
-            log(Color.DIM, "Evaluating played initial move (depth %d)..." % depth)
+            log(Color.BLACK, "Evaluating played initial move (depth %d)..." % depth)
             analyzed_move = AnalysisEngine.evaluate_move(self.initial_board, self.initial_move, depth)
             self.analyzed_moves.append(analyzed_move)
             log_move(self.initial_board, self.initial_move, analyzed_move.score, show_uci=True)
 
     def _set_initial_position(self):
-        initial_move = self.initial_move or self.analyzed_moves[0].move
+        initial_move = self.initial_move
+        if not initial_move and len(self.analyzed_moves) > 0:
+            initial_move = self.analyzed_moves[0].move
         self.initial_position = PuzzlePosition(self.initial_board, initial_move)
 
     def _player_moves_first(self) -> bool:
@@ -85,7 +88,7 @@ class Puzzle(object):
                 return True
             elif not white_to_move and self.initial_score.mate() < 0:
                 return True
-        elif self.initial_position.score.is_mate() and self.initial_move:
+        elif self.initial_move and self.initial_position.score.is_mate():
             # player just moved and has a winning position to checkmate the opponent
             white_just_moved = not self.initial_position.board.turn
             if self.initial_score.is_mate():
@@ -142,7 +145,6 @@ class Puzzle(object):
                 log(Color.DIM, log_str)
             position = PuzzlePosition(position.board, position.best_move)
             position.evaluate(depth)
-            # if self.check_ambiguity:
             is_player_move = not is_player_move
         self._calculate_final_score(depth)
         if self.is_complete():
