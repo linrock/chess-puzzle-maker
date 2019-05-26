@@ -51,10 +51,21 @@ def log_move(board: Board, move: Move, score: Score,
     else:
         log_str = log_str.ljust(15)
     log_str += Color.ENDC + Color.BLUE
-    if score.is_mate():
-        log_str += ("   Mate: %d" % score.mate()).ljust(12)
-    else:
-        log_str += ("   CP: %d" % score.score()).ljust(12)
+    log_str += "  " + _score_str(score)
     if highlight:
         log_str += Color.YELLOW + "   Investigate!"
     log(Color.GREEN, log_str)
+
+def _score_str(score) -> str:
+    color = Color.WHITE
+    if score.is_mate():
+        sc = score.mate()
+        if sc < 0:
+            color = Color.DARK_GREY
+        log_str = "%sMate: %s%d" % (Color.BLUE, color, sc)
+    else:
+        sc = score.score()
+        if sc < 0:
+            color = Color.DARK_GREY
+        log_str = "%sCP: %s%d" % (Color.BLUE, color, sc)
+    return log_str.ljust(10 + len(Color.BLUE + color)) + Color.ENDC
