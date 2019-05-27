@@ -1,8 +1,8 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from collections import namedtuple
 import shutil
 
-from chess.engine import SimpleEngine, Limit, Score
+from chess.engine import SimpleEngine, Limit, Score, EngineTerminatedError, InfoDict
 
 from modules.fishnet import stockfish_command
 from modules.utils import sign
@@ -27,13 +27,17 @@ class AnalysisEngine(object):
 
     @staticmethod
     def quit():
-        if AnalysisEngine.engine:
+        if not AnalysisEngine.engine:
+            return
+        try:
             AnalysisEngine.engine.quit()
-            AnalysisEngine.engine = None
+        except:
+            pass
+        AnalysisEngine.engine = None
 
     @staticmethod
     def best_move(board, depth) -> AnalyzedMove:
-        info = AnalysisEngine.instance().analyse(board, Limit(depth=depth))
+        info = AnalysisEngine._analyze(board, depth)
         if info.get("pv"):
             best_move = info["pv"][0]
         else:
@@ -44,7 +48,7 @@ class AnalysisEngine(object):
     @staticmethod
     def best_moves(board, depth, multipv=3) -> List[AnalyzedMove]:
         best_moves = []
-        infos = AnalysisEngine.instance().analyse(board, Limit(depth=depth), multipv=multipv)
+        infos = AnalysisEngine._analyze(board, depth, multipv=multipv)
         for info in infos:
             move = info["pv"][0]
             score = info["score"].white()
@@ -53,15 +57,22 @@ class AnalysisEngine(object):
 
     @staticmethod
     def evaluate_move(board, move, depth) -> AnalyzedMove:
-        info = AnalysisEngine.instance().analyse(board, Limit(depth=depth), root_moves=[move])
+        info = AnalysisEngine._analyze(board, depth, root_moves=[move])
         assert move == info["pv"][0]
         score = info["score"].white()
         return AnalyzedMove(move, board.san(move), score)
 
     @staticmethod
     def score(board, depth) -> Score:
-        info = AnalysisEngine.instance().analyse(board, Limit(depth=depth))
-        return info["score"].white()
+        return AnalysisEngine.best_move(board, depth).score
+
+    @staticmethod
+    def _analyze(board, depth, **kwargs) -> Union[List[InfoDict], InfoDict]:
+        try:
+            info = AnalysisEngine.instance().analyse(board, Limit(depth=depth), **kwargs)
+        except EngineTerminatedError:
+            AnalysisEngine._analyze(board, depth, **kwargs)
+        return info
 
 
 def ambiguous_best_move(scores: List[Score]) -> bool:
