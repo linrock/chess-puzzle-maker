@@ -71,6 +71,7 @@ class AnalysisEngine(object):
         try:
             info = AnalysisEngine.instance().analyse(board, Limit(depth=depth), **kwargs)
         except EngineTerminatedError:
+            AnalysisEngine.quit()
             AnalysisEngine._analyze(board, depth, **kwargs)
         return info
 
