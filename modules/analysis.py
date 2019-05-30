@@ -5,6 +5,8 @@ import shutil
 from chess.engine import SimpleEngine, Limit, Score, EngineTerminatedError, InfoDict
 
 from modules.fishnet import stockfish_command
+from modules.logger import log
+from modules.colors import Color
 from modules.utils import sign
 
 AnalyzedMove = namedtuple("AnalyzedMove", ["move", "move_san", "score"])
@@ -71,8 +73,9 @@ class AnalysisEngine(object):
         try:
             info = AnalysisEngine.instance().analyse(board, Limit(depth=depth), **kwargs)
         except EngineTerminatedError:
+            log(Color.RED, "Analysis engine crashed... restarting")
             AnalysisEngine.quit()
-            AnalysisEngine._analyze(board, depth, **kwargs)
+            info = AnalysisEngine._analyze(board, depth, **kwargs)
         return info
 
 
