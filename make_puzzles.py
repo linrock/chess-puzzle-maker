@@ -133,4 +133,4 @@ log(
     Color.MAGENTA,
     "\nGenerated %d puzzles from %d positions in %d games" % (n_puzzles, n_positions, game_id)
 )
-engine.quit()
+AnalysisEngine.quit()
