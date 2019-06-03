@@ -2,6 +2,7 @@ import chess
 import chess.pgn
 
 from modules.analysis import AnalysisEngine
+from modules.version import __version__
 
 
 def _score_to_str(score) -> str:
@@ -54,6 +55,7 @@ class PuzzlePgn(object):
         if puzzle_winner:
             game.headers['PuzzleWinner'] = puzzle_winner
         game.headers['PuzzleEngine'] = AnalysisEngine.name()
+        game.headers['PuzzleMakerVersion'] = __version__
         return game
 
     def to_pgn(self, pgn_headers=None) -> str:
