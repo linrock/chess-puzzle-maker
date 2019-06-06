@@ -1,5 +1,5 @@
 import chess
-import chess.pgn
+from chess.pgn import Game
 
 from modules.analysis import AnalysisEngine
 from modules.version import __version__
@@ -11,14 +11,14 @@ def _score_to_str(score) -> str:
     else:
         return score.cp
 
-class PuzzlePgn(object):
+class PuzzleExporter(object):
     """ Exports a puzzle to a PGN file
     """
     def __init__(self, puzzle):
         self.puzzle = puzzle
 
-    def _candidate_moves_annotations(self, candidate_moves):
-        """ Returns the scores of the possible candidate moves
+    def _candidate_moves_annotations(self, candidate_moves) -> str:
+        """ Returns the candidate moves with evaluations for PGN comments
         """
         comment = ""
         for candidate_move in candidate_moves:
@@ -26,12 +26,12 @@ class PuzzlePgn(object):
             comment += " (%s) " % _score_to_str(candidate_move.score)
         return comment.strip()
 
-    def export(self, pgn_headers=None) -> chess.pgn.Game:
+    def export(self, pgn_headers=None) -> Game:
         """ pgn_headers - PGN headers to include in the exported PGN
         """
         fen = self.puzzle.initial_board.fen()
         board = chess.Board(fen)
-        game = chess.pgn.Game().from_board(board)
+        game = Game().from_board(board)
         game_node = game
         game_node.comment = "score: %s -> %s" % (
             _score_to_str(self.puzzle.initial_score),

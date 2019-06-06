@@ -5,7 +5,7 @@ from chess import Move
 import chess.pgn
 
 from modules.puzzle_position import PuzzlePosition
-from modules.puzzle_pgn import PuzzlePgn
+from modules.puzzle_exporter import PuzzleExporter
 from modules.logger import log, log_board, log_move
 from modules.colors import Color
 from modules.analysis import AnalysisEngine, AnalyzedMove
@@ -153,7 +153,7 @@ class Puzzle(object):
             log(Color.RED, "Puzzle incomplete")
 
     def to_pgn(self, pgn_headers=None) -> chess.pgn.Game:
-        return PuzzlePgn(self).to_pgn(pgn_headers)
+        return PuzzleExporter(self).to_pgn(pgn_headers)
 
     def category(self) -> Optional[str]:
         """ Mate     - win by checkmate
