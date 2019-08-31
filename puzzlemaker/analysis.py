@@ -4,10 +4,10 @@ import shutil
 
 from chess.engine import SimpleEngine, Limit, Score, EngineTerminatedError, InfoDict
 
-from modules.fishnet import stockfish_command
-from modules.logger import log
-from modules.colors import Color
-from modules.utils import sign
+from puzzlemaker.fishnet import stockfish_command
+from puzzlemaker.logger import log
+from puzzlemaker.colors import Color
+from puzzlemaker.utils import sign
 
 AnalyzedMove = namedtuple("AnalyzedMove", ["move", "move_san", "score"])
 

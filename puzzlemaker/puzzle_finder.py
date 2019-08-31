@@ -4,12 +4,12 @@ from chess import Board
 from chess.pgn import Game
 from chess.engine import Score, Cp
 
-from modules.logger import log, log_move
-from modules.colors import Color
-from modules.analysis import AnalysisEngine
-from modules.puzzle import Puzzle
-from modules.utils import sign, material_total, material_count
-from modules.constants import SCAN_DEPTH
+from puzzlemaker.logger import log, log_move
+from puzzlemaker.colors import Color
+from puzzlemaker.analysis import AnalysisEngine
+from puzzlemaker.puzzle import Puzzle
+from puzzlemaker.utils import sign, material_total, material_count
+from puzzlemaker.constants import SCAN_DEPTH
 
 
 def find_puzzle_candidates(game: Game, scan_depth=SCAN_DEPTH) -> List[Puzzle]:

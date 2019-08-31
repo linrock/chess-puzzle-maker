@@ -10,12 +10,12 @@ import sys
 from chess import Board
 import chess.pgn
 
-from modules.colors import Color
-from modules.puzzle import Puzzle
-from modules.logger import configure_logging, log
-from modules.puzzle_finder import find_puzzle_candidates
-from modules.analysis import AnalysisEngine
-from modules.constants import SCAN_DEPTH, SEARCH_DEPTH
+from puzzlemaker.colors import Color
+from puzzlemaker.puzzle import Puzzle
+from puzzlemaker.logger import configure_logging, log
+from puzzlemaker.puzzle_finder import find_puzzle_candidates
+from puzzlemaker.analysis import AnalysisEngine
+from puzzlemaker.constants import SCAN_DEPTH, SEARCH_DEPTH
 
 parser = argparse.ArgumentParser(
     description=__doc__,

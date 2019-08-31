@@ -5,10 +5,10 @@ import unittest
 import chess
 import chess.pgn
 
-from modules.puzzle import Puzzle
-from modules.analysis import AnalysisEngine
+from puzzlemaker.puzzle import Puzzle
+from puzzlemaker.analysis import AnalysisEngine
 
-# from modules.logger import configure_logging
+# from puzzlemaker.logger import configure_logging
 # configure_logging()
 
 # use a lower search depth when possible for faster tests

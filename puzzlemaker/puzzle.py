@@ -4,13 +4,13 @@ from typing import Optional
 from chess import Move
 import chess.pgn
 
-from modules.puzzle_position import PuzzlePosition
-from modules.puzzle_exporter import PuzzleExporter
-from modules.logger import log, log_board, log_move
-from modules.colors import Color
-from modules.analysis import AnalysisEngine, AnalyzedMove
-from modules.utils import material_difference
-from modules.constants import MIN_PLAYER_MOVES
+from puzzlemaker.puzzle_position import PuzzlePosition
+from puzzlemaker.puzzle_exporter import PuzzleExporter
+from puzzlemaker.logger import log, log_board, log_move
+from puzzlemaker.colors import Color
+from puzzlemaker.analysis import AnalysisEngine, AnalyzedMove
+from puzzlemaker.utils import material_difference
+from puzzlemaker.constants import MIN_PLAYER_MOVES
 
 
 class Puzzle(object):

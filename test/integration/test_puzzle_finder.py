@@ -4,8 +4,8 @@ import unittest
 
 import chess.pgn
 
-from modules.puzzle_finder import find_puzzle_candidates
-from modules.analysis import AnalysisEngine
+from puzzlemaker.puzzle_finder import find_puzzle_candidates
+from puzzlemaker.analysis import AnalysisEngine
 
 
 def pgn_file_path(pgn_filename) -> io.TextIOWrapper:

@@ -5,8 +5,8 @@ import logging
 from chess import Move, Board
 from chess.engine import Score
 
-from modules.colors import Color
-from modules.utils import fullmove_string
+from puzzlemaker.colors import Color
+from puzzlemaker.utils import fullmove_string
 
 
 def configure_logging(level=logging.DEBUG):

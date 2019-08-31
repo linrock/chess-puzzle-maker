@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from chess.engine import Cp, Mate
 
-from modules.analysis import ambiguous_best_move
+from puzzlemaker.analysis import ambiguous_best_move
 
 
 class TestAmbiguous(unittest.TestCase):

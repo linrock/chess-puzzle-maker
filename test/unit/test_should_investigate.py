@@ -3,7 +3,7 @@ import unittest
 from chess import Board
 from chess.engine import Cp, Mate
 
-from modules.puzzle_finder import should_investigate
+from puzzlemaker.puzzle_finder import should_investigate
 
 board = Board()
 

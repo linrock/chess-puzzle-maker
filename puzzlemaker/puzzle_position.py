@@ -4,11 +4,11 @@ from collections import namedtuple
 from chess import Board, Move
 from chess.engine import Score
 
-from modules.logger import log, log_board, log_move
-from modules.colors import Color
-from modules.analysis import AnalysisEngine, AnalyzedMove, ambiguous_best_move
-from modules.utils import material_difference, material_count, fullmove_string
-from modules.constants import NUM_CANDIDATE_MOVES
+from puzzlemaker.logger import log, log_board, log_move
+from puzzlemaker.colors import Color
+from puzzlemaker.analysis import AnalysisEngine, AnalyzedMove, ambiguous_best_move
+from puzzlemaker.utils import material_difference, material_count, fullmove_string
+from puzzlemaker.constants import NUM_CANDIDATE_MOVES
 
 
 class PuzzlePosition(object):

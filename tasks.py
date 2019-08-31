@@ -1,5 +1,5 @@
 from invoke import task
-from modules.fishnet import stockfish_command
+from puzzlemaker.fishnet import stockfish_command
 
 @task
 def test(c, unit=False, integration=False):

@@ -1,8 +1,8 @@
 import chess
 from chess.pgn import Game
 
-from modules.analysis import AnalysisEngine
-from modules.version import __version__
+from puzzlemaker.analysis import AnalysisEngine
+from puzzlemaker.version import __version__
 
 
 def _score_to_str(score) -> str:
