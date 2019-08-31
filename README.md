@@ -28,16 +28,18 @@ Install the required python libraries:
 
 `pip3 install -r requirements.txt`
 
-Download an official Stockfish binary from the [Stockfish website](https://stockfishchess.org/download/) and make sure `stockfish` is available in your `$PATH`
+And have a version of Stockfish available in your `$PATH`:
 
-Or run `inv update-stockfish` to get the latest multi-variant Stockfish fork used by Lichess.
+* Download an official Stockfish binary from the [Stockfish website](https://stockfishchess.org/download/)
+* Or run `inv update-stockfish` to get the latest multi-variant Stockfish fork used by Lichess
 
 
-### Output
+## Creating puzzles
 
-By default, the resulting puzzles will be printed in PGN format to standard output while errors and log messages are printed to standard error.
+Created puzzles are printed in PGN format to standard output
+while errors and log messages are printed to standard error.
 
-If you want to write the puzzles to a file, redirect standard output:
+If you want to write created puzzles to a file, redirect standard output:
 
 `./make_puzzles.py --pgn games.pgn >> puzzles.pgn`
 
@@ -50,26 +52,43 @@ An example PGN output:
 [PuzzleWinner "Black"]
 [SetUp "1"]
 
-26... Nxe5   { Nxe5  (-168) }
-27.   Rxg8   { Rxg8  (-166) Rgh4 (-251)  Re4 (-351) }
-27... Nxc4+  { Nxc4+ (-178) Rxg8 ( 382)  Nf3+ (479) }
-28.   Kd3    { Kd3   (-155) Ke2  (-183)  Kd1 (-285) }
-28... Nb2+   { Nb2+  (-178) Rxg8 ( 211)  Ne5+ (344) }
-29.   Ke2    { Kd2   (-164) Ke2  (-174)             }
+26... Nxe5   { Nxe5  [-1.68] }
+27.   Rxg8   { Rxg8  [-1.66] Rgh4 [-2.51]  Re4  [-3.51] }
+27... Nxc4+  { Nxc4+ [-1.78] Rxg8 [ 3.82]  Nf3+ [ 4.79] }
+28.   Kd3    { Kd3   [-1.55] Ke2  [-1.83]  Kd1  [-2.85] }
+28... Nb2+   { Nb2+  [-1.78] Rxg8 [ 2.11]  Ne5+ [ 3.44] }
+29.   Ke2    { Kd2   [-1.64] Ke2  [-1.74]               }
 ```
 
-Each move is annotated with the scores for the best possible moves from that position
-as determined by the chess engine.
+Each move in the puzzle is annotated with the best 3 candidate moves
+considered by the chess engine.
 
 
-### Tests
+## Examples
 
-You can run the whole test suite with
+To scan a PGN for positions that might be candidate puzzles without
+investigating any of the positions:
+
+`./make_puzzles.py --scan-only --pgn games.pgn`
+
+To start at the n-th PGN in a file:
+
+`./make_puzzles.py --start-index 1234 --pgn games.pgn`
+
+To fetch a Lichess game and save it as a PGN:
+
+`inv fetch-lichess -g 12345`
+
+To fetch all games from a Lichess tournament and save the games to PGN:
+
+`inv fetch-lichess -t 67890`
+
+You can run the whole test suite with:
 
 `inv test`
 
 
-### Acknowledgements
+## Acknowledgements
 
 This program is based on:
 
