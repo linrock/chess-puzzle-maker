@@ -47,8 +47,7 @@ group.add_argument("--search-depth", metavar="DEPTH", nargs="?",
 # Misc settings
 parser.add_argument("--start-index", metavar="INDEX", type=int, default=0,
                     help="Start at the n-th game in a PGN (starting at 0)")
-parser.add_argument("--quiet", dest="loglevel",
-                    default=logging.DEBUG, action="store_const", const=logging.INFO,
+parser.add_argument("--quiet", default=False, action="store_true",
                     help="substantially reduce the number of logged messages")
 parser.add_argument("--scan-only", default=False, action="store_true",
                     help="Only scan for possible puzzles. Don't analyze positions")
@@ -75,7 +74,10 @@ engine.configure({
   'Contempt': 0,
 })
 
-configure_logging(level=settings.loglevel)
+if settings.quiet:
+    configure_logging(level=logging.INFO)
+else:
+    configure_logging(level=logging.DEBUG)
 
 def print_puzzle_pgn(puzzle, pgn_headers=None):
     puzzle_pgn = puzzle.to_pgn(pgn_headers=pgn_headers)
