@@ -1,11 +1,11 @@
 # Chess puzzle maker
 
-This program creates chess puzzles from positions with clear sequences of best moves.
+This is a command-line program that creates chess puzzles from positions with clear sequences of best moves.
 It looks for positions where a player can:
 
 * Checkmate the opponent in a forced sequence
-* Convert a position into a material advantage after a mistake by the opponent
-* Equalize a losing position after a mistake by the opponent
+* Convert a position into a material advantage
+* Equalize a losing position
 
 Give it a PGN with any number of games or positions and it will look for positions to convert into puzzles:
 
@@ -43,7 +43,21 @@ If you want to write created puzzles to a file, redirect standard output:
 
 `./make_puzzles.py --pgn games.pgn >> puzzles.pgn`
 
-An example PGN output:
+
+## How it works
+
+It scans the moves of a game for mistakes, represented by large swings in position evaluation.
+
+<img src="https://user-images.githubusercontent.com/208617/70076652-3af78380-15cd-11ea-969b-217789c5401b.png" width=340 />
+
+For each of these positions, it looks for move sequences where the player can make one clear best move.
+
+<img src="https://user-images.githubusercontent.com/208617/70076756-742ff380-15cd-11ea-828a-44f0ed12b78d.png" width=340 />
+
+If it finds that the position could become a puzzle, it will output the puzzle as a PGN.
+
+
+## Example PGN output
 
 ```
 [FEN "6rr/1k3p2/1pb1p1np/p1p1P2R/2P3R1/2P1B3/P1BK1PP1/8 b - - 5 26"]
@@ -64,14 +78,14 @@ Each move in the puzzle is annotated with the best 3 candidate moves
 considered by the chess engine.
 
 
-## Examples
+## Example commands
 
 To scan a PGN for positions that might be candidate puzzles without
 investigating any of the positions:
 
 `./make_puzzles.py --scan-only --pgn games.pgn`
 
-To start at the n-th PGN in a file:
+To start at the n-th PGN in a PGN file with lots of games:
 
 `./make_puzzles.py --start-index 1234 --pgn games.pgn`
 
