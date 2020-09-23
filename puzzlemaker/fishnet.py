@@ -14,7 +14,6 @@ import ctypes
 import http.client as httplib
 import urllib.parse as urlparse
 import urllib.request as urlrequest
-import urllib
 
 
 def stockfish_command(update=False):
