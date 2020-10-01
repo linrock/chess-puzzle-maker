@@ -1,5 +1,6 @@
 from typing import List, Optional, Union
 from collections import namedtuple
+import glob
 import shutil
 
 from chess.engine import SimpleEngine, Limit, Score, EngineTerminatedError, InfoDict
@@ -132,5 +133,9 @@ def _stockfish_command() -> Optional[str]:
     cmd = stockfish_command()
     if shutil.which(cmd):
         return stockfish_command()
+    local_stockfish_bins = glob.glob("./stockfish-*")
+    if local_stockfish_bins:
+        # matches 'stockfish-x86_64' in local dir after running build-stockfish.sh
+        return local_stockfish_bins[0]
     else:
         return shutil.which("stockfish")
