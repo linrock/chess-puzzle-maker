@@ -7,7 +7,7 @@ if [ -d Stockfish/src ]; then
     make clean > /dev/null
     git pull
 else
-    git clone --depth 1 https://github.com/niklasf/Stockfish.git --branch fishnet
+    git clone --depth 1 https://github.com/official-stockfish/Stockfish.git
     cd Stockfish/src
 fi
 
