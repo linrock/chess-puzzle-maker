@@ -28,9 +28,12 @@ Install the required python libraries:
 
 `pip3 install -r requirements.txt`
 
-And have a version of Stockfish available in your `$PATH`:
+Make sure you have a version of Stockfish available in your `$PATH` or local directory:
 
-* Download an official Stockfish binary from the [Stockfish website](https://stockfishchess.org/download/)
+* You can install a Stockfish binary using Homebrew if you're on macOS (`brew install stockfish`)
+* Or install an old version of Stockfish using apt if you're on Ubuntu Linux (`sudo apt install stockfish`)
+* Or download an official Stockfish release from the [Stockfish website](https://stockfishchess.org/download/)
+* Or run `./build-stockfish.sh` to compile the latest [official Stockfish development build](https://github.com/official-stockfish/Stockfish)
 * Or run `inv update-stockfish` to get the latest multi-variant Stockfish fork used by Lichess
 
 
