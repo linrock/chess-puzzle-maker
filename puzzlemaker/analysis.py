@@ -41,11 +41,10 @@ class AnalysisEngine(object):
     @staticmethod
     def best_move(board, depth) -> AnalyzedMove:
         info = AnalysisEngine._analyze(board, depth)
-        if info.get("pv"):
-            best_move = info["pv"][0]
-        else:
-            best_move = None
         score = info["score"].white()
+        if not info.get("pv"):
+            return AnalyzedMove(None, None, score)
+        best_move = info["pv"][0]
         return AnalyzedMove(best_move, board.san(best_move), score)
 
     @staticmethod
