@@ -60,4 +60,3 @@ class PuzzleExporter(object):
 
     def to_pgn(self, pgn_headers=None) -> str:
         return str(self.export(pgn_headers)).replace("}", "}\n")
-

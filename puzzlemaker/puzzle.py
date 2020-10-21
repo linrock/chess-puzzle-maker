@@ -166,7 +166,7 @@ class Puzzle(object):
         final_cp = self.final_score.score()
         if initial_cp is not None and final_cp is not None:
             # going from a disadvantage to an equal position
-            if abs(initial_cp) > 2 and abs(final_cp) < 0.9:
+            if abs(initial_cp) > 200 and abs(final_cp) < 90:
                 return "Equalize"
             # otherwise, the puzzle is only complete if the score changed
             # significantly after the initial position and was converted
