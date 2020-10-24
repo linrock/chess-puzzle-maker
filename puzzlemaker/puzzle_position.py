@@ -30,8 +30,12 @@ class PuzzlePosition(object):
         self.candidate_moves: List[AnalyzedMove] = []
 
     def _log_position(self):
-        move_san = self.initial_board.san(self.initial_move)
-        log(Color.VIOLET, "\nAfter %s %s" % (fullmove_string(self.initial_board).strip(), move_san))
+        if self.initial_move:
+            move_san = self.initial_board.san(self.initial_move)
+            log(
+                Color.VIOLET,
+                "\nAfter %s %s" % (fullmove_string(self.initial_board).strip(), move_san)
+            )
         log_board(self.board)
         log(Color.DARK_BLUE, "Material difference:  %d" % material_difference(self.board))
         log(Color.DARK_BLUE, "# legal moves:        %d" % self._num_legal_moves())
