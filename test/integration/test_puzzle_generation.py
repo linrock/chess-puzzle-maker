@@ -48,7 +48,7 @@ class TestPuzzleIsComplete(unittest.TestCase):
         self.assertTrue(puzzle.is_complete())
         self.assertFalse(puzzle.player_moves_first)
         self.assertEqual(puzzle.category(), "Material")
-        expected_uci_moves = ['a7b7', 'd2g2', 'g1g2', 'c4d5', 'g2g1', 'd5b7']
+        expected_uci_moves = ['a7b7', 'd2g2', 'g1g2', 'c4d5', 'g2f1', 'd5b7']
         self.assertEqual(
             [str(p.initial_move) for p in puzzle.positions][:6],
             expected_uci_moves

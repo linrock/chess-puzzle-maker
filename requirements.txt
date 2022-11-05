@@ -1,4 +1,4 @@
-colorama==0.3.7
-requests==2.20.0
-python-chess==0.28.0
-invoke==1.2.0
+colorama==0.4.6
+requests==2.28.1
+chess==1.9.3
+invoke==1.7.3
