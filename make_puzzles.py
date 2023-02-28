@@ -71,7 +71,6 @@ engine = AnalysisEngine.instance()
 engine.configure({
   'Threads': settings.threads,
   'Hash': settings.memory,
-  'Contempt': 0,
 })
 
 if settings.quiet:
